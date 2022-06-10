@@ -1,2 +1,2 @@
-# drizzlingPSFs
-Correctly drizzling ACS PSFs to account for geometric corrections
+# spike
+Command line tool to correctly drizzle ACS PSFs, accounting for geometric corrections.
