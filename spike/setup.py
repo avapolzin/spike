@@ -2,11 +2,11 @@ import setuptools
 
 setuptools.setup(
 	name = "spike",
-	version = "1.0",
+	version = "0.1",
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle HST and JWST PSFs for improved analyses.",
-	packages = ["spike", "spike/hst", "spike/jwst"],
+	packages = ["spike", "spike/hst", "spike/jwst", "spike/roman"],
 	url = "https://github.com/avapolzin/spike",
 	license = 'MIT',
 	classifiers = [
@@ -18,5 +18,5 @@ setuptools.setup(
 		"Topic :: Scientific/Engineering :: Astronomy",
 		"Topic :: Scientific/Engineering :: Physics"],
 	python_requires = ">=3",
-	install_requires = ["astropy", "drizzlepac", "glob", "os", "subprocess"]
+	install_requires = ["astropy", "drizzlepac", "matplotlib", "mpi4py", "numpy", "webbpsf"]
 )
