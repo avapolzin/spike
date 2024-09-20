@@ -26,31 +26,40 @@ Point spread functions (PSFs) describe the distribution of light for a pure poin
 
 The PSF of co-added images is of generic interest to both ground- and space-based instruments, as it can be impacted by differing co-addition schemes and may have an effect on the analysis of those data [@Mandelbaum.etal.2023]. The cumulative effect of the geometric distortions and offsets in angle and pixel location of space-based data are apparent in the effective PSF of the co-added and resampled (drizzled; @CITE) image, making a PSF modeled on uncombined images insufficient for careful photometric analyses. This is a recognized limitation of existing PSF models, and `DrizzlePac` recently added functionality to use drizzled pre-computed model PSFs in their native photometric catalog generator [@DrizzlePac3.3.0]. This drizzled PSF uses generic `TinyTim` [@Krist.etal.2011] models, which do not account for source position on the chip and do not allow the user to set model parameters without overwriting the existing grid of model PSFs. Simultaneously, the resultant co-added PSF is not output, and there is not an existing, simple way to generate drizzled PSFs for use in other analyses. Instead, an empirical PSF may be taken from the data or unsaturated stars near the object of interest may be selected as an proxy for the PSF. For particularly crowded fields, or those where most stars are saturated, these alternatives pose a real problem.
 
-For analyses to be consistent, mock PSFs may be used, but the proper treatment of them involves generating model PSFs and then co-adding them in the same way as the parent images are co-added. Given the number of steps between the selection of an object and the creation of a cumulative mock PSF in the region of that object, it can be onerous to generate "realistic" PSFs for application to data. The code presented here, `spike`, streamlines the process, taking images and coordinates and directly outputting correctly co-added model PSFs for either the _Hubble Space Telescope_, the _James Webb Space Telescope_, or the upcoming Nancy Grace Roman Space Telescope. Model PSFs can be generated using different industry-standard packages, `TinyTim` [@Krist.etal.2011] and `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], or users can provide model PSFs associated with individual images. As a result, `spike` is both easy to use and flexible. 
+For analyses to be consistent, mock PSFs may be used, but the proper treatment of them involves generating model PSFs and then co-adding them in the same way as the parent images are co-added. Given the number of steps between the selection of an object and the creation of a cumulative mock PSF in the region of that object, it can be onerous to generate "realistic" PSFs for application to data. The code presented here, `spike`, streamlines the process, taking images and coordinates and directly outputting correctly co-added model PSFs for either the _Hubble Space Telescope_, the _James Webb Space Telescope_, or the upcoming Nancy Grace Roman Space Telescope. Model PSFs can be generated using different industry-standard packages, including `TinyTim` [@Krist.etal.2011] and `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], or users can provide model PSFs associated with individual images. As a result, `spike` is both easy to use and flexible. 
 
 # Workflow
 
 The premise of `spike` is that, given reduced, but not yet co-added, \_flt and \_flc from either _HST_ or _JWST_ and the coordinates of an object of interest, detector/chip-specifc model PSFs themselves can be directly "drizzled". The code can be run using images that have been "tweaked" or images that have not yet undergone any `astrodrizzle` post-processing.
 
-The package relies on `astropy`[CITE] for conversion of objects' astronomical coordinates (in right ascension and declination) to pixel coordinates (in X, Y), using the images' WCS. A model PSF is then generated for each unique input image and coordinates combination. Instrument information, including camera, filter, and, if necessary, chip, is automatically read directly from the header of each .fits file by default, but can be overridden by user choice. Similarly, users can generate PSF models using pre-defined defaults, update model parameters, or upload their own model PSFs to be drizzled. 
+The package relies on `astropy`[CITE] for conversion of objects' astronomical coordinates (in right ascension and declination) to pixel coordinates (in X, Y), using the images' WCS. A model PSF is then generated for each unique input image and coordinates combination. Instrument information, including camera, filter, and, if necessary, chip, is automatically read directly from the header of each .fits file by default, but can be overridden by user choice. Similarly, users can generate PSF models using pre-defined defaults, update model parameters, or upload their own model PSFs to be drizzled.
+
+Though a generic empirical PSF can be computed from the drizzled image, `spike` includes the ability for users to generate and drizzle empirical PSFs via a number of different codes. Computation of these PSFs may require more user input (such as selecting good stars for which to measure light profiles) and may take more time. The empirical models included here are chosen for relevance to high-resolution space-based data; user-generated PSFs from other tools may be used with `spike.psf`, but are not shipped as part of `spike.psfgen`.
+
+In most cases, users will only ever interact with the top-level functions `spike.psf.hst`, `spike.psf.jwst`, and `spike.psf.roman`. However, PSF model creation can be accessed directly via the functions in `spike.psfgen`, and this feature may be of added value to users on its own, as `spike` smoothes over some of the complication of individual tools as an all-in-one means of accessing model PSFs via simple Python functions.
 
 `spike` is also parallelized for use with large sets of coordinates using `mpi4py` [@Dalcin.etal.2005; @Dalcin.etal.2008; @Dalcin.etal.2011; @Dalcin.Fang.2021; @Rogowski.etal.2023], and the option to run the code in parallel is togglable. Note that multithreading will not work in Jupyter notebooks.  
 
-In addition to .fits outputs, it is possible to write .png images of the individual PSF models and the final co-add, which allows users to do quick visual inspection of the
+In addition to .fits outputs, it is possible to write .png images of the individual PSF models and the final co-add, which allows users to do quick visual inspection.
+
 
 # Preparation for Future Observatories
 
 Right now, the Roman pipeline uses the same drizzling implementation as _JWST_, and `WebbPSF` includes a module to simulate Roman PSFs. As a forward looking step, we include our own module to handle the proper co-addition of Roman PSFs. The `spike.roman` module does not include a separate step for subpixel alignment, as has been done for _HST_ and _JWST_ by "tweaking" images. Instead, model Roman PSFs are directly drizzled. When the observatory is actually launched and data become available, `spike` will be updated to reflect the most current version of the Nancy Grace Roman pipeline. Since Roman is not yet collecting data, all testing has been done on simulated data from @ CITE.
 
-Raw data are not yet available for the European Space Agency's _Euclid_ mission, which was launched in 2023. Initial analyses of the combined and processed _Euclid_ Early Release Science observations rely on empirical PSFs, carefully measured from co-added data [@ CITE]. A new _Euclid_ module will be added to `spike` as data and PSF modeling tools become available over the next years. Proper PSF co-addition is of particular importance to _Euclid_ to enable carefully calibrated measurements of cosmic shear. 
+Raw data are not yet available for the European Space Agency's _Euclid_ mission, which was launched in 2023. Initial analyses of the combined and processed _Euclid_ Early Release Science observations rely on empirical PSFs, carefully measured from co-added data [@ CITE]. A new _Euclid_ function will be added to `spike` as data and PSF modeling tools become available over the next years. Proper PSF co-addition is of particular importance to _Euclid_ to enable carefully calibrated measurements of cosmic shear. 
 
 # Software and Packages Used
- - `astropy`
- - `drizzlepac`
- - `matplotlib`
- - `mpi4py`
- - `numpy`
- - `webbpsf`
+ - `astropy` [@CITE]
+ - `drizzlepac` [@CITE]
+ - `matplotlib` [@CITE]
+ - `mpi4py` [@CITE]
+ - `numpy` [@CITE]
+ - `photutils` [@CITE]
+ - `PSFEx` [@CITE]
+ - `SExtractor` [@CITE]
+ - `TinyTim` [@CITE] -- including the option to use the @Gillis.etal.2020 parameters [@Gillis.2019]
+ - `webbpsf` [@CITE]
 
 # Acknowledgments
 

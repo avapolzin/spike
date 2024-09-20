@@ -6,7 +6,7 @@ setuptools.setup(
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle HST and JWST PSFs for improved analyses.",
-	packages = ["spike", "spike/hst", "spike/jwst", "spike/roman"],
+	packages = ["spike", "spike/psf", "spike/psfgen"],
 	url = "https://github.com/avapolzin/spike",
 	license = 'MIT',
 	classifiers = [
