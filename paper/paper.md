@@ -38,7 +38,7 @@ Though a generic empirical PSF can be computed from the drizzled image, `spike` 
 
 In most cases, users will only ever interact with the top-level functions `spike.psf.hst`, `spike.psf.jwst`, and `spike.psf.roman`. However, PSF model creation can be accessed directly via the functions in `spike.psfgen`, and this feature may be of added value to users on its own, as `spike` smoothes over some of the complication of individual tools as an all-in-one means of accessing model PSFs via simple Python functions.
 
-`spike` is also parallelized for use with large sets of coordinates using `mpi4py` [@Dalcin.etal.2005; @Dalcin.etal.2008; @Dalcin.etal.2011; @Dalcin.Fang.2021; @Rogowski.etal.2023], and the option to run the code in parallel is togglable. Note that multithreading will not work in Jupyter notebooks.  
+`spike` is also parallelized for use with large sets of coordinates using `multiprocess`, and the option to run the code in parallel is togglable. 
 
 In addition to .fits outputs, it is possible to write .png images of the individual PSF models and the final co-add, which allows users to do quick visual inspection.
 
@@ -53,7 +53,6 @@ Raw data are not yet available for the European Space Agency's _Euclid_ mission,
  - `astropy` [@CITE]
  - `drizzlepac` [@CITE]
  - `matplotlib` [@CITE]
- - `mpi4py` [@CITE]
  - `numpy` [@CITE]
  - `photutils` [@CITE]
  - `PSFEx` [@CITE]
@@ -65,6 +64,4 @@ Raw data are not yet available for the European Space Agency's _Euclid_ mission,
 
 AP is supported by the Quad Fellowship.
 
-
-MAKE TINY.config with all of the general PSF parameters not including chip location etc
 

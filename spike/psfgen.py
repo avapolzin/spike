@@ -1,46 +1,53 @@
 import os
 
 
+class Vividict(dict):
+	## with thanks to https://stackoverflow.com/a/24089632
+    def __missing__(self, key):
+        value = self[key] = type(self)()
+        return value
+
+
 ##########
 # * * * *
 ##########
 
-def tinypsf(coords, pretweaked = False, keeporig = True, plot = False, verbose = False):
+tinyparams = Vividict() #to index into TinyTim parameters from proper names
+tinyparams['camera']['name'] = ['ACS WFC', 'ACS HRC']
+tinyparams['camera']['value'] = [15, 16]
+
+
+def tinypsf(coords, img, plot = False, verbose = False):
 	"""
 	Generate HST PSFs using TinyTim.
+	In addition to making model PSF, write tweak parameters to header.
 
 	Parameters:
-		coords (str): Coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
+		coords (list): Pixel coordinates of object of interest.[X, Y, chip]
+		img (str): Path to image for which PSF is generated.
 		
 		img_type (str): 'flc', 'flt', 'c0f', 'c1f' -- specifies which file-type to include.
-		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
-		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
 	"""
 
 
-	if keeporig and not pretweaked:
-		os.system('mkdir '+img_dir+'_orig')
-		os.system('cp -r '+img_dir+' '+'img_dir'+'_copy')
-		if verbose:
-			print('Made copy of '+img_dir)
 
 
-
-def tinygillispsf(coords, pretweaked = False, keeporig = True, plot = False, keep = False, verbose = False):
+def tinygillispsf(coords, img, plot = False, keep = False, verbose = False):
 	"""
 	Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al (2020).
+	In addition to making model PSF, write tweak parameters to header.
 
 	Note that the Gillis et al. (2020) code will be downloaded to your working directory. If keep = False (default), 
 	it will be removed after use.
 
 	Parameters:
-		coords (str): Coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
+		coords (list): Pixel coordinates of object of interest. [X, Y, chip]
+		img (str): Path to image for which PSF is generated.
+
 		img_type (str): 'flc', 'flt', 'c0f', 'c1f' -- specifies which file-type to include.
 		inst (str): 'ACS', 'WFC3', 'WFPC2', 'FOC', 'NICMOS'
-		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
-		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
 		keep (bool): If True, retains make_psf.py (Gillis et al. 2020)
 		verbose (bool): If True, prints progress messages.
@@ -63,11 +70,38 @@ def tinygillispsf(coords, pretweaked = False, keeporig = True, plot = False, kee
 		if verbose:
 			print('Removed make_psf.py')
 
+
+
 def wfcpsf():
 	"""
 	Read in empirical HST/WFC3 PSFs. ## will really need to check instructions for how to do this
 
 	"""
+
+
+def stdpsf(coords, img, pretweaked = False, keeporig = True, plot = False, keep = False, verbose = False):
+	"""
+	Read in HST STDPSFs.
+
+	"""
+
+	if not os.path.exists('psf_utilities.py'):
+		# download STScI code for handling Jay Anderson's STDPSFs: https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/
+		rawurl = 'https://github.com/spacetelescope/hst_notebooks/blob/main/notebooks/WFC3/point_spread_function/psf_utilities.py'
+		os.system('wget ' + rawurl)
+		if verbose:
+			print('Retrieved psf_utilities.py')
+	
+	from psf_utilities import download_psf_model
+
+
+
+
+	if os.path.exists('psf_utilities.py') and not keep:
+		os.remove('psf_utilities.py')
+		if verbose:
+			print('Removed psf_utilities.py')
+
 
 
 def jwpsf():

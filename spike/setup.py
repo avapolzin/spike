@@ -1,12 +1,12 @@
 import setuptools
 
 setuptools.setup(
-	name = "spike",
+	name = "spike-psf",
 	version = "0.1",
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle HST and JWST PSFs for improved analyses.",
-	packages = ["spike", "spike/psf", "spike/psfgen"],
+	packages = ["spike", "spike/psf", "spike/psfgen", "spike/tools"],
 	url = "https://github.com/avapolzin/spike",
 	license = 'MIT',
 	classifiers = [
