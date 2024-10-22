@@ -13,8 +13,9 @@ from drizzlepac import tweakreg, tweakback, astrodrizzle
 ##########
 
 
-def hst(img_dir, obj, 
-	pretweaked = False, keeporig = True, plot = False, verbose = False, parallel = False, **kwargs):
+def hst(img_dir, obj, img_type, inst, camera, method, savepath,
+		pretweaked = False, keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
+		**kwargs):
 	"""
 	Generate drizzled HST PSFs.
 
@@ -24,15 +25,17 @@ def hst(img_dir, obj,
 		img_type (str): 'flc', 'flt', 'c0f', 'c1f' -- specifies which file-type to include.
 		inst (str): 'ACS', 'WFC3', 'WFPC1', 'WFPC2', 'FOC', 'NICMOS', 'STIS'
 		camera (str): 
-		tool (str): 'TinyTim', 'TinyTim_Gillis', 'WFCPSF' (empirical), 'STDPSF' (empirical),
+		method (str): 'TinyTim', 'TinyTim_Gillis', 'WFCPSF' (empirical), 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
-				if 'USER', tool should be a function that generates, or path to a directory of user-generated, PSFs 
+				if 'USER', method should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [coords]_[band]_psf.fits, e.g., 23.31+30.12_F814W_psf.fits or 195.78-46.52_F555W_psf.fits
+		savepath (str): Where/with what name output drizzled PSF will be saved.
 		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
+		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
 		**kwargs: Keyword arguments for PSF generation function.
 	"""
 
@@ -49,25 +52,25 @@ def hst(img_dir, obj,
 		updatewcs = True
 
 	genpsf = True
-	if tool.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'WFCPSF', 'STDPSF', 'EPSF', 'SEPSF', 'USER']:
+	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'WFCPSF', 'STDPSF', 'EPSF', 'SEPSF', 'USER']:
 		raise Exception('tool must be one of TINYTIM, TINYTIM_GILLIS, WFCPSF, STDPSF, EPSF, SEPSF, USER')
-	if tool.upper() == 'TINYTIM':
+	if method.upper() == 'TINYTIM':
 		psffunc = spike.psfgen.tinypsf
-	if tool.upper() == 'TINYTIM_GILLIS':
+	if method.upper() == 'TINYTIM_GILLIS':
 		psffunc = spike.psfgen.tinygillispsf
-	if tool.upper() == 'WFCPSF':
-		if inst != 'WFC3':
+	if method.upper() == 'WFCPSF':
+		if inst.upper() != 'WFC3':
 			raise Exception('spike.psfgen.wfcpsf ONLY works with HST/WFC3 images.')
 		psffunc = spike.psfgen.wfcpsf
-	if tool.upper() == 'EPSF':
+	if method.upper() == 'EPSF':
 		psffunc = spike.psfgen.effpsf
-	if tool.upper() == 'SEPSF':
+	if method.upper() == 'SEPSF':
 		psffunc = spike.psfgen.psfex
-	if tool.upper() == 'USER':
-		if type(tool) == str: #check if user input is path to directory
+	if method.upper() == 'USER':
+		if type(method) == str: #check if user input is path to directory
 			genpsf = False
-		if type(tool) != str: #or function
-			psffunc = tool
+		if type(method) != str: #or function
+			psffunc = method
 
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
@@ -112,10 +115,42 @@ def hst(img_dir, obj,
 		# could add option for people to feed in a function that generates PSFs themselves, but that might be silly
 
 
+	if out == 'asdf':
+		# .asdf file read out in addition to .fits
+		tools.to_asdf()
+
+
 
 def jwst():
 
 
-def roman():
+def roman(config):
+	"""
+	Generate drizzled Roman Space Telescope PSFs.
+
+	Parameters:
+		config (dict): Dictionary containing relevant information for each object/coordinate. 
+			If generating PSFs for multiple coordinate locations, config should be list of dicts.
+			An example dictionary looks like, 
+				config = {'obj': 'M51', filters':[], 'pixlocs':[], 'detectors':[]}
+		## will need to figure out coordinates + WCS for drizzling model PSFs...
+		## reading drizzlepac handbook again to figure this out
+		## could extract and write relevant fields to the header and then set reference pixel
+			based on the pixel location field?
+
+
+
+	"""
+
+	filt_list = np.unique(config['filters'])
+
+	for f in filt_list:
+		detectors = config['detectors'][config['filters'] == f]
+		pixloc = config['pixloc'][config['filters'] == f]
+		# etc
+
+
+
+
 
 

@@ -13,7 +13,7 @@ class Vividict(dict):
 ##########
 
 tinyparams = Vividict() #to index into TinyTim parameters from proper names
-tinyparams['camera']['name'] = ['ACS WFC', 'ACS HRC']
+tinyparams['camera']['name'] = ['ACS/WFC', 'ACS/HRC']
 tinyparams['camera']['value'] = [15, 16]
 
 

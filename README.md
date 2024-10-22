@@ -31,7 +31,7 @@ To get a drizzled PSF, ...
 fairly simple and can require as little as a working directory for images and the coordinates of an object of interest.
 
 
-Ultimately, some of the other functions included in `spike`, may be useful. For instance, the functions in `spike.psfgen` are methods to compute and save (to .fits) various model PSFs for a variety of telescopes/instruments which share similar syntax and required inputs and are callable from python directly. Similarly, `spike.tools` houses generic functions, which may be broadly applicable, including a python wrapper for `SExtractor` (not to be confused with `sep`). Please refer to [spike.readthedocs.io](https://spike.readthedocs.io) for details.
+Ultimately, some of the other functions included in `spike`, may be useful. For instance, the functions in `spike.psfgen` are methods to compute and save (to .fits) various model PSFs for a variety of telescopes/instruments which share similar syntax and required inputs and are callable from python directly. Similarly, `spike.tools` houses generic functions, which may be broadly applicable, including a python wrapper for `SExtractor` (not to be confused with `sep`). Please refer to [spike.readthedocs.io](https://spike-psf.readthedocs.io) for details.
 
 ## Issues and Contributing
 

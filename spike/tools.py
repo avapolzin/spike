@@ -44,20 +44,24 @@ def checkpixloc(coords, img, inst, camera = None):
 		inst (str): Instrument of interest. 
 				HST: 'ACS', 'WFC3', 'WFPC1', WFPC2', 'FOC', 'NICMOS', 'STIS'
 				JWST: 'MIRI', 'NIRCAM', 'NIRISS'
-				Roman: 'WFI', 'Coronograph'
+				Roman: 'WFI', 'CGI'
 		camera (str): Camera associated with instrument.
 				HST/ACS: 'WFC', 'HRC'
 				HST/WFC3: 'UVIS', 'IR'
+				JWST/NIRISS: 'Imaging', 'AMI' #AMI has different multi-extension mode
 
 	Returns:
-		[X, Y, chip] (list): Pixel coordinates and, if relevant, chip number.
-				Only returned if object coordinates fall onto detector.
+		[X, Y, chip] (list): Pixel coordinates and, if relevant, chip number (HST) or detector name (Roman).
+				Only returned if object coordinates fall onto detector - returns NaNs if not.
 
 	"""
 	hdu = fits.open(img)
-	imcam = inst.upper() + '/' + camera.upper()
+	if camera:
+		imcam = inst.upper() + '/' + camera.upper()
+	if not camera:
+		imcam = inst.upper()
 
-	### HST instrument checks ###
+	### instrument checks ###
 	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
 		chip1 = hdu[4]
 		chip2 = hdu[1]
@@ -98,7 +102,8 @@ def checkpixloc(coords, img, inst, camera = None):
 		else:
 			out = [x_coord, y_coord, chip]
 
-	if imcam in ['ACS/HRC', 'WFC3/IR']:
+	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS/IMAGING']:
+		# for WFC3, only checks the final readout by design
 		chip = 0 #no chip
 		wcs1 = WCS(hdu[1].header, fobj = hdu)
 		datshape = hdu[1].data.shape
@@ -110,12 +115,25 @@ def checkpixloc(coords, img, inst, camera = None):
 		else:
 			out = [np.nan] * 3
 
+	if imcam in ['WFI', 'CGI']: #need to get detector name rather than chip number
+		#will have to look at simulated imaging to see how to do this
+		#UGH
+
 
 
 
 
 
 	return out
+
+def to_asdf(save = True):
+	"""
+	Convert .fits file to .asdf, by simply wrapping data and header extensions.
+
+
+	"""
+
+
 
 def pysextractor():
 	"""
