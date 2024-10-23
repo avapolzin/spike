@@ -8,7 +8,7 @@ tags:
 authors:
   - name: Ava Polzin
     orcid: 0000-0002-5283-933X
-    corresponding:True
+    corresponding: true
     affiliation: 1
 affiliations:
  - name: Department of Astronomy and Astrophysics, The University of Chicago, USA
