@@ -6,15 +6,15 @@ tags:
   - point spread functions
   - photometry
 authors:
-  - name: "Ava Polzin"
-    orcid: "0000-0002-5283-933X"
+  - name: Ava Polzin
+    orcid: 0000-0002-5283-933X
     corresponding = True
     affiliation: "1" # (Multiple affiliations must be quoted)
 affiliations:
- - name: "Department of Astronomy and Astrophysics, The University of Chicago, USA"
-   index: "1"
+ - name: Department of Astronomy and Astrophysics, The University of Chicago, USA
+   index: 1
 date: 13 September 2024
-bibliography: paper.bib
+bibliography: "./paper.bib"
 ___
 
 # Summary
