@@ -78,6 +78,8 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 			for i in imgs:
 				coords = tools.checkpixloc(skycoords, inst, camera)
 				psffunc(coords, i, **kwargs)
+				# need to add if TinyTim + WFPC1/NICMOS/FOC, check date
+				# also need to account for jitter and subsampling as options
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once

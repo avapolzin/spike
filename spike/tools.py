@@ -12,7 +12,7 @@ def objloc(obj):
 
 	Parameters:
 		obj (str): Name or coordinates for object of interest. If coordinates, should be in
-			HH:MM:SS DD:MM:SS or degree formats.
+			HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.
 	Returns:
 		coords (astropy coordinates object)
 	"""
@@ -115,12 +115,9 @@ def checkpixloc(coords, img, inst, camera = None):
 		else:
 			out = [np.nan] * 3
 
-	if imcam in ['WFI', 'CGI']: #need to get detector name rather than chip number
-		#will have to look at simulated imaging to see how to do this
-		#UGH
-
-
-
+	# if imcam in ['WFI', 'CGI']: #need to get detector name rather than chip number
+	# 	#will have to look at simulated imaging to see how to do this
+	# 	#UGH
 
 
 
@@ -143,3 +140,20 @@ def pysextractor():
 	Parameters:
 
 	"""
+
+def rewrite_header(obj, header):
+	"""
+	Write HST and JWST image headers to the model PSFs and modify the coordinates and WCS.
+
+
+	"""
+
+def write_header(obj, header_params):
+	"""
+	Write Roman image headers to model PSFs and modify coordinates and WCS.
+	Takes in dictionary of relevant header keys given size of files.
+
+	
+	"""
+
+

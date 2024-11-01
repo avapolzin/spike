@@ -1,23 +1,15 @@
 import os
 
 
-class Vividict(dict):
-	## with thanks to https://stackoverflow.com/a/24089632
-    def __missing__(self, key):
-        value = self[key] = type(self)()
-        return value
-
-
 ##########
 # * * * *
 ##########
 
-tinyparams = Vividict() #to index into TinyTim parameters from proper names
-tinyparams['camera']['name'] = ['ACS/WFC', 'ACS/HRC']
-tinyparams['camera']['value'] = [15, 16]
+tinyparams = {}
+tinyparams['camera'] = {'ACS/WFC':15, 'ACS/HRC':16}
 
 
-def tinypsf(coords, img, plot = False, verbose = False):
+def tinypsf(coords, img, plot = False, verbose = False, jitter = None, sampling = 2):
 	"""
 	Generate HST PSFs using TinyTim.
 	In addition to making model PSF, write tweak parameters to header.
@@ -31,6 +23,14 @@ def tinypsf(coords, img, plot = False, verbose = False):
 		verbose (bool): If True, prints progress messages.
 	"""
 
+	## look for tinytest.param on other computer
+	## use this to generate a parameter file for each image, which will be efficient for use
+	## also think about generating default .param files for people to test on
+	## same for tinygillispsf but may be structured differently
+	## really need to get this done today!
+
+	if jitter:
+		os.subprocess ...
 
 
 

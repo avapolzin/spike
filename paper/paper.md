@@ -14,7 +14,7 @@ affiliations:
  - name: Department of Astronomy and Astrophysics, The University of Chicago, USA
    index: 1
 date: 13 September 2024
-bibliography: paper.bib
+bibliography: paper/paper.bib
 ___
 
 # Summary
