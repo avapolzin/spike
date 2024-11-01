@@ -1,4 +1,4 @@
-___
+---
 title: 'spike: A tool to drizzle HST, JWST, and Roman PSFs for improved analyses'
 tags:
   - Python
@@ -14,8 +14,8 @@ affiliations:
  - name: Department of Astronomy and Astrophysics, The University of Chicago, USA
    index: 1
 date: 13 September 2024
-bibliography: paper/paper.bib
-___
+bibliography: paper.bib
+---
 
 # Summary
 
