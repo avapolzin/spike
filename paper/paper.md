@@ -30,7 +30,7 @@ For analyses to be consistent, mock PSFs may be used, but the proper treatment o
 
 # Workflow
 
-The premise of `spike` is that, given reduced, but not yet co-added, .fits files from _HST_, _JWST_, or _Roman_ and the coordinates of an object of interest, detector/chip-specifc model PSFs themselves can be directly "drizzled". The code can be run using images that have been "tweaked" or images that have not yet undergone any `astrodrizzle` post-processing.
+The premise of `spike` is that, given reduced, but not yet co-added, .fits files from _HST_, _JWST_, or Roman and the coordinates of an object of interest, detector/chip-specifc model PSFs themselves can be directly "drizzled". The code can be run using images that have been "tweaked" or images that have not yet undergone any `astrodrizzle` post-processing.
 
 The package relies on `astropy`[@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022] for conversion of objects' astronomical coordinates (in right ascension and declination) to pixel coordinates (in X, Y), using the images' world coordinate system information. A model PSF is then generated for each unique input image and coordinates combination. Instrument information, including camera, filter, and, if necessary, chip, is automatically read directly from the header of each .fits file by default, but can be overridden by user choice. Similarly, users can generate PSF models using pre-defined defaults, update model parameters, or upload their own model PSFs to be drizzled.
 
@@ -56,9 +56,9 @@ Raw data are not yet available for the European Space Agency's _Euclid_ mission,
  - `numpy` [@harris2020array]
  - `photutils` [@Bradley.etal]
  - `PSFEx` [@Bertin.2011; @Bertin.2013]
- - `SExtractor` [@Bertin.Arnauts.1996]
+ - `SExtractor` [@Bertin.Arnouts.1996]
  - `TinyTim` [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters [@Gillis.2019]
- - `webbpsf` [@@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
+ - `webbpsf` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
 
 # Acknowledgments
 
