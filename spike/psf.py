@@ -5,16 +5,28 @@ from spike.tools import objloc
 from astropy.io import fits
 from astropy.wcs import WCS, utils
 import numpy as np
+import subprocess
+from subprocess import call
+import warnings
+
+def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
+	return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = warning_on_one_line
 
 from drizzlepac import tweakreg, tweakback, astrodrizzle
+from spike.jwstcal import tweakreg, tweakback, resample #check name of tweak steps
+from spike.romancal import tweakreg, tweakback, resample
 
 ##########
 # * * * *
 ##########
 
 
-def hst(img_dir, obj, img_type, inst, camera, method, savepath,
+def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledpsf.fits', drizzleimgs = False,
 		pretweaked = False, keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
+		## all of the drizzle parameters
+		## all of the tweakreg parameters
 		**kwargs):
 	"""
 	Generate drizzled HST PSFs.
@@ -25,11 +37,12 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 		img_type (str): 'flc', 'flt', 'c0f', 'c1f' -- specifies which file-type to include.
 		inst (str): 'ACS', 'WFC3', 'WFPC1', 'WFPC2', 'FOC', 'NICMOS', 'STIS'
 		camera (str): 
-		method (str): 'TinyTim', 'TinyTim_Gillis', 'WFCPSF' (empirical), 'STDPSF' (empirical),
+		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', method should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [coords]_[band]_psf.fits, e.g., 23.31+30.12_F814W_psf.fits or 195.78-46.52_F555W_psf.fits
-		savepath (str): Where/with what name output drizzled PSF will be saved.
+		savepath (str): Where/with what name output drizzled PSF will be saved. Defaults to 'psfs/drizzledpsf.fits'.
+		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
 		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
@@ -46,7 +59,7 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 			print('Made copy of '+img_dir)
 
 
-	imgs = glob.glob(img_dir+'/*'+img_type+'.fits')
+	imgs = sorted(glob.glob(img_dir+'/*'+img_type+'.fits'))
 
 	if inst.upper() == 'WFPC2':
 		updatewcs = True
@@ -64,7 +77,7 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 		psffunc = spike.psfgen.wfcpsf
 	if method.upper() == 'EPSF':
 		psffunc = spike.psfgen.effpsf
-	if method.upper() == 'SEPSF':
+	if method.upper() == 'PSFEX':
 		psffunc = spike.psfgen.psfex
 	if method.upper() == 'USER':
 		if type(method) == str: #check if user input is path to directory
@@ -93,6 +106,8 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 				#need filter name to make PSFs drizzlable
 
 				if parallel:
+					if method.upper() == 'PSFEX':
+						warnings.warn('Warning: Check your config and param files to ensure output files ...')
 					pool = Pool(processes=(cpu_count() - 1))
 					for coord in coords:
 						pool.apply_async(psffunc, args = (coord, i), kwds = kwargs)
@@ -109,12 +124,21 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath,
 			## figure out how best to parallelize at this point
 
 
+			if not pretweaked:
+				# otherwise skip the tweak steps
+
+
+
+
 
 		# also need to iterate through files -- will need to do this with mpi4py integrated -- UGH
 		# will need to decide how to iterate through objects and at what point
 		# think I will name PSFs degcoord_imgname_band_psf.fits
 		# can then combine on coordinates and filter easily enough
 		# could add option for people to feed in a function that generates PSFs themselves, but that might be silly
+
+		# https://hst-docs.stsci.edu/drizzpac/chapter-1-introduction-to-astrodrizzle-and-drizzlepac/1-4-data-from-the-mast-archive
+		# need to figure out how WCSCORR plays into this -- that's where Tweakreg info is stored
 
 
 	if out == 'asdf':
@@ -140,11 +164,23 @@ def roman(config):
 		## could extract and write relevant fields to the header and then set reference pixel
 			based on the pixel location field?
 
+		## planning to simply copy headers -- probably using dictionaries, then update CRVALs and NPIX vals
+			to reflect the size of the PSF and the coordinates of the central pixel
+		## this is extra annoying given the fact that all of the Roman data will be generated in different ways
+
+		## can also just use the images since single detector will be ~100s of MB?
+		## will write it for either a dictionary or... will need to store wcs information in dict, too, though...
+
 
 
 	"""
 
 	filt_list = np.unique(config['filters'])
+	config['header'] = # will use same syntax as fits -> asdf to store all header info
+	# will then edit the header info and apply it to the PSF images before drizzling
+
+	# can also offer option that allows for the case where not using config, 
+	# but instead using individual images
 
 	for f in filt_list:
 		detectors = config['detectors'][config['filters'] == f]
@@ -154,5 +190,5 @@ def roman(config):
 
 
 
-
+### ADD COMMENT TO FINAL PSF FITS HEADER THAT IT WAS GENERATED WITH spike
 

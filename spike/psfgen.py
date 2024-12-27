@@ -1,4 +1,6 @@
 import os
+import pkg_resources
+CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
 
 
 ##########
@@ -23,14 +25,11 @@ def tinypsf(coords, img, plot = False, verbose = False, jitter = None, sampling 
 		verbose (bool): If True, prints progress messages.
 	"""
 
-	## look for tinytest.param on other computer
-	## use this to generate a parameter file for each image, which will be efficient for use
-	## also think about generating default .param files for people to test on
-	## same for tinygillispsf but may be structured differently
-	## really need to get this done today!
 
-	if jitter:
-		os.subprocess ...
+	# if jitter:
+
+	
+		
 
 
 
@@ -71,12 +70,6 @@ def tinygillispsf(coords, img, plot = False, keep = False, verbose = False):
 			print('Removed make_psf.py')
 
 
-
-def wfcpsf():
-	"""
-	Read in empirical HST/WFC3 PSFs. ## will really need to check instructions for how to do this
-
-	"""
 
 
 def stdpsf(coords, img, pretweaked = False, keeporig = True, plot = False, keep = False, verbose = False):
@@ -124,3 +117,13 @@ def sepsf():
 	Generate PSFs using PSFEx.
 
 	"""
+
+
+
+	## PSFEx .psf outputs store the linear basis functions of PSF in different extensions
+	# this means a model should be a sum of over the first dimension of the .psf output
+	psfmodel = np.sum(psfexmodel, axis = 0)
+
+
+
+
