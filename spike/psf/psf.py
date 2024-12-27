@@ -124,7 +124,7 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 			## figure out how best to parallelize at this point
 
 
-			if not pretweaked:
+			# if not pretweaked:
 				# otherwise skip the tweak steps
 
 
@@ -170,8 +170,6 @@ def roman(config):
 
 		## can also just use the images since single detector will be ~100s of MB?
 		## will write it for either a dictionary or... will need to store wcs information in dict, too, though...
-
-
 
 	"""
 

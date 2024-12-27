@@ -16,3 +16,5 @@ If you use this package or the scripts in this repository in a publication, plea
 * if you use ``PSFEx`` to generate empirical PSFs: ``PSFEx`` and ``SExtractor``
 * if you use ePSFs: ``photutils``
 * if you use STDPSFs: 
+
+Note that the BibTex for all of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.

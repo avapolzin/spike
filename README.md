@@ -41,6 +41,7 @@ Ultimately, some of the other functions included in `spike`, may be useful. For 
 Since `spike` has utility for working with data, the most useful test of the code is to actually generate and drizzle PSFs from imaging. The code to generate Figures 1 and 2 from Polzin in prep is in test_outputs.py, which can be used to confirm the package works. Note that the input file structure is such that each instrument's data should be partitioned in its own directory, where all included data may be included in the final drizzled product. 
 
 An example file structure:
+
 *working_directory*
 - test_outputs.py
 - *acswfc_imaging*
@@ -64,6 +65,6 @@ All tests should pass by default, *but, if you are not intending to use `spike` 
 
 ## Issues and Contributing
 
-If you encounter a bug, first check [FAQ.md](https://github.com/avapolzin/spike/blob/master/FAQ.md); if you don't find a solution there, please feel free to open an issue or a PR. If you have a question, please feel free to email me at apolzin at uchicago dot edu.
+If you encounter a bug, first check the [documatnation](https://spike-psf.readthedocs.io) or the [FAQ](https://github.com/avapolzin/spike/blob/master/FAQ.md); if you don't find a solution there, please feel free to open an issue (or a PR with a fix). If you have a question, please feel free to email me at apolzin at uchicago dot edu.
 
 If you would like to contribute to `spike`, either enhancing what already exists here or working to add features (as for other telescopes/PSF models), please make a pull request. If you are unsure of how your enhancement will work with the existing code, reach out and we can discuss it.

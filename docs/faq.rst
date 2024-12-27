@@ -27,7 +27,7 @@ spike
 
 1. **Why am I getting 'NameResolveError: Unable to find coordinates for name ...' when I feed spike.psf an object name?**
 
-The most likely reason you'd get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow ``spike`` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run `spike` immediately.
+The most likely reason you'd get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow ``spike`` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run ``spike`` immediately.
 
 2. **I am encountering a problem with one of the pipeline modules (spike.jwstcal, spike.romancal, or spike.stcal). How much has changed from the official Space Telescope release?**
 
@@ -69,8 +69,7 @@ PSFEx
 
 If you plan to use PSFEx to generate empirical PSFs, both SExtractor and PSFEx must be downloaded and installed separately following the instructions `here <https://github.com/astromatic/sextractor>`_ and `here <https://github.com/astromatic/psfex>`_ respectively.
 
-Some notes on PSFEx/SExtractor installation for Macs: You can use ``brew install automake, libtool`` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these `instructions <http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69>`_). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories, so in your PSFEx directory, you will want to run some variation of ``./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib
-`` when configuring the Makefile for PSFEx.
+Some notes on PSFEx/SExtractor installation for Macs: You can use ``brew install automake, libtool`` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these `instructions <http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69>`_). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories, so in your PSFEx directory, you will want to run some variation of ``./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib`` when configuring the Makefile for PSFEx.
 
 There is also a bug in the PSFEx installation code -- discussed nicely `here <https://trac.macports.org/ticket/71003>`_ -- within PSFEx/src/levmar/compiler.h, you will need to change "finite" to "isfinite" before attempting to run ``make``.
 
