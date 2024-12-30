@@ -53,7 +53,7 @@ from spike.stcal.alignment_util import compute_s_region_keyword, compute_scale
 from spike.romancal.associations_asn_from_list import asn_from_list
 
 import spike.romancal.assign_wcs_utils as utils
-from spike.romancal.datamodels_library41 import ModelLibrary
+from spike.romancal.datamodels_library import ModelLibrary
 from spike.romancal import resample_gwcs_drizzle, resample_utils
 
 log = logging.getLogger(__name__)

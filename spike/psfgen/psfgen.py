@@ -29,7 +29,7 @@ def tinypsf(coords, img, plot = False, verbose = False, jitter = None, sampling 
 	# if jitter:
 
 	
-		
+	return placeholder
 
 
 
@@ -102,7 +102,7 @@ def jwpsf():
 	Generate JWST and Roman PSFs using WebbPSF.
 
 	"""
-
+	return placeholder
 
 def effpsf():
 	"""
@@ -110,7 +110,7 @@ def effpsf():
 
 	"""
 
-
+	return placeholder
 
 def sepsf():
 	"""
@@ -118,12 +118,5 @@ def sepsf():
 
 	"""
 
-
-
-	## PSFEx .psf outputs store the linear basis functions of PSF in different extensions
-	# this means a model should be a sum of over the first dimension of the .psf output
-	psfmodel = np.sum(psfexmodel, axis = 0)
-
-
-
+	return placeholder
 

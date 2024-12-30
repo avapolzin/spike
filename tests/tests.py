@@ -38,11 +38,33 @@ def test_multiprocessing():
 
 def test_multiprocessing():
 	# more extensive/robust check on async file creation
+	# if this doesn't pass on the assert, user should not use the parallel option
+	import os
+	from multiprocessing import Pool, cpu_count
+	pool = Pool(processes = (cpu_count() - 1))
+	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
+		pool.apply_async(paralleltest, args = (i))
+	pool.close()
+	pool.join()
+	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
+		with open(i+'_test.txt') as file:
+		    checkstring = file.read()
+		assert i == checkstring
+		os.system('rm '+i+'_test.txt')
 
 
 
 def test_psfgen():
-	## have to assert that aliases actually exist (for TinyTim, SExtractor, etc.)
+	## have to search for executables and aliases
+	## can use which I guess? 
+	## sex, psfex -- executables
+	## tiny1,2,3 (or just TINYTIM) -- alias; WEBBPSF_PATH -- alias
+
+	# https://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+	# https://stackoverflow.com/questions/51785022/check-if-sourced-bash-profile-command-exists
+
+	# https://stackoverflow.com/questions/41230547/check-if-program-is-installed-in-c
+
 
 	## test TinyTim,
 

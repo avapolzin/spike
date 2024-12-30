@@ -15,8 +15,8 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
 warnings.formatwarning = warning_on_one_line
 
 from drizzlepac import tweakreg, tweakback, astrodrizzle
-from spike.jwstcal import tweakreg, tweakback, resample #check name of tweak steps
-from spike.romancal import tweakreg, tweakback, resample
+# from spike.jwstcal import tweakreg, tweakback, resample #check name of tweak steps
+# from spike.romancal import tweakreg, tweakback, resample
 
 ##########
 # * * * *
@@ -149,6 +149,8 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 
 def jwst():
 
+	return placeholder
+
 
 def roman(config):
 	"""
@@ -158,23 +160,25 @@ def roman(config):
 		config (dict): Dictionary containing relevant information for each object/coordinate. 
 			If generating PSFs for multiple coordinate locations, config should be list of dicts.
 			An example dictionary looks like, 
-				config = {'obj': 'M51', filters':[], 'pixlocs':[], 'detectors':[]}
-		## will need to figure out coordinates + WCS for drizzling model PSFs...
+			config = {'obj': 'M51', filters':[], 'pixlocs':[], 'detectors':[]}
+
+	Returns:
+
+	"""
+	## will need to figure out coordinates + WCS for drizzling model PSFs...
 		## reading drizzlepac handbook again to figure this out
 		## could extract and write relevant fields to the header and then set reference pixel
-			based on the pixel location field?
+		#	based on the pixel location field?
 
 		## planning to simply copy headers -- probably using dictionaries, then update CRVALs and NPIX vals
-			to reflect the size of the PSF and the coordinates of the central pixel
+		#	to reflect the size of the PSF and the coordinates of the central pixel
 		## this is extra annoying given the fact that all of the Roman data will be generated in different ways
 
 		## can also just use the images since single detector will be ~100s of MB?
 		## will write it for either a dictionary or... will need to store wcs information in dict, too, though...
 
-	"""
-
 	filt_list = np.unique(config['filters'])
-	config['header'] = # will use same syntax as fits -> asdf to store all header info
+	# config['header'] = # will use same syntax as fits -> asdf to store all header info
 	# will then edit the header info and apply it to the PSF images before drizzling
 
 	# can also offer option that allows for the case where not using config, 
@@ -185,7 +189,7 @@ def roman(config):
 		pixloc = config['pixloc'][config['filters'] == f]
 		# etc
 
-
+	return placeholder
 
 
 ### ADD COMMENT TO FINAL PSF FITS HEADER THAT IT WAS GENERATED WITH spike

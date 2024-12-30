@@ -107,7 +107,7 @@ def all_steps():
     steps : dict
         Key is the classname, value is the class
     """
-    from jwst.stpipe import Step
+    from spike.jwstcal.stpipe_core import JwstStep as Step
 
     jwst = import_module('jwst')
     jwst_fpath = os.path.split(jwst.__file__)[0]

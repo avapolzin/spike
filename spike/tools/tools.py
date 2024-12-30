@@ -7,8 +7,12 @@ from astropy.wcs import WCS, utils
 import numpy as np
 import os
 import pkg_resources
+
 CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
 
+# #########
+#  * * * * 
+# #########
 
 def objloc(obj):
 	"""
@@ -209,13 +213,14 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 
 
 
-def psfexim(psfpath, pixloc, save = False):
+def psfexim(psfpath, pixloc, resamp = True, save = False):
 	"""
 	Generate image from PSFEx .psf file.
 
 	Parameters:
 		psfpath (str): Path to the relevant .psf file from the working directory.
 		pixloc (tuple): Pixel location of object of interest in (x, y).
+		resamp (bool: If True, will (interpolate) and regrid model PSF to image pixel scale.
 		save (str): If 'fits', 'arr', 'txt', will save in the specified format with name from psfpath.
 			The option to save as an array results in a .npy file.
 
@@ -228,14 +233,33 @@ def psfexim(psfpath, pixloc, save = False):
 	x = (x_ - psfexmodel[1].header['POLZERO1'])/psfexmodel[1].header['POLSCAL1']
 	y = (y_ - psfexmodel[1].header['POLZERO2'])/psfexmodel[1].header['POLSCAL2']
 
+	order = psfexmodel[1].header['POLDEG1']
 
+	xpoly, ypoly = x**np.arange(order+1), y**np.arange(order+1)
 
+	# takes X_c * Phi_c, where Phi is the vector and X_c(x, y) is the basis function
+	# see https://psfex.readthedocs.io/en/latest/Working.html and
+	# https://www.astromatic.net/wp-content/uploads/psfex_article.pdf
+
+	xc = []
+	for i, yy in enumerate(ypoly):
+	    for ii, xx in enumerate(xpoly[:(order+1-i)]):
+	        xc.append(xx*yy)
+
+	phic = psfexmodel[1].data['PSF_MASK'][0]
+
+	psfmodel = np.sum(phic * np.array(xc)[:, None, None], axis = 0)
+
+	if resamp:
+		if psfexmodel[1].header['PSF_SAMP'] != 1.:
+			import scipy.interpolate
+
+		# use some scipy interpolation
+		# add scipy to references in paper draft
+		# and to requirements.txt
 
 	return psfmodel
 
-
-
-	## FINISH THIS ONEEEEEEE
 
 def pypsfex(cat_path, pixloc = None, config = None, userargs = None, makepsf = True, keepconfig = False):
 	"""
@@ -261,13 +285,13 @@ def pypsfex(cat_path, pixloc = None, config = None, userargs = None, makepsf = T
 	if config:
 		configpath = config
 
-	psfex_args = 'psfex'+cat_path+' -c '+configpath
+	psfex_args = 'psfex '+cat_path+' -c '+configpath
 
 	if userargs:
 		psfex_args += ' '+userargs
 
 	os.system(psfex_args)
-	os.system('mv test.psf ' + img_path.replace('fits', 'psf')) #move to img name
+	os.system('mv test.psf ' + cat_path.replace('cat', 'psf')) #move to img name
 
 	if (not keepconfig) and (not config):
 		# clean up user directory by removing copied files
@@ -275,21 +299,23 @@ def pypsfex(cat_path, pixloc = None, config = None, userargs = None, makepsf = T
 		os.system('rm *.conv')
 
 	if makepsf:
-		sfexmodel = fits.open(img_path.replace('fits', 'psf'))
 
 		if coords:
 			x, y, chip = coords
 
-
 		if not coords:
-			## PSFEx .psf outputs store the linear basis vectors of the PSF in different extensions
-			# this means a model should be a sum of over the first dimension of the .psf output
-			# so to first order, this is correct, but does not account for geometric distortions
-			psfmodel = np.sum(psfexmodel[1].data['PSF_MASK'][0], axis = 0)
+			#assumes that .cat and .fits file are in the same directory
+			im = fits.open(cat_path.replace('cat', 'fits'))[1].data
+			x, y = im.shape/2 #select central pixel if not specified
+
+
+		psfmodel = psfexim(cat_path.replace('cat', 'psf'), pixloc = (x, y))
+			
 		return psfmodel
 
 
 def photutils_seg():
+	return placeholder
 
 
 def rewrite_header(obj, header):
@@ -298,6 +324,7 @@ def rewrite_header(obj, header):
 
 
 	"""
+	return placeholder
 
 def write_header(obj, header_params):
 	"""
@@ -306,5 +333,5 @@ def write_header(obj, header_params):
 
 
 	"""
-
+	return placeholder
 

@@ -42,7 +42,7 @@ import io
 
 import asdf
 from astropy.io import fits
-import stdatamodels.jwst.datamodels.util.open as datamodels_open
+from stdatamodels.jwst.datamodels.util import open as datamodels_open
 from spike.stpipe.library import AbstractModelLibrary, NoGroupID
 
 # from jwst.associations import AssociationNotValidError, load_asn

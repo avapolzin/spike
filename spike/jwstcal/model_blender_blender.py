@@ -41,9 +41,9 @@ Original: https://github.com/spacetelescope/jwst/blob/main/jwst/model_blender/bl
 from astropy.io import fits
 from stdatamodels import fits_support
 
-from spike.model_blender_rules import make_blender
-from spike.model_blender_schemautil import parse_schema
-from spike.model_blender_tablebuilder import TableBuilder, table_to_schema
+from spike.jwstcal.model_blender_rules import make_blender
+from spike.jwstcal.model_blender_schemautil import parse_schema
+from spike.jwstcal.model_blender_tablebuilder import TableBuilder, table_to_schema
 
 
 __all__ = ['ModelBlender']

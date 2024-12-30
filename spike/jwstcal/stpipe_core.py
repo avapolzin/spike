@@ -46,7 +46,7 @@ from stdatamodels.jwst.datamodels import JwstDataModel
 from stdatamodels.jwst import datamodels
 from spike.stpipe import crds_client
 from spike.stpipe.step import Step
-from spike.stpipe,pipeline import Pipeline
+from spike.stpipe.pipeline import Pipeline
 
 # from jwst import __version_commit__, __version__
 __version_commit__ = '1.16.1' #hard coding based on released development version

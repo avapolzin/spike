@@ -14,7 +14,7 @@ NEWBASIS_NUMBER 8               # Number of new basis vectors
 PSF_SAMPLING    0.0             # Sampling step in pixel units (0.0 = auto)
 PSF_PIXELSIZE   1.0             # Effective pixel size in pixel step units
 PSF_ACCURACY    0.01            # Accuracy to expect from PSF "pixel" values
-PSF_SIZE        25,25           # Image size of the PSF model
+PSF_SIZE        35,35           # Image size of the PSF model
 PSF_DGEOCORRECT N               # Use diff. geom. maps (if provided) Y/N?
 PSF_RECENTER    N               # Allow recentering of PSF-candidates Y/N ?
 MEF_TYPE        INDEPENDENT     # INDEPENDENT or COMMON

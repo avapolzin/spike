@@ -56,9 +56,9 @@ import spike.jwstcal.resample_utils as resample_utils
 
 from spike.jwstcal.associations_asn_from_list import asn_from_list
 
-from spike.jwstcal.datamodels import ModelLibrary
+from spike.jwstcal.datamodels_library import ModelLibrary
 
-from spike.jwstcal.model_blender.blender import ModelBlender
+from spike.jwstcal.model_blender_blender import ModelBlender
 
 
 log = logging.getLogger(__name__)

@@ -51,7 +51,7 @@ from spike.stpipe.format_template import FormatTemplate
 # from . import __version__
 __version__ = '1.16.1'
 from spike.romancal.associations_exceptions import AssociationNotValidError
-from soike.romancal.associations_lib_constraint import Constraint, meets_conditions
+from spike.romancal.associations_lib_constraint import Constraint, meets_conditions
 from spike.romancal.associations_lib_ioregistry import IORegistry
 
 __all__ = ["Association"]

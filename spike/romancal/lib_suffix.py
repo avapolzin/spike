@@ -216,7 +216,7 @@ def find_suffixes():
     is worth doing dynamically or only as a utility to update
     a static list.
     """
-    from romancal.stpipe.utilities import all_steps
+    from spike.romancal.stpipe_utilities import all_steps
 
     # First traverse the code base and find all
     # `Step` classes. The default suffix is the

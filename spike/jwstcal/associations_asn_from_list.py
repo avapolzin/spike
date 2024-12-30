@@ -41,7 +41,7 @@ Original: https://github.com/spacetelescope/jwst/blob/main/jwst/associations/asn
 import argparse
 import sys
 
-from spike.jwstcal.assocations_registry import AssociationRegistry
+from spike.jwstcal.associations_registry import AssociationRegistry
 from spike.jwstcal.associations_lib_rules_level3_base import DMS_Level3_Base
 
 __all__ = ['asn_from_list']

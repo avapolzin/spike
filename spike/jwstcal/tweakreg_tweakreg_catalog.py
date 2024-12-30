@@ -50,7 +50,7 @@ from photutils.segmentation import SourceFinder, SourceCatalog
 
 from stdatamodels.jwst.datamodels import dqflags, ImageModel
 
-from spike.source_catalog_detection import JWSTBackground
+from spike.jwstcal.source_catalog_detection import JWSTBackground
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

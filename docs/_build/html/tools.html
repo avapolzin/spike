@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tools &mdash; spike 0.5 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=db78e746"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,7 +47,18 @@
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="psf.html">Top-level Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="psfgen.html">PSF Generation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.checkpixloc"><code class="docutils literal notranslate"><span class="pre">checkpixloc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.objloc"><code class="docutils literal notranslate"><span class="pre">objloc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.photutils_seg"><code class="docutils literal notranslate"><span class="pre">photutils_seg()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.psfexim"><code class="docutils literal notranslate"><span class="pre">psfexim()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.pypsfex"><code class="docutils literal notranslate"><span class="pre">pypsfex()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.pysextractor"><code class="docutils literal notranslate"><span class="pre">pysextractor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_header"><code class="docutils literal notranslate"><span class="pre">rewrite_header()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.to_asdf"><code class="docutils literal notranslate"><span class="pre">to_asdf()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.write_header"><code class="docutils literal notranslate"><span class="pre">write_header()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="citation.html">Citation</a></li>
 </ul>
@@ -76,8 +88,154 @@
            <div itemprop="articleBody">
              
   <section id="tools">
-<span id="spike-tools"></span><h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline"></a></h1>
+<span id="spike-tools"></span><h1>Tools<a class="headerlink" href="#tools" title="Link to this heading"></a></h1>
 <p>General tools that are used in the infrastructure of <code class="docutils literal notranslate"><span class="pre">spike</span></code>.</p>
+<dl class="py function" id="module-spike.tools">
+<dt class="sig sig-object py" id="spike.tools.checkpixloc">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">checkpixloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camera</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.checkpixloc" title="Link to this definition"></a></dt>
+<dd><p>Get object location on detector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
+<li><p><strong>img</strong> (<em>str</em>) – Path to image.</p></li>
+<li><p><strong>inst</strong> (<em>str</em>) – Instrument of interest.
+HST: ‘ACS’, ‘WFC3’, ‘WFPC1’, WFPC2’, ‘FOC’, ‘NICMOS’, ‘STIS’
+JWST: ‘MIRI’, ‘NIRCAM’, ‘NIRISS’
+Roman: ‘WFI’, ‘CGI’</p></li>
+<li><p><strong>camera</strong> (<em>str</em>) – Camera associated with instrument.
+HST/ACS: ‘WFC’, ‘HRC’
+HST/WFC3: ‘UVIS’, ‘IR’
+JWST/NIRISS: ‘Imaging’, ‘AMI’ #AMI has different multi-extension mode</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Pixel coordinates and, if relevant, chip number (HST) or detector name (Roman).</dt><dd><p>Only returned if object coordinates fall onto detector - returns NaNs if not.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[X, Y, chip] (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.objloc">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">objloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.objloc" title="Link to this definition"></a></dt>
+<dd><p>Get object location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> (<em>str</em>) – Name or coordinates for object of interest. If coordinates, should be in
+HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>coords (astropy coordinates object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.photutils_seg">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">photutils_seg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.photutils_seg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.psfexim">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">psfexim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.psfexim" title="Link to this definition"></a></dt>
+<dd><p>Generate image from PSFEx .psf file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>psfpath</strong> (<em>str</em>) – Path to the relevant .psf file from the working directory.</p></li>
+<li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y).</p></li>
+<li><p><strong>(</strong><strong>bool</strong> (<em>resamp</em>) – If True, will (interpolate) and regrid model PSF to image pixel scale.</p></li>
+<li><p><strong>save</strong> (<em>str</em>) – If ‘fits’, ‘arr’, ‘txt’, will save in the specified format with name from psfpath.
+The option to save as an array results in a .npy file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D image of PSFEx model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.pypsfex">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixloc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
+<dd><p>Wrapper to easily call PSFEx from python.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cat_path</strong> (<em>str</em>) – Path to the SExtractor catalog from the working directory.</p></li>
+<li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y, chip) - as from spike.tools.checkpixloc.
+If not specified, generates generic model assuming basis vectors are equally weighted.</p></li>
+<li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.psfex.</p></li>
+<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to PSFEx.</p></li>
+<li><p><strong>makepsf</strong> (<em>bool</em>) – If True, returns 2D PSF model.</p></li>
+<li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generates a .psf file that stores linear bases of PSF.
+If makepsf = True, also returns 2D array containing PSF model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.pysextractor">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pysextractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pysextractor" title="Link to this definition"></a></dt>
+<dd><p>Wrapper to easily call SExtractor from python.
+Using this in lieu of sep for easier compatibility with PSFEx.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_path</strong> (<em>str</em>) – Path to the image from the working directory.</p></li>
+<li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.sex.</p></li>
+<li><p><strong>psf</strong> (<em>bool</em>) – If True and no configuration file specified, uses config and param files that work with PSFEx.</p></li>
+<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to SExtractor.</p></li>
+<li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generates a .cat file with the same name as img_path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.rewrite_header">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_header" title="Link to this definition"></a></dt>
+<dd><p>Write HST and JWST image headers to the model PSFs and modify the coordinates and WCS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.to_asdf">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">to_asdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitspath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.to_asdf" title="Link to this definition"></a></dt>
+<dd><p>Convert .fits file to .asdf, by simply wrapping data and header extensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitspath</strong> (<em>str</em>) – Path to .fits file to convert.</p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – If True, saves the .asdf file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ASDF file object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.write_header">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">write_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.write_header" title="Link to this definition"></a></dt>
+<dd><p>Write Roman image headers to model PSFs and modify coordinates and WCS.
+Takes in dictionary of relevant header keys given size of files.</p>
+</dd></dl>
+
 </section>
 
 

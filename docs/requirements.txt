@@ -4,7 +4,7 @@ asdf
 astropy
 crds
 drizzle
-drizzlepac
+drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git
 gwcs
 jsonschema
 matplotlib
@@ -13,6 +13,7 @@ photutils
 psutil
 pyyaml
 roman-datamodels
+scipy
 spherical-geometry
 stdatamodels
 tweakwcs

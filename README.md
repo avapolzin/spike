@@ -12,10 +12,10 @@ git clone https://github.com/avapolzin/spike.git
 
 cd spike
 
-sudo python3 setupy.py install
+sudo pip install .
 
 ````
-or (which does not work yet because I need to figure out the c bindings...)
+or (which does not work yet because I need to figure out what to do with the c bindings and direct dependencies)
 ```bash
 pip install spike-psf
 ```

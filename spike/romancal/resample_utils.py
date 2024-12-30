@@ -50,7 +50,7 @@ from astropy.nddata.bitmask import bitfield_to_boolean_mask
 from roman_datamodels.dqflags import pixel
 from spike.stcal.alignment_util import wcs_from_footprints
 
-from romancal.assign_wcs_utils import wcs_bbox_from_shape
+from spike.romancal.assign_wcs_utils import wcs_bbox_from_shape
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

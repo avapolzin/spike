@@ -1,10 +1,9 @@
 import os
-from multiprocessing import Pool, cpu_count
-
 ## this is to test multiprocessing and file creation
-# 
-
-def paralleltest(str):
+# has to be importable as required by multiprocess
+def paralleltest(string):
 	"""
-	Test string to write to file and filename.
+	Function to test async write to file and filename.
 	"""
+	os.system('echo "'+string+'"" > testtext.txt')
+	os.system('mv testtext.txt '+string+'_test.txt')
