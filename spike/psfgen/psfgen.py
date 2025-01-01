@@ -86,6 +86,9 @@ def tinypsf(coords, img, pos, plot = False, verbose = False,
 	# this is also where tinyparams comes into play
 	# command_list = 
 
+	if imcam == 'ACS/WFC':
+		command_list = []
+
 
 	tiny = subprocess.Popen(tiny1, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	newline = os.linesep
