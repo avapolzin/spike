@@ -56,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pysextractor"><code class="docutils literal notranslate"><span class="pre">pysextractor()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_header"><code class="docutils literal notranslate"><span class="pre">rewrite_header()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.to_asdf"><code class="docutils literal notranslate"><span class="pre">to_asdf()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spike.tools.write_header"><code class="docutils literal notranslate"><span class="pre">write_header()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
@@ -100,7 +99,7 @@
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image.</p></li>
 <li><p><strong>inst</strong> (<em>str</em>) – Instrument of interest.
-HST: ‘ACS’, ‘WFC3’, ‘WFPC1’, WFPC2’, ‘FOC’, ‘NICMOS’, ‘STIS’
+HST: ‘ACS’, ‘WFC3’, ‘WFPC1’, WFPC2’, ‘NICMOS’, ‘STIS’
 JWST: ‘MIRI’, ‘NIRCAM’, ‘NIRISS’
 Roman: ‘WFI’, ‘CGI’</p></li>
 <li><p><strong>camera</strong> (<em>str</em>) – Camera associated with instrument.
@@ -111,13 +110,15 @@ JWST/NIRISS: ‘Imaging’, ‘AMI’ #AMI has different multi-extension mode</p
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>Pixel coordinates and, if relevant, chip number (HST) or detector name (Roman).</dt><dd><p>Only returned if object coordinates fall onto detector - returns NaNs if not.</p>
+<dt>Pixel coordinates, chip number (HST) or detector name (JWST/Roman) –</dt><dd><p>if relevant, and filter name.
+Only returned if object coordinates fall onto detector - returns NaNs if not.
+Also generates duplicate “topsf” image which will be used in PSF drizzling.</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[X, Y, chip] (list)</p>
+<dd class="field-odd"><p>[X, Y, chip, filter] (list)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -144,14 +145,14 @@ HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.psfexim">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">psfexim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.psfexim" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">psfexim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.psfexim" title="Link to this definition"></a></dt>
 <dd><p>Generate image from PSFEx .psf file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>psfpath</strong> (<em>str</em>) – Path to the relevant .psf file from the working directory.</p></li>
 <li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y).</p></li>
-<li><p><strong>(</strong><strong>bool</strong> (<em>resamp</em>) – If True, will (interpolate) and regrid model PSF to image pixel scale.</p></li>
+<li><p><strong>(</strong><strong>bool</strong> (<em>regrid</em>) – If True, will (interpolate) and regrid model PSF to image pixel scale.</p></li>
 <li><p><strong>save</strong> (<em>str</em>) – If ‘fits’, ‘arr’, ‘txt’, will save in the specified format with name from psfpath.
 The option to save as an array results in a .npy file.</p></li>
 </ul>
@@ -173,7 +174,9 @@ The option to save as an array results in a .npy file.</p></li>
 <li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y, chip) - as from spike.tools.checkpixloc.
 If not specified, generates generic model assuming basis vectors are equally weighted.</p></li>
 <li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.psfex.</p></li>
-<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to PSFEx.</p></li>
+<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to PSFEx. The preferred way to include
+user arguments is via specification in the config file as command line arguments simply override the
+corresponding configuration setting.</p></li>
 <li><p><strong>makepsf</strong> (<em>bool</em>) – If True, returns 2D PSF model.</p></li>
 <li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
 </ul>
@@ -196,7 +199,9 @@ Using this in lieu of sep for easier compatibility with PSFEx.</p>
 <li><p><strong>img_path</strong> (<em>str</em>) – Path to the image from the working directory.</p></li>
 <li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.sex.</p></li>
 <li><p><strong>psf</strong> (<em>bool</em>) – If True and no configuration file specified, uses config and param files that work with PSFEx.</p></li>
-<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to SExtractor.</p></li>
+<li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to SExtractor. The preferred way to include
+user arguments is via specification in the config file as command line arguments simply override the
+corresponding configuration setting.</p></li>
 <li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
 </ul>
 </dd>
@@ -208,14 +213,14 @@ Using this in lieu of sep for easier compatibility with PSFEx.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.rewrite_header">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_header" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_header" title="Link to this definition"></a></dt>
 <dd><p>Write HST and JWST image headers to the model PSFs and modify the coordinates and WCS.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.to_asdf">
 <span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">to_asdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitspath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.to_asdf" title="Link to this definition"></a></dt>
-<dd><p>Convert .fits file to .asdf, by simply wrapping data and header extensions.</p>
+<dd><p>Convert .fits file to .asdf by simply wrapping data and header extensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -227,13 +232,6 @@ Using this in lieu of sep for easier compatibility with PSFEx.</p>
 <dd class="field-even"><p>ASDF file object</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spike.tools.write_header">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">write_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.write_header" title="Link to this definition"></a></dt>
-<dd><p>Write Roman image headers to model PSFs and modify coordinates and WCS.
-Takes in dictionary of relevant header keys given size of files.</p>
 </dd></dl>
 
 </section>

@@ -34,8 +34,8 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 	Parameters:
 		img_dir (str): Path to directory containing _flt or _flc files for which model PSF will be generated.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): 'flc', 'flt', 'c0f', 'c1f' -- specifies which file-type to include.
-		inst (str): 'ACS', 'WFC3', 'WFPC1', 'WFPC2', 'FOC', 'NICMOS', 'STIS'
+		img_type (str): 'flc', 'flt', 'c0f', 'c1f', 'cal', 'calints' -- specifies which file-type to include.
+		inst (str): 'ACS', 'WFC3', 'WFPC1', 'WFPC2', NICMOS', 'STIS'
 		camera (str): 
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
@@ -61,6 +61,11 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 
 	imgs = sorted(glob.glob(img_dir+'/*'+img_type+'.fits'))
 
+	if inst.upper() in ['ACS', 'WFC3']:
+		imcam = inst.upper()+'/'+camera.upper()
+	if inst.upper() in ['WFPC1', 'WFPC2', 'NICMOS', 'STIS']:
+		imcam = inst.upper()
+
 	if inst.upper() == 'WFPC2':
 		updatewcs = True
 
@@ -68,12 +73,12 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'WFCPSF', 'STDPSF', 'EPSF', 'SEPSF', 'USER']:
 		raise Exception('tool must be one of TINYTIM, TINYTIM_GILLIS, WFCPSF, STDPSF, EPSF, SEPSF, USER')
 	if method.upper() == 'TINYTIM':
+		if inst.upper() == 'WFC3':
+			warnings.warn('TinyTim is not recommended for modeling WFC3 PSFs. See https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling.',
+				Warning, stacklevel = 2)
 		psffunc = spike.psfgen.tinypsf
 	if method.upper() == 'TINYTIM_GILLIS':
 		psffunc = spike.psfgen.tinygillispsf
-	if method.upper() == 'WFCPSF':
-		if inst.upper() != 'WFC3':
-			raise Exception('spike.psfgen.wfcpsf ONLY works with HST/WFC3 images.')
 		psffunc = spike.psfgen.wfcpsf
 	if method.upper() == 'EPSF':
 		psffunc = spike.psfgen.effpsf
@@ -89,10 +94,8 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 		if type(obj) == str: #check number of objects
 			skycoords = tools.objloc(o)
 			for i in imgs:
-				coords = tools.checkpixloc(skycoords, inst, camera)
-				psffunc(coords, i, **kwargs)
-				# need to add if TinyTim + WFPC1/NICMOS/FOC, check date
-				# also need to account for jitter and subsampling as options
+				coords = tools.checkpixloc(skycoords, i, inst, camera)
+				psffunc(coords, i, imcam, pos, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -101,7 +104,7 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 			
 			for i in imgs:
 
-				coords = tools.checkpixloc(skycoords, inst, camera)
+				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
 				#need filter name to make PSFs drizzlable
 
@@ -110,15 +113,12 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 						warnings.warn('Warning: Check your config and param files to ensure output files ...')
 					pool = Pool(processes=(cpu_count() - 1))
 					for coord in coords:
-						pool.apply_async(psffunc, args = (coord, i), kwds = kwargs)
+						pool.apply_async(psffunc, args = (coord, i, imcam, pos), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, **kwargs) #will need to feed instrument and camera everytime
-														# even if not used
-														# so will need a comprehensive set of user inputs
-														# in addition to kwargs
+						psffunc(coords, i, imcam, pos, **kwargs) 
 					
 
 			## figure out how best to parallelize at this point
@@ -157,37 +157,11 @@ def roman(config):
 	Generate drizzled Roman Space Telescope PSFs.
 
 	Parameters:
-		config (dict): Dictionary containing relevant information for each object/coordinate. 
-			If generating PSFs for multiple coordinate locations, config should be list of dicts.
-			An example dictionary looks like, 
-			config = {'obj': 'M51', filters':[], 'pixlocs':[], 'detectors':[]}
+		
 
 	Returns:
 
 	"""
-	## will need to figure out coordinates + WCS for drizzling model PSFs...
-		## reading drizzlepac handbook again to figure this out
-		## could extract and write relevant fields to the header and then set reference pixel
-		#	based on the pixel location field?
-
-		## planning to simply copy headers -- probably using dictionaries, then update CRVALs and NPIX vals
-		#	to reflect the size of the PSF and the coordinates of the central pixel
-		## this is extra annoying given the fact that all of the Roman data will be generated in different ways
-
-		## can also just use the images since single detector will be ~100s of MB?
-		## will write it for either a dictionary or... will need to store wcs information in dict, too, though...
-
-	filt_list = np.unique(config['filters'])
-	# config['header'] = # will use same syntax as fits -> asdf to store all header info
-	# will then edit the header info and apply it to the PSF images before drizzling
-
-	# can also offer option that allows for the case where not using config, 
-	# but instead using individual images
-
-	for f in filt_list:
-		detectors = config['detectors'][config['filters'] == f]
-		pixloc = config['pixloc'][config['filters'] == f]
-		# etc
 
 	return placeholder
 

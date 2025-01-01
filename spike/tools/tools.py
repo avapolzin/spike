@@ -50,7 +50,7 @@ def checkpixloc(coords, img, inst, camera = None):
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image.
 		inst (str): Instrument of interest. 
-				HST: 'ACS', 'WFC3', 'WFPC1', WFPC2', 'FOC', 'NICMOS', 'STIS'
+				HST: 'ACS', 'WFC3', 'WFPC1', WFPC2', 'NICMOS', 'STIS'
 				JWST: 'MIRI', 'NIRCAM', 'NIRISS'
 				Roman: 'WFI', 'CGI'
 		camera (str): Camera associated with instrument.
@@ -59,8 +59,10 @@ def checkpixloc(coords, img, inst, camera = None):
 				JWST/NIRISS: 'Imaging', 'AMI' #AMI has different multi-extension mode
 
 	Returns:
-		[X, Y, chip] (list): Pixel coordinates and, if relevant, chip number (HST) or detector name (Roman).
-				Only returned if object coordinates fall onto detector - returns NaNs if not.
+		[X, Y, chip, filter] (list): Pixel coordinates, chip number (HST) or detector name (JWST/Roman) -- 
+			if relevant, and filter name.
+			Only returned if object coordinates fall onto detector - returns NaNs if not.
+			Also generates duplicate "topsf" image which will be used in PSF drizzling.
 
 	"""
 	hdu = fits.open(img)
@@ -68,6 +70,14 @@ def checkpixloc(coords, img, inst, camera = None):
 		imcam = inst.upper() + '/' + camera.upper()
 	if not camera:
 		imcam = inst.upper()
+
+	try: #get filter
+	    filt = hdu[0].header['FILTER']
+	except:
+	    if hdu[0].header['FILTER1'].startswith('F'):
+	        filt = hdu[0].header['FILTER1']
+	    else:
+	        filt = hdu[0].header['FILTER2']
 
 	### instrument checks ###
 	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
@@ -102,22 +112,108 @@ def checkpixloc(coords, img, inst, camera = None):
 					x_coord = check[0]
 					y_coord = check[1]
 					if a == chip1:
-						chip = '1'
+						chip = 1
 					if a == chip2:
-						chip = '2'
+						chip = 2
 		if np.isnan(chip):
-			out = [np.nan, np.nan, chip]
+			out = [np.nan, np.nan, chip, np.nan]
 		else:
-			out = [x_coord, y_coord, chip]
-			os.system('cp '+img+' '+img.replace('.fits', '_topsf.fits')) #generate img to tweak + drizzle
-			## generating the image and will process it in future step
-			## actually will want to process here so that I can Tweak
-			## then will drizzle the _topsf ones with the PSFs overwriting the other data
-			## should actually be fairly simple (famous last words)
+			out = [x_coord, y_coord, chip, filt]
+			os.system('cp '+img+' '+img.replace('.fits', '_%s_topsf.fits'%filt))
+
+
+	if imcam == 'WFPC':
+		chip1 = hdu[1]
+		chip2 = hdu[2]
+		chip3 = hdu[3]
+		chip4 = hdu[4]
+		chip1 = hdu[5]
+		chip2 = hdu[6]
+		chip3 = hdu[7]
+		chip4 = hdu[8]
+		chips = [chip1, chip2, chip3, chip4, chip5, chip6, chip7, chip8]
+
+		chip = np.nan
+		for a in chips:
+			wcs1 = WCS(a.header, fobj = hdu)
+			datshape = a.data.shape
+			if type(coords) != astropy.coordinates.sky_coordinate.SkyCoord:
+				xcoord_out = []
+				ycoord_out = []
+				chip_out = []
+				for coord in coords:
+					check = utils.skycoord_to_pixel(coord, wcs1)
+					if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
+						xcoord_out.append(check[0])
+						ycoord_out.append(check[1])
+						if a == chip1:
+							chip_out.append('1')
+						if a == chip2:
+							chip_out.append('2')
+				if len(xcoord_out) >= 1:
+					out = [[xcoord_out[i], ycoord_out[i], chip_out[i]] for i in range(len(coords))]
+				if len(xcoord_out) == 0:
+					out = [np.nan] * 3
+			if type(coords) == astropy.coordinates.sky_coordinate.SkyCoord:
+				check = utils.skycoord_to_pixel(coords, wcs1)
+				if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
+					x_coord = check[0]
+					y_coord = check[1]
+
+					chip = np.where(np.array(chips) == a)[0][0] + 1
+					
+		if np.isnan(chip):
+			out = [np.nan, np.nan, chip, np.nan]
+		else:
+			out = [x_coord, y_coord, chip, filt]
+			os.system('cp '+img+' '+img.replace('.fits', '_%s_topsf.fits'%filt))
+
+
+	if imcam == 'WFPC2':
+		chip1 = hdu[1]
+		chip2 = hdu[2]
+		chip3 = hdu[3]
+		chip4 = hdu[4]
+		chips = [chip1, chip2, chip3, chip4]
+
+		chip = np.nan
+		for a in chips:
+			wcs1 = WCS(a.header, fobj = hdu)
+			datshape = a.data.shape
+			if type(coords) != astropy.coordinates.sky_coordinate.SkyCoord:
+				xcoord_out = []
+				ycoord_out = []
+				chip_out = []
+				for coord in coords:
+					check = utils.skycoord_to_pixel(coord, wcs1)
+					if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
+						xcoord_out.append(check[0])
+						ycoord_out.append(check[1])
+						if a == chip1:
+							chip_out.append('1')
+						if a == chip2:
+							chip_out.append('2')
+				if len(xcoord_out) >= 1:
+					out = [[xcoord_out[i], ycoord_out[i], chip_out[i]] for i in range(len(coords))]
+				if len(xcoord_out) == 0:
+					out = [np.nan] * 3
+			if type(coords) == astropy.coordinates.sky_coordinate.SkyCoord:
+				check = utils.skycoord_to_pixel(coords, wcs1)
+				if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
+					x_coord = check[0]
+					y_coord = check[1]
+
+					chip = np.where(np.array(chips) == a)[0][0] + 1
+					
+		if np.isnan(chip):
+			out = [np.nan, np.nan, chip, np.nan]
+		else:
+			out = [x_coord, y_coord, chip, filt]
+			os.system('cp '+img+' '+img.replace('.fits', '_%s_topsf.fits'%filt))
 
 
 
-	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS/IMAGING']:
+	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS/IMAGING', 'WFI', 'CGI']:
 		# for WFC3, only checks the final readout by design
 		chip = 0 #no chip
 		wcs1 = WCS(hdu[1].header, fobj = hdu)
@@ -126,26 +222,25 @@ def checkpixloc(coords, img, inst, camera = None):
 		if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
 			x_coord = check[0]
 			y_coord = check[1]
-			out = [x_coord, y_coord, chip]
-			os.system('cp '+img+' '+img.replace('.fits', '_topsf.fits')) #generate img to tweak + drizzle
+			if imcam == 'NIRCAM':
+				chip = hdu[0].header['DETECTOR']
+				if chip in ['NRCALONG', 'NRCBLONG']:
+					chip = chip.replace('LONG', '5')
+			if imcam == 'WFI':
+				# based on how SCA detector is identified in simulated data: https://roman.ipac.caltech.edu/sims/Simulations_csv.html
+				strlist = img.split('_')
+				chip = 'SCA%s'%strlist[-1].split('.')[0].rjust(2, '0')
+			out = [x_coord, y_coord, chip, filt]
+			os.system('cp '+img+' '+img.replace('.fits', '_%s_topsf.fits'%filt)) #generate img to tweak + drizzle
 		else:
-			out = [np.nan] * 3
-
-	# if imcam in ['WFI', 'CGI']: #need to get detector name rather than chip number
-	# 	#will have to look at simulated imaging to see how to do this
-	# 	#detectors all lead to individual files, so will have to understand what part of name
-	#   #or which part of header stores identifier
-
-	# also still need to add all of the other HST imaging modes -- WFPC2 etc. BLERGH
-
-
+			out = [np.nan] * 4
 
 	return out
 
 
 def to_asdf(fitspath, save = True):
 	"""
-	Convert .fits file to .asdf, by simply wrapping data and header extensions.
+	Convert .fits file to .asdf by simply wrapping data and header extensions.
 
 	Parameters:
 		fitspath (str): Path to .fits file to convert.
@@ -181,7 +276,9 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 		img_path (str): Path to the image from the working directory.
 		config (str): If specifying custom config, path to config file. If none, uses default.sex.
 		psf (bool): If True and no configuration file specified, uses config and param files that work with PSFEx.
-		userargs (str): Any additional command line arguments to feed to SExtractor.
+		userargs (str): Any additional command line arguments to feed to SExtractor. The preferred way to include
+			user arguments is via specification in the config file as command line arguments simply override the 
+			corresponding configuration setting.
 		keepconfig (str): If True, retain parameter files and convolutional kernels moved to working dir.
 
 	Returns:
@@ -213,14 +310,14 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 
 
 
-def psfexim(psfpath, pixloc, resamp = True, save = False):
+def psfexim(psfpath, pixloc, regrid = True, save = False):
 	"""
 	Generate image from PSFEx .psf file.
 
 	Parameters:
 		psfpath (str): Path to the relevant .psf file from the working directory.
 		pixloc (tuple): Pixel location of object of interest in (x, y).
-		resamp (bool: If True, will (interpolate) and regrid model PSF to image pixel scale.
+		regrid (bool: If True, will (interpolate) and regrid model PSF to image pixel scale.
 		save (str): If 'fits', 'arr', 'txt', will save in the specified format with name from psfpath.
 			The option to save as an array results in a .npy file.
 
@@ -250,7 +347,7 @@ def psfexim(psfpath, pixloc, resamp = True, save = False):
 
 	psfmodel = np.sum(phic * np.array(xc)[:, None, None], axis = 0)
 
-	if resamp:
+	if regrid:
 		if psfexmodel[1].header['PSF_SAMP'] != 1.:
 			import scipy.interpolate
 
@@ -258,19 +355,25 @@ def psfexim(psfpath, pixloc, resamp = True, save = False):
 		# add scipy to references in paper draft
 		# and to requirements.txt
 
+	# if save:
+
+		## then add all of the code to save the psfex model psf image
+
 	return psfmodel
 
 
-def pypsfex(cat_path, pixloc = None, config = None, userargs = None, makepsf = True, keepconfig = False):
+def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True, keepconfig = False):
 	"""
 	Wrapper to easily call PSFEx from python. 
 
 	Parameters:
 		cat_path (str): Path to the SExtractor catalog from the working directory.
-		pixloc (tuple): Pixel location of object of interest in (x, y, chip) - as from spike.tools.checkpixloc.
+		pos(tuple): Pixel (and spectral) location of object of interest in (x, y, chip, filter) - as from spike.tools.checkpixloc.
 			If not specified, generates generic model assuming basis vectors are equally weighted.
 		config (str): If specifying custom config, path to config file. If none, uses default.psfex.
-		userargs (str): Any additional command line arguments to feed to PSFEx.
+		userargs (str): Any additional command line arguments to feed to PSFEx. The preferred way to include
+			user arguments is via specification in the config file as command line arguments simply override the 
+			corresponding configuration setting.
 		makepsf (bool): If True, returns 2D PSF model.
 		keepconfig (str): If True, retain parameter files and convolutional kernels moved to working dir.
 
@@ -301,7 +404,7 @@ def pypsfex(cat_path, pixloc = None, config = None, userargs = None, makepsf = T
 	if makepsf:
 
 		if coords:
-			x, y, chip = coords
+			x, y, chip, filts = pos
 
 		if not coords:
 			#assumes that .cat and .fits file are in the same directory
@@ -318,7 +421,7 @@ def photutils_seg():
 	return placeholder
 
 
-def rewrite_header(obj, header):
+def rewrite_header(coords, img, imcam, pos):
 	"""
 	Write HST and JWST image headers to the model PSFs and modify the coordinates and WCS.
 
@@ -326,12 +429,4 @@ def rewrite_header(obj, header):
 	"""
 	return placeholder
 
-def write_header(obj, header_params):
-	"""
-	Write Roman image headers to model PSFs and modify coordinates and WCS.
-	Takes in dictionary of relevant header keys given size of files.
-
-
-	"""
-	return placeholder
 

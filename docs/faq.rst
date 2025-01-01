@@ -41,6 +41,10 @@ If you encounter a bug that ultimately traces back to ``spike.jwstcal``, ``spike
 
 As it turns out, ``multiprocessing`` specifically requires that functions be *imported*. It is possible that you will have to create a dummy script that houses your custom PSF generation function. There's a good example of this on `StackOverflow <https://stackoverflow.com/a/42383397>`_.
 
+4. **I'm working with Jupyter Lab/Notebook, and my environment variables are loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH. How do I access them from Jupyter?**
+
+There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_.
+
 
 TinyTim
 -------

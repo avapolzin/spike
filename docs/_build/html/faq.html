@@ -116,6 +116,10 @@
 <li><p><strong>I’m encountering an AttributeError when I enable parallelization and define my own function to generate PSFs. How do I fix this?</strong></p></li>
 </ol>
 <p>As it turns out, <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> specifically requires that functions be <em>imported</em>. It is possible that you will have to create a dummy script that houses your custom PSF generation function. There’s a good example of this on <a class="reference external" href="https://stackoverflow.com/a/42383397">StackOverflow</a>.</p>
+<ol class="arabic simple" start="4">
+<li><p><strong>I’m working with Jupyter Lab/Notebook, and my environment variables are loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH. How do I access them from Jupyter?</strong></p></li>
+</ol>
+<p>There are several ways to make sure that your environment variables are accessible. The various options are discussed in this <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">StackOverflow thread</a>.</p>
 </section>
 <section id="tinytim">
 <h2>TinyTim<a class="headerlink" href="#tinytim" title="Link to this heading"></a></h2>

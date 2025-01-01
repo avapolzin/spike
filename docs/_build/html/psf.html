@@ -94,8 +94,8 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>img_dir</strong> (<em>str</em>) – Path to directory containing _flt or _flc files for which model PSF will be generated.</p></li>
 <li><p><strong>obj</strong> (<em>str</em><em>, </em><em>arr-like</em>) – Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.</p></li>
-<li><p><strong>img_type</strong> (<em>str</em>) – ‘flc’, ‘flt’, ‘c0f’, ‘c1f’ – specifies which file-type to include.</p></li>
-<li><p><strong>inst</strong> (<em>str</em>) – ‘ACS’, ‘WFC3’, ‘WFPC1’, ‘WFPC2’, ‘FOC’, ‘NICMOS’, ‘STIS’</p></li>
+<li><p><strong>img_type</strong> (<em>str</em>) – ‘flc’, ‘flt’, ‘c0f’, ‘c1f’, ‘cal’, ‘calints’ – specifies which file-type to include.</p></li>
+<li><p><strong>inst</strong> (<em>str</em>) – ‘ACS’, ‘WFC3’, ‘WFPC1’, ‘WFPC2’, NICMOS’, ‘STIS’</p></li>
 <li><p><strong>camera</strong> (<em>str</em>)</p></li>
 <li><p><strong>method</strong> (<em>str</em>) – ‘TinyTim’, ‘TinyTim_Gillis’, ‘STDPSF’ (empirical),
 ‘epsf’ (empirical), ‘PSFEx’ (empirical) – see spike.psfgen for details – or ‘USER’;
@@ -124,14 +124,7 @@ named [coords]_[band]_psf.fits, e.g., 23.31+30.12_F814W_psf.fits or 195.78-46.52
 <dt class="sig sig-object py" id="spike.psf.roman">
 <span class="sig-prename descclassname"><span class="pre">spike.psf.</span></span><span class="sig-name descname"><span class="pre">roman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psf.roman" title="Link to this definition"></a></dt>
 <dd><p>Generate drizzled Roman Space Telescope PSFs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary containing relevant information for each object/coordinate.
-If generating PSFs for multiple coordinate locations, config should be list of dicts.
-An example dictionary looks like,
-config = {‘obj’: ‘M51’, filters’:[], ‘pixlocs’:[], ‘detectors’:[]}</p>
-</dd>
-</dl>
+<p>Parameters:</p>
 <p>Returns:</p>
 </dd></dl>
 

@@ -53,7 +53,7 @@ In addition to .fits outputs, users can specify whether they would like a .asdf 
 
 # Preparation for Future Observatories
 
-Right now, the Roman pipeline uses the same resampling/drizzling implementation as _JWST_ via `romancal` [@romancal], and `WebbPSF` includes a module to simulate Roman PSFs. As a forward looking step, a module is included here to handle the proper co-addition of Roman PSFs. The `spike.psf.roman` module includes step for subpixel alignment, as has been done for _HST_ and _JWST_ by "tweaking" images, and model Roman PSFs are then directly drizzled using a version of `romancal.resample`. When the observatory is actually launched and data become available, `spike` will be updated to reflect the most current version of the Nancy Grace Roman Space Telescope pipeline and the detailed considerations of the real data. Due to the anticipated single pointing file size, in addition to taking single detector images, `spike.psf.roman` can take as input a dictionary containing pixel locations, filters, etc. which are used with `spike.psfgen`. Convenience functions are provided to derive some these quantities from images. Since Roman is not yet collecting data, `spike.psf.roman` is based on the structure of simulated single detector data from [@Troxel.etal.2023].
+Right now, the Roman pipeline uses the same resampling/drizzling implementation as _JWST_ via `romancal` [@romancal], and `WebbPSF` includes a module to simulate Roman PSFs. As a forward looking step, a module is included here to handle the proper co-addition of Roman PSFs. The `spike.psf.roman` module includes step for subpixel alignment, as has been done for _HST_ and _JWST_ by "tweaking" images, and model Roman PSFs are then directly drizzled using a version of `romancal.resample`. When the observatory is actually launched and data become available, `spike` will be updated to reflect the most current version of the Nancy Grace Roman Space Telescope pipeline and the detailed considerations of the real data. Due to the anticipated single pointing file size, in addition to taking single detector images, `spike.psf.roman` can take as input a dictionary containing pixel locations, filters, etc. which are used with `spike.psfgen`. Convenience functions are provided to derive some these quantities from images. Since Roman is not yet collecting data, `spike.psf.roman` is based on the structure of simulated single detector data from [e.g., @Troxel.etal.2023].
 
 Raw data are not yet available for the European Space Agency's _Euclid_ mission, which was launched in 2023. Initial analyses of the combined and processed _Euclid_ Early Release Observations rely on empirical PSFs, carefully measured from co-added data CITE. A new _Euclid_ function will be added to `spike` as data and PSF modeling tools become available over the next years. Proper PSF co-addition is of particular importance to _Euclid_ to enable carefully calibrated measurements of cosmic shear. 
 
@@ -62,12 +62,12 @@ Raw data are not yet available for the European Space Agency's _Euclid_ mission,
 Since drizzled `spike` PSFs are intended for use with calibrated and resampled data products from these original pipelines, it is imperative that the processing done on the PSFs is the same as the processing of those data products. Both `jwst` [@Bushouse.etal.2024] and `romancal` are complex packages that house the entire _James Webb Space Telescope_ and Nancy Grace Roman Space Telescope pipelines. As such, they have complicated functionality that relies on modules with more stringent installation requirements. Using `jwst` and `romancal` out of the box places strict limitations on the allowed operating systems. To address this, making `spike` more flexible, there are stripped down versions of the necessary "tweak" and resample scripts included with `spike` as `spike.jwstcal`, `spike.romancal`, `spike.stcal`, and `spike.stpipe`. Each module is only subtly changed from `jwst`, `romancal`, and their underlying `STCAL` [@stcal] and `stpipe` [@stpipe] to avoid unnecessary dependencies that restrict installation.
 
 # Software and Packages Used
- - `asdf` [@graham.etal.]
+ - `asdf` [@graham.etal]
  - `astropy` [@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022]
  - `crds` [@crds]
  - `drizzle` [@Simon.etal.2024]
  - `drizzlepac` [@Hoffmann.etal.2021]
- - `gwcs` [@Dencheva.etal.]
+ - `gwcs` [@Dencheva.etal]
  - `jsonschema` [@jsonschema]
  - `jwst` [@Bushouse.etal.2024]
  - `matplotlib` [@Hunter.2007]
@@ -84,7 +84,7 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
  - `stdatamodels` [@stdatamodels]
  - `stpipe` [@stpipe]
  - `TinyTim` [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters [@Gillis.2019]
- - `tweakwcs` [@cara.etal.]
+ - `tweakwcs` [@cara.etal]
  - `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
 
 # Acknowledgments

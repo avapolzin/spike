@@ -7,14 +7,14 @@ If you use this package or the scripts in this repository in a publication, plea
 
 ``spike`` relies on many other pieces of software. Please also credit the following codes/papers (if stated the condition is met):
 
-* if you use ``spike`` with HST data: ``drizzlepac``
-* if you use ``spike`` with JWST data: ``jwst``
-* if you use ``spike`` with Roman data: ``romancal``
-* if you use ``TinyTim`` model PSFs: ``TinyTim`` 
-* if you use ``TinyTim`` model PSFs with the Gillis et al. modification: ``TinyTim`` + Gillis (2019)/Gillis et al. (2020)
-* if you use ``WebbPSF`` model PSFs: ``WebbPSF``
-* if you use ``PSFEx`` to generate empirical PSFs: ``PSFEx`` and ``SExtractor``
-* if you use ePSFs: ``photutils``
+* if you use ``spike`` with HST data: ``drizzlepac`` (`Hoffmann et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021AAS...23821602H/abstract>`_)
+* if you use ``spike`` with JWST data: ``jwst`` (`Bushouse et al. 2024 <https://zenodo.org/records/7038885>`_)
+* if you use ``spike`` with Roman data: ``romancal`` (`Roman calibration pipeline developers 2024 <https://github.com/spacetelescope/romancal>`_)
+* if you use ``TinyTim`` model PSFs: ``TinyTim`` (`Krist et al. 2011 <https://ui.adsabs.harvard.edu/abs/2011SPIE.8127E..0JK/abstract>`_)
+* if you use ``TinyTim`` model PSFs with the Gillis et al. modification: ``TinyTim`` (`Krist et al. 2011 <https://ui.adsabs.harvard.edu/abs/2011SPIE.8127E..0JK/abstract>`_) + `Gillis (2019) <https://bitbucket.org/brgillis/tinytim_psfs/src/master/>`_/`Gillis et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020MNRAS.496.5017G/abstract>`_
+* if you use ``WebbPSF`` model PSFs: ``WebbPSF`` (Perrin et al. `2012 <https://ui.adsabs.harvard.edu/abs/2012SPIE.8442E..3DP/abstract>`_; `2014 <https://ui.adsabs.harvard.edu/abs/2014SPIE.9143E..3XP/abstract>`_; `2024 <https://github.com/spacetelescope/webbpsf>`_)
+* if you use ``PSFEx`` to generate empirical PSFs: ``PSFEx`` (Bertin `2011 <https://ui.adsabs.harvard.edu/abs/2011ASPC..442..435B/abstract>`_; `2013 <https://ui.adsabs.harvard.edu/abs/2013ascl.soft01001B/abstract>`_) and ``SExtractor`` (`Bertin & Arnauts 1996 <https://ui.adsabs.harvard.edu/abs/1996A%26AS..117..393B/abstract>`_)
+* if you use ePSFs: ``photutils`` (`Bradley et al. 2024 <https://zenodo.org/records/13989456>`_)
 * if you use STDPSFs: 
 
 Note that the BibTex for all of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.
