@@ -59,15 +59,20 @@ def test_psfgen():
 	    TINY_PATH = os.environ['TINYTIM']
 	except:
 	    TINY_PATH = None
+	    print('Cannot find TinyTim. If you want to use TinyTim to generate PSFs, please make sure it is installed properly.')
 
 	if TINY_PATH:
 		ttex = fits.open('./test_data/ttout.fits')
 		outtiny = spike.psfgen.tinypsf(coords, img, imcam, pos)
-		assert outtiny == ttex[0].data
+		assert outtiny == ttex[0].data #check extension number here
 
 	## test PSFEx
 	SE_PATH = shutil.which('sex')
+	if not SE_PATH:
+		print('Cannot find SExtractor. If you want to use PSFEx to generate PSFs, please make sure it is installed properly.')
 	PSFEX_PATH = shutil.which('psfex')
+	if not PSFEX_PATH:
+		print('Cannot find PSFEx. If you want to use PSFEx to generate PSFs, please make sure it is installed properly.')
 	if SE_PATH and PSFEX_PATH:
 		psfexex = np.load('./test_data/psfexout.npy')
 		outpsfex = spike.psfgen.sepsf(coords, img, imcam, pos)
@@ -78,6 +83,7 @@ def test_psfgen():
 	    WEBBPSF_PATH = os.environ['WEBBPSF_PATH']
 	except:
 	    WEBBPSF_PATH = None
+	    print('Cannot find WEBBPSF_PATH. If you want to use WebbPSF to generate PSFs, please make sure the ancillary data files are installed properly.')
 
 	if WEBBPSF_PATH:
 		wex = fits.open('./test_data/wout.fits')

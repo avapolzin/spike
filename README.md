@@ -67,6 +67,6 @@ All tests should pass by default, *but, if you are not intending to use `spike` 
 
 ## Issues and Contributing
 
-If you encounter a bug, first check the [documatnation](https://spike-psf.readthedocs.io) or the [FAQ](https://github.com/avapolzin/spike/blob/master/FAQ.md); if you don't find a solution there, please feel free to open an issue (or a PR with a fix). If you have a question, please feel free to email me at apolzin at uchicago dot edu.
+If you encounter a bug, first check the [documentation](https://spike-psf.readthedocs.io) or the [FAQ](https://github.com/avapolzin/spike/blob/master/FAQ.md); if you don't find a solution there, please feel free to open an issue (or a PR with a fix). If you have a question, please feel free to email me at apolzin at uchicago dot edu.
 
 If you would like to contribute to `spike`, either enhancing what already exists here or working to add features (as for other telescopes/PSF models), please make a pull request. If you are unsure of how your enhancement will work with the existing code, reach out and we can discuss it.
