@@ -1,6 +1,4 @@
-![spike_logo 004](https://github.com/user-attachments/assets/bc7dd19e-1fe8-4c06-ae36-3501b9aa8fc5)
-
-[![Documentation Status](https://readthedocs.org/projects/spike-psf/badge/?version=latest)](https://spike-psf.readthedocs.io/en/latest/?badge=latest)
+![spike_logo 004](https://github.com/user-attachments/assets/bc7dd19e-1fe8-4c06-ae36-3501b9aa8fc5) [![Documentation Status](https://readthedocs.org/projects/spike-psf/badge/?version=latest)](https://spike-psf.readthedocs.io/en/latest/?badge=latest)
 
 All-in-one tool to generate, and correctly drizzle, _HST_, _JWST_, and Roman PSFs.
 
