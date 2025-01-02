@@ -55,6 +55,13 @@ def test_multiprocessing():
 
 
 def test_psfgen():
+	"""
+	Test image processing and PSF generation steps of spike.
+
+	Attempts to confirm the existence of optional executables before running.
+	"""
+	import shutil
+	import spike
 	## have to search for executables and aliases
 	## can use which I guess? 
 	## sex, psfex -- executables
@@ -65,11 +72,43 @@ def test_psfgen():
 
 	# https://stackoverflow.com/questions/41230547/check-if-program-is-installed-in-c
 
+	coords = spike.tools.objloc() # will need to work out my choice
+	img = './test_data/imexample.fits'
+	imcam = 'ACS/WFC'
+	pos = spike.tools.checkpixloc(coords, img, imcam)
 
-	## test TinyTim,
+	## test TinyTim
+	try:
+	    TINY_PATH = os.environ['TINYTIM']
+	except:
+	    TINY_PATH = None
 
-	## test PSFEx, 
+	if TINY_PATH:
+		ttex = fits.open('./test_data/ttout.fits')
+		outtiny = spike.psfgen.tinypsf(coords, img, imcam, pos)
+		assert outtiny == ttex[0].data
 
-	# the generated models will be in test_data
-	# will keep minimal data, too, for empirical PSF tests
-	# this will be annoying to set up -- will finish everything else first
+	## test PSFEx
+	SE_PATH = shutil.which('sex')
+	PSFEX_PATH = shutil.which('psfex')
+	if SE_PATH and PSFEX_PATH:
+		psfexex = np.load('./test_data/psfexout.npy')
+		outpsfex = spike.psfgen.sepsf(coords, img, imcam, pos)
+		assert outpsfex == psfexex
+
+	## test WebbPSF
+	try:
+	    WEBBPSF_PATH = os.environ['WEBBPSF_PATH']
+	except:
+	    WEBBPSF_PATH = None
+
+	if WEBBPSF_PATH:
+		wex = fits.open('./test_data/wout.fits')
+		outw = spike.psfgen.jwpsf(coords, img, imcam, pos)
+		assert outw == wex[3].data
+
+		
+
+
+
+

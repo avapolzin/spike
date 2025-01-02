@@ -50,7 +50,7 @@ def checkpixloc(coords, img, inst, camera = None):
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image.
 		inst (str): Instrument of interest. 
-				HST: 'ACS', 'WFC3', 'WFPC1', WFPC2', 'NICMOS', 'STIS'
+				HST: 'ACS', 'WFC3', 'WFPC', WFPC2', 'NICMOS', 'STIS'
 				JWST: 'MIRI', 'NIRCAM', 'NIRISS'
 				Roman: 'WFI', 'CGI'
 		camera (str): Camera associated with instrument.
@@ -236,6 +236,8 @@ def checkpixloc(coords, img, inst, camera = None):
 			out = [np.nan] * 4
 
 	return out
+
+	#STIS and NICMOS?
 
 
 def to_asdf(fitspath, save = True):

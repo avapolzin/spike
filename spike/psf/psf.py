@@ -35,7 +35,7 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 		img_dir (str): Path to directory containing _flt or _flc files for which model PSF will be generated.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
 		img_type (str): 'flc', 'flt', 'c0f', 'c1f', 'cal', 'calints' -- specifies which file-type to include.
-		inst (str): 'ACS', 'WFC3', 'WFPC1', 'WFPC2', NICMOS', 'STIS'
+		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS', 'STIS'
 		camera (str): 
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
@@ -90,30 +90,49 @@ def hst(img_dir, obj, img_type, inst, camera, method, savepath = 'psfs/drizzledp
 		if type(method) != str: #or function
 			psffunc = method
 
+	if not pretweaked:
+		# need to add these arguments to options above
+		tweakreg.TweakReg(imgs, threshold=6.0, searchrad=3.0, dqbits=-16,
+        configobj = None, interactive=False, shiftfile=True, expand_refcat=True,
+        outshifts='shift_searchrad.txt', updatehdr=True)
+
+
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
+			drizzlelist = {} #write file prefixes to drizzle per filter
 			skycoords = tools.objloc(o)
 			for i in imgs:
-				coords = tools.checkpixloc(skycoords, i, inst, camera)
-				psffunc(coords, i, imcam, pos, **kwargs)
+				pos = tools.checkpixloc(skycoords, i, inst, camera)
+				if np.isfinite(pos[0]): #confirm object falls onto image
+					if pos[3] not in drizzlelist.keys():
+						drizzlelist[pos[3]] = []
+					drizzlelistp[pos[3]].append(i)
+
+					psffunc(coords, i, imcam, pos, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
+
+			drizzlelist = {}
 			for o in obj:
+				drizzlelist[o] = {}
 				skycoords.append(tools.objloc(o))
 			
 			for i in imgs:
 
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
-				#need filter name to make PSFs drizzlable
-
 				if parallel:
 					if method.upper() == 'PSFEX':
 						warnings.warn('Warning: Check your config and param files to ensure output files ...')
 					pool = Pool(processes=(cpu_count() - 1))
-					for coord in coords:
-						pool.apply_async(psffunc, args = (coord, i, imcam, pos), kwds = kwargs)
+					for j, p in enumerate(pos):
+						if np.isfinite(p[0]): #confirm that object falls onto detector
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+							drizzlelistp[obj[j]][pos[3]].append(i)
+
+							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:

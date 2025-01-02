@@ -13,12 +13,15 @@ warnings.formatwarning = warning_on_one_line
 
 CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
 
-##########
-# * * * *
-##########
-
 tinyparams = {}
-tinyparams['imcam'] = {'ACS/WFC':15, 'ACS/HRC':16}
+tinyparams['imcam'] = {'WFPC1/WFC':1, 'WFPC1/PC':2, 'FOC/f48':3, 'FOC/f96':4, 
+'WFPC2/WFC':5, 'WFPC2/PC':6, 'FOC/f48-COSTAR':7, 'FOC/f96-COSTAR':8, 'NICMOS/NIC1-precool':9,
+'NICMOS/NIC2-precool':10, 'NICMOS/NIC3-precool':11, 'STIS/CCD':12, 'STIS/NUV':13, 'STIS/FUV':14,
+'ACS/WFC':15, 'ACS/HRC':16, 'ACS/HRC-offspot':17, 'ACS/SBC':18, 'NICMOS/NIC1':19, 
+'NICMOS/NIC2':20, 'NICMOS/NIC3':21, 'WFC3/UVIS':22, 'WFC3/IR':23}
+# listing all options here, though not all are explicitly included in the spike code
+tinyparams['specparam'] = {'O5':1, 'O8F':2, 'O6':3, 'B1V':4, 'B3V':5, 'B6V':6, 'A05':7, 'A5V':8, 
+'F6V':9, 'F8V':10, 'G2V':11, 'G5V':12, 'G8V':13, 'K4V':14, 'K7V':15, 'M1.5V':16, 'M3V':17}
 
 try:
     TINY_PATH = os.environ['TINYTIM']
@@ -26,22 +29,31 @@ except:
     TINY_PATH = None
 
 
-def tinypsf(coords, img, pos, plot = False, verbose = False, 
+##########
+# * * * *
+##########
+
+
+def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	ebmv = None, av = None, wmag = None,
-	jitter = None, major = None, minor = None, angle = None):
+	jitter = None, major = None, minor = None, angle = None,
+	specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., 
+	specalpha = 1., specbeta = 1., fov_arcsec = 6., despace = 0.):
 	"""
 	Generate HST PSFs using TinyTim.
 	All of the options from TinyTim are easily available here *except* custom filters
 	and subsampling, as they complicate use with spike. If you would like a subsampled
 	Tiny Tim PSF model, please use spike.psfgen.tinygillispsf() instead.
-	In addition to making model PSF, write tweak parameters to header.
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image for which PSF is generated.
+		imcam
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
+		writeto (bool): If True, will write 2D model PSF to copy of img (differentiated with '_topsf' 
+			suffix) and will amend relevant WCS information/remove extraneous extensions.
 		ebmv (float):
 		av (float):
 		wmag (float):
@@ -49,6 +61,16 @@ def tinypsf(coords, img, pos, plot = False, verbose = False,
 		major (float):
 		minor (float):
 		angle (float):
+		specchoice (str): 'list', 'blackbody', 'plaw_nu', 'plaw_lam' -- if 'list', must also specify
+			listchoice; if 'blackbody', must also specify temp, 
+		listchoice (str): One of 'O5', 'O8F', 'O6', 'B1V', 'B3V', 'B6V', 'A0V', 'A5V', 'F6V', 'F8V',
+			'G2V', 'G5V', 'G8V', 'K4V', 'K7V', 'M1.5V', 'M3V'
+		temp (float)
+		specalpha (float): Spectral index alpha for F(nu)~nu^alpha.
+		specbeta (float): Spectral index alpha for F(lambda)~lambda^beta.
+		fov_arcsec 
+		despace (float): Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
+			the 4th Zernike polynomial.
 	"""
 	if not TINY_PATH:
 		# this is a warning and not an error on the off chance that the TinyTim executables are 
@@ -80,14 +102,48 @@ def tinypsf(coords, img, pos, plot = False, verbose = False,
 	if None in [major, minor, angle]:
 		warnings.warn('All of major, minor, and angle must be specified to be applied. Proceeding with no elliptical jitter.', Warning, stacklevel = 2)
 
-	## choose your own adventure command list generation
-	# this will be annoying
-	# and will want to draw from image header and inputs from psf mostly
-	# this is also where tinyparams comes into play
-	# command_list = 
+	if specchoice = 'list':
+		spec = 1
+		specparam = tinyparams['specparam'][listchoice]
 
-	if imcam == 'ACS/WFC':
-		command_list = []
+	if specchoice == 'blackbody':
+		spec = 2
+		specparam = temp
+
+	if specchoice == 'plaw_fnu':
+		spec = 3
+		specparam = specalpha
+
+	if specchoice == 'plaw_flam':
+		spec = 4
+		specparam = specbeta
+
+	modname = img.replace('.fits', coordstring+'_%s_'%pos[3]+'_psf')
+
+	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
+		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 
+		pos[3], spec, specparam, fov_arcsec, despace, modname]
+	if imcam in ['ACS/HRC', 'WFC3/IR']:
+		command_list = [16, '%i %i'%(pos[0], pos[1]), pos[3], 
+		spec, specparam, fov_arcsec, despace, modname]
+	if imcam == 'WFPC1':
+		if pos[2] <= 4:
+			imcam = 'WFPC/WFC'
+		if pos[2] >= 5:
+			imcam = 'WFPC/PC'
+		imfits = fits.open(img)
+		yyyy, mm, dd = imfits[0].header['DATE'].split('T')[0].split('-')
+		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 
+		'%i %i %i'%(dd, mm, yyyy), pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
+	if (imcam == 'WFPC2') and (pos[2] == 1):
+		imcam = 'WFPC2/PC'
+		command_list = [tinyparams['imcam'][imcam], '%i %i'%(pos[0], pos[1]), 
+		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
+	if (imcam == 'WFPC2') and (pos[2] >= 2):
+		imcam = 'WFPC2/WFC'
+		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 
+		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
+
 
 
 	tiny = subprocess.Popen(tiny1, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -100,20 +156,26 @@ def tinypsf(coords, img, pos, plot = False, verbose = False,
 	if verbose:
 		print("Completed PSF modeling.")
 
-	if inst.upper() == 'ACS': 
+	if imcam in ['ACS/WFC', 'ACS/HRC']: 
 		os.system(TINY_PATH+'/tiny3 tiny.param')
 		if verbose:
 			print("Completed geometric distortion correction.")
+
+	# deal with NICMOS and STIS -- will add later
+	# inclined to include NICMOS but not STIS
+	# NICMOS has time complication since the cryo-cooler etc. matter
+	# set date of change over at April 3, 2002: https://ui.adsabs.harvard.edu/abs/2008AIPC..985..799S/abstract
 
 	
 	return placeholder
 
 
 
-def tinygillispsf(coords, img, pos, plot = False, keep = False, verbose = False):
+def tinygillispsf(coords, img, pos, plot = False, keep = False, verbose = False, writeto = True):
 	"""
-	Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al (2020).
-	In addition to making model PSF, write tweak parameters to header.
+	Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al (2020), 
+	which were tested on ACS imaging.
+	
 
 	Note that the Gillis et al. (2020) code will be downloaded to your working directory. If keep = False (default), 
 	it will be removed after use.
