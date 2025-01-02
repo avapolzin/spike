@@ -23,21 +23,7 @@ def test_objloc(obj, expected):
 
 
 def test_multiprocessing():
-	## confirm that multiprocessing is working as expected for simultaneous file generation
-	import os
-	from multiprocessing import Pool, cpu_count
-	pool = Pool(processes = (cpu_count() - 1))
-	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
-		pool.apply_async(os.system, args = ('touch '+i+'_test.txt'))
-	pool.close()
-	pool.join()
-	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
-		assert os.path.exists(i+'_test.txt')
-		os.system('rm '+i+'_test.txt')
-
-
-def test_multiprocessing():
-	# more extensive/robust check on async file creation
+	# simple check on async file creation
 	# if this doesn't pass on the assert, user should not use the parallel option
 	import os
 	from multiprocessing import Pool, cpu_count
@@ -49,7 +35,7 @@ def test_multiprocessing():
 	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
 		with open(i+'_test.txt') as file:
 		    checkstring = file.read()
-		assert i == checkstring
+		assert i+'\n' == checkstring
 		os.system('rm '+i+'_test.txt')
 
 
@@ -62,15 +48,6 @@ def test_psfgen():
 	"""
 	import shutil
 	import spike
-	## have to search for executables and aliases
-	## can use which I guess? 
-	## sex, psfex -- executables
-	## tiny1,2,3 (or just TINYTIM) -- alias; WEBBPSF_PATH -- alias
-
-	# https://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-	# https://stackoverflow.com/questions/51785022/check-if-sourced-bash-profile-command-exists
-
-	# https://stackoverflow.com/questions/41230547/check-if-program-is-installed-in-c
 
 	coords = spike.tools.objloc() # will need to work out my choice
 	img = './test_data/imexample.fits'
@@ -107,7 +84,7 @@ def test_psfgen():
 		outw = spike.psfgen.jwpsf(coords, img, imcam, pos)
 		assert outw == wex[3].data
 
-		
+
 
 
 

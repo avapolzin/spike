@@ -99,7 +99,7 @@
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image.</p></li>
 <li><p><strong>inst</strong> (<em>str</em>) – Instrument of interest.
-HST: ‘ACS’, ‘WFC3’, ‘WFPC1’, WFPC2’, ‘NICMOS’, ‘STIS’
+HST: ‘ACS’, ‘WFC3’, ‘WFPC’, WFPC2’, ‘NICMOS’, ‘STIS’
 JWST: ‘MIRI’, ‘NIRCAM’, ‘NIRISS’
 Roman: ‘WFI’, ‘CGI’</p></li>
 <li><p><strong>camera</strong> (<em>str</em>) – Camera associated with instrument.
@@ -165,13 +165,13 @@ The option to save as an array results in a .npy file.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.pypsfex">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixloc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
 <dd><p>Wrapper to easily call PSFEx from python.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cat_path</strong> (<em>str</em>) – Path to the SExtractor catalog from the working directory.</p></li>
-<li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y, chip) - as from spike.tools.checkpixloc.
+<li><p><strong>pos</strong> (<em>tuple</em>) – Pixel (and spectral) location of object of interest in (x, y, chip, filter) - as from spike.tools.checkpixloc.
 If not specified, generates generic model assuming basis vectors are equally weighted.</p></li>
 <li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.psfex.</p></li>
 <li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to PSFEx. The preferred way to include

@@ -34,7 +34,7 @@ except:
 ##########
 
 
-def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
+def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
 	ebmv = None, av = None, wmag = None,
 	jitter = None, major = None, minor = None, angle = None,
 	specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., 
@@ -102,7 +102,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	if None in [major, minor, angle]:
 		warnings.warn('All of major, minor, and angle must be specified to be applied. Proceeding with no elliptical jitter.', Warning, stacklevel = 2)
 
-	if specchoice = 'list':
+	if specchoice == 'list':
 		spec = 1
 		specparam = tinyparams['specparam'][listchoice]
 
