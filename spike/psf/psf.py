@@ -19,8 +19,8 @@ warnings.formatwarning = warning_on_one_line
 ##########
 
 
-def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, savepath = 'psfs/drizzledpsf.fits', 
-		drizzleimgs = False, pretweaked = False, driz_type = None, totweak = None,
+def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, 
+		savedir = 'psfs', drizzleimgs = False, pretweaked = False,
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		tweakparams = {'threshold':6.0, 
 					   'searchrad':3.0, 
@@ -62,14 +62,9 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, savepat
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
 				imgprefix corresponds to the name of the relevant flt/flc/c0f/c1f/... files in the directory and the 
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
-		savepath (str): Where/with what name output drizzled PSF will be saved. Defaults to 'psfs/drizzledpsf.fits'.
+		savedir (str): Where the PSF models and drizzled PSF will be saved. Defaults to 'psfs'.
 		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
-		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
-		driz_type (str): e.g., 'drz', 'drc'. If no drizzled images in directory, None.
-		totweak (str): If pretweaked = False, refers to totweak. Options are 'tweak', 'tweakback', 'skip', or None.
-			If 'tweak', uses tweakreg; if 'tweakback', uses tweakback (must have drizzled image files available);
-			if 'skip', skips the tweak step entirely; and if None, selects between 'tweak'/'tweakback' based on available 
-			data. 'tweakback' is generally preferred due to lower computational load.
+		pretweaked (bool): If True, skips TweakReg steps to include fine WCS corrections.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
@@ -123,45 +118,25 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, savepat
 		if type(usermethod) != str: #or function
 			psffunc = method
 
+	filelist = {} # generate list of files to tweak -- by filter
+	for fi in imgs:
+		hdu = fits.open(fi)
+		try: #get filter
+		filt = hdu[0].header['FILTER']
+		except:
+			if hdu[0].header['FILTER1'].startswith('F'):
+				filt = hdu[0].header['FILTER1']
+			else:
+				filt = hdu[0].header['FILTER2']
+		if filt not in filelist.keys():
+			filelist[filt] = []
+		filelist[filt].append(fi)
 
 	if not pretweaked:
-
-		filelist = {} # generate list of files to tweak -- by filter
-		filelist['cal'], filelist['driz'] = [], []
-		for fi in imgs:
-			hdu = fits.open(fi)
-			try: #get filter
-			filt = hdu[0].header['FILTER']
-			except:
-				if hdu[0].header['FILTER1'].startswith('F'):
-					filt = hdu[0].header['FILTER1']
-				else:
-					filt = hdu[0].header['FILTER2']
-			if filt not in filelist.keys():
-				filelist['cal'][filt] = []
-				filelist['driz'][filt] = []
-			filelist['cal'][filt].append(fi)
-
-		if driz_type:
-			drimgs = sorted(glob.glob(img_dir+'/*'+driz_type+'.fits'))
-			for fdi in drimgs:
-				hdu = fits.open(fdi)
-				try: #get filter
-				filt = hdu[0].header['FILTER']
-				except:
-					if hdu[0].header['FILTER1'].startswith('F'):
-						filt = hdu[0].header['FILTER1']
-					else:
-						filt = hdu[0].header['FILTER2']
-				if filt not in filelist.keys():
-					filelist['driz'][filt] = []
-				filelist['driz'][filt].append(fdi)
-
-		if totweak == 'tweak':
-			for fk in filelist['cal'].keys():
-				if filelist['driz'][fk] != []:
-					tweakreg.TweakReg(filelist['cal'][fk], 
-						refimage = filelist['driz'][fk][0], **tweakparams)
+		# note that if there are many input files, tweakreg will be very slow and prone
+		# to overuse of RAM	
+		for fk in filelist.keys():
+			tweakreg.TweakReg(filelist[fk], **tweakparams)
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -217,23 +192,41 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, savepat
 			drizzlelist[obj][filt].append(im)
 			
 
-
-			## also need to parallelize the drizzling of PSFs by object
-
-
 	if keeporig:
 		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
-	# if method.upper() in ['EPSF', 'PSFEX']:
-	# 	drizzleparams['drizz_cr_corr'] = False #CR-corrected imgs will already exist from PSF generation
+
+	for do in drizzlelist.keys()
+		if parallel:
+			pool = Pool(processes=(cpu_count() - 1))
+			for dk in drizzlelist[do].keys():
+				pool.apply_async(astrodrizzle.AstroDrizzle, args = (drizzlelist[do][dk]), kwds = drizzleparams)
+			pool.close()
+			pool.join()
+		if not parallel:
+			for dk in drizzlelist[do].keys():
+				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
+
+	
+	if drizzleimgs: # useful for processing all images + PSFs simultaneously
+		for fk in filelist.keys():
+			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
 
 
-
-
+	# clean up step to move all of the PSF files to the relevant directory
+	# should grab all .pngs, .fits etc.
+	if not os.exists(savedir):
+		os.mkdirs(savedir)
+	os.system('mv *_psf* %s'%savedir) # generated PSF models
+	os.system('mv *.psf %s'%savedir)
+	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
-		tools.to_asdf()
+		sufs = ['drc', 'drz']:
+		dout = np.concatenate((sorted(glob.glob('*_drc.fits')), sorted(glob.glob('*_drz.fits'))))
+		for di in dout:
+			tools.to_asdf(di)
 
 
 
