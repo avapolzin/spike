@@ -20,7 +20,7 @@ warnings.formatwarning = warning_on_one_line
 
 
 def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, 
-		savepath = 'psfs/drizzledpsf.fits', drizzleimgs = False, pretweaked = False, 
+		savepath = 'psfs/drizzledpsf.fits', drizzleimgs = False, pretweaked = False,
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		tweakparams = {'threshold':6.0, 
 					   'searchrad':3.0, 
@@ -117,9 +117,24 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None,
 		if type(usermethod) != str: #or function
 			psffunc = method
 
+	filelist = {} # generate list of files to tweak -- by filter
+	for fi in imgs:
+		hdu = fits.open(fi)
+		try: #get filter
+		filt = hdu[0].header['FILTER']
+		except:
+			if hdu[0].header['FILTER1'].startswith('F'):
+				filt = hdu[0].header['FILTER1']
+			else:
+				filt = hdu[0].header['FILTER2']
+		if filt not in filelist.keys():
+			filelist[filt] = []
+		filelist[filt].append(fi)
+
 	if not pretweaked:
 		# need to add these arguments to options above
-		tweakreg.TweakReg(imgs, **tweakparams)
+		for fk in filelist.keys():
+			tweakreg.TweakReg(filelist[fk], **tweakparams)
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object

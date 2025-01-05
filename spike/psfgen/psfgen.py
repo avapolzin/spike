@@ -462,7 +462,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	tools.pysextractor(img+'[%i]'%ext, config = seconf)
 	if verbose:
 		print('Finished SExtractor, running PSFEx')
-	psfmodel = tools.pypsfex(img.replace('fits', 'cat'), config = psfconf)
+	psfmodel = tools.pypsfex(img.replace('fits', 'cat'), config = psfconf, save = savepsfex)
 	if verbose:
 		print('Finished PSFEx, generating image')
 

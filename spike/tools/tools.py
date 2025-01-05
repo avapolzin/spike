@@ -450,7 +450,6 @@ def rewrite_fits(psfarr, coords, img, imcam, pos):
 	hdr['CRVAL2'] = CRVAL2
 	hdr['CRPIX1'] = CRPIX1
 	hdr['CRPIX2'] = CRPIX2
-	# have to add the pixel-corrected tweak parameters
 	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
 
 	coordstring = str(coords.ra)
