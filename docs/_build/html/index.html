@@ -85,19 +85,19 @@
 <p>If you are using <code class="docutils literal notranslate"><span class="pre">WebbPSF</span></code>, you will need to install the relevant data and include it in your path. Instructions to do this are available <a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/installation.html#data-install">here</a>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">jwst</span></code> and <code class="docutils literal notranslate"><span class="pre">romancal</span></code> pipelines – which are used in tweak/resample steps for JWST and Roman – require the setup of the CRDS_PATH environment variable. The amended version of the code also relies on <code class="docutils literal notranslate"><span class="pre">crds</span></code>, so it is necessary to set these environment variables according to the instructions <a class="reference external" href="https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html">here</a> if you plan to use <code class="docutils literal notranslate"><span class="pre">spike</span></code> with JWST or Roman data.</p>
 <p>If you install all of the optional dependencies described above, your shell’s startup file will look something like:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export TINYTIM=&quot;/path/to/tinytim-7.5&quot;</span>
-<span class="go">alias tiny1=&quot;$TINYTIM/tiny1&quot;</span>
-<span class="go">alias tiny2=&quot;$TINYTIM/tiny2&quot;</span>
-<span class="go">alias tiny3=&quot;$TINYTIM/tiny3&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">TINYTIM</span><span class="o">=</span><span class="s2">&quot;/path/to/tinytim-7.5&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny1</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny1&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny2</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny2&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny3</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny3&quot;</span>
 
-<span class="go">export WEBBPSF_PATH=&quot;/path/to/webbpsf-data&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">WEBBPSF_PATH</span><span class="o">=</span><span class="s2">&quot;/path/to/webbpsf-data&quot;</span>
 
-<span class="go">export CRDS_PATH=&quot;/path/to/crds_cache/&quot;</span>
-<span class="gp"># </span><span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_SERVER_URL</span><span class="o">=</span><span class="s2">&quot;https://jwst-crds.stsci.edu&quot;</span>
-<span class="gp"># </span><span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_SERVER_URL</span><span class="o">=</span><span class="s2">&quot;https://roman-crds.stsci.edu&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_PATH</span><span class="o">=</span><span class="s2">&quot;/path/to/crds_cache/&quot;</span>
+<span class="c1"># export CRDS_SERVER_URL=&quot;https://jwst-crds.stsci.edu&quot;</span>
+<span class="c1"># export CRDS_SERVER_URL=&quot;https://roman-crds.stsci.edu&quot;</span>
 </pre></div>
 </div>
-<p>Since both JWST and Roman CRDS servers may be defined, these variables are added directly within <code class="docutils literal notranslate"><span class="pre">spike.jwstcal</span></code> and <a href="#id3"><span class="problematic" id="id4">``</span></a>spike.romancal``and do not need to be added to your startup file.</p>
+<p>Since both JWST and Roman CRDS servers may be defined, these variables are added directly within <code class="docutils literal notranslate"><span class="pre">spike.jwstcal</span></code> and <code class="docutils literal notranslate"><span class="pre">spike.romancal</span></code> and do not need to be added to your startup file.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>

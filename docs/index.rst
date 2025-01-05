@@ -17,7 +17,7 @@ The ``jwst`` and ``romancal`` pipelines -- which are used in tweak/resample step
 
 If you install all of the optional dependencies described above, your shell's startup file will look something like:
 
-.. code-block:: console
+.. code-block:: bash
 
 	export TINYTIM="/path/to/tinytim-7.5"
 	alias tiny1="$TINYTIM/tiny1"
@@ -30,7 +30,7 @@ If you install all of the optional dependencies described above, your shell's st
 	# export CRDS_SERVER_URL="https://jwst-crds.stsci.edu"
 	# export CRDS_SERVER_URL="https://roman-crds.stsci.edu"
 
-Since both JWST and Roman CRDS servers may be defined, these variables are added directly within ``spike.jwstcal`` and ``spike.romancal``and do not need to be added to your startup file.
+Since both JWST and Roman CRDS servers may be defined, these variables are added directly within ``spike.jwstcal`` and ``spike.romancal`` and do not need to be added to your startup file.
 
 .. toctree::
 	:maxdepth: 1

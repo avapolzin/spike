@@ -24,7 +24,8 @@ __all__ = ['resample_step', 'resample', 'resample_utils',
 'associations_pool', 'associations_lib_counter', 'datamodels_library', 'model_blender_rules', 
 'model_blender_schemautil', 'model_blender_tablebuilder', 'stpipe_utilities',
 'tweakreg_tweakreg_step', 'stpipe_core',
-'tweakreg_tweakreg_catalog', 'source_catalog_detection']
+'tweakreg_tweakreg_catalog', 'source_catalog_detection', 
+'outlier_detection_step', 'outlier_detection_imaging']
 
 
 # import .resample_step, .resample, .resample_utils
@@ -60,3 +61,4 @@ from . import associations_pool, associations_lib_counter, datamodels_library, m
 from . import model_blender_schemautil, model_blender_tablebuilder
 from . import tweakreg_tweakreg_step, stpipe_core
 from . import tweakreg_tweakreg_catalog, source_catalog_detection
+from . import outlier_detection_step, outlier_detection_imaging
