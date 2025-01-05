@@ -24,11 +24,33 @@ or (which does not work yet because I need to figure out what to do with the c b
 pip install spike-psf
 ```
 
+If you install from PyPI, you will also need to install `DrizzlePac` from the [GitHub distribution](https://github.com/spacetelescope/drizzlepac.git).
+
 *Note that `spike.psfgen.tinypsf` and `spike.psfgen.tinygillispsf` require `TinyTim` for simulated PSFs. To use that module, please download [`TinyTim` version 7.5](https://github.com/spacetelescope/tinytim/releases) and follow the install instructions. Since that software is now unmaintained, refer to the [STScI site](https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling) for details and caveats.*
 
 *If you plan to use the `PSFEx` empirical PSF modeling, that will similarly need to be downloaded from the [GitHub repository](https://github.com/astromatic/psfex) and installed, as will [`SExtractor`](https://github.com/astromatic/sextractor).*
 
 *If you are using `WebbPSF`, you will need to install the relevant data and include it in your path. Instructions to do this are available [here](https://webbpsf.readthedocs.io/en/latest/installation.html#data-install).*
+
+*The `jwst` and `romancal` pipelines -- which are used in tweak/resample steps for JWST and Roman -- require the setup of CRDS_PATH and CRDS_SERVER_URL environment variables. The amended version of the code also relies on `crds`, so it is necessary to set these environment variables according to the instructions [here](https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html) if you plan to use `spike` with JWST or Roman data.*
+
+If you install all of the optional dependencies described above, your shell's startup file will look something like:
+
+``` bash
+
+export TINYTIM="/path/to/tinytim-7.5"
+alias tiny1="$TINYTIM/tiny1"
+alias tiny2="$TINYTIM/tiny2"
+alias tiny3="$TINYTIM/tiny3"
+
+export WEBBPSF_PATH="/path/to/webbpsf-data"
+
+export CRDS_PATH="/path/to/crds_cache/"
+# export CRDS_SERVER_URL="https://jwst-crds.stsci.edu"
+# export CRDS_SERVER_URL="https://roman-crds.stsci.edu"
+```
+
+Since both JWST and Roman CRDS servers may be defined, these variables are added directly within `spike.jwstcal` and `spike.romancal` and do not need to be added to your startup file. 
 
 
 ## Getting Started

@@ -34,7 +34,7 @@ def test_multiprocessing():
 	pool.join()
 	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
 		with open(i+'_test.txt') as file:
-		    checkstring = file.read()
+			checkstring = file.read()
 		assert i+'\n' == checkstring
 		os.system('rm '+i+'_test.txt')
 
@@ -56,10 +56,10 @@ def test_psfgen():
 
 	## test TinyTim
 	try:
-	    TINY_PATH = os.environ['TINYTIM']
+		TINY_PATH = os.environ['TINYTIM']
 	except:
-	    TINY_PATH = None
-	    print('Cannot find TinyTim. If you want to use TinyTim to generate PSFs, please make sure it is installed properly.')
+		TINY_PATH = None
+		print('Cannot find TinyTim. If you want to use TinyTim to generate PSFs, please make sure it is installed properly.')
 
 	if TINY_PATH:
 		ttex = fits.open('./test_data/ttout.fits')
@@ -80,10 +80,10 @@ def test_psfgen():
 
 	## test WebbPSF
 	try:
-	    WEBBPSF_PATH = os.environ['WEBBPSF_PATH']
+		WEBBPSF_PATH = os.environ['WEBBPSF_PATH']
 	except:
-	    WEBBPSF_PATH = None
-	    print('Cannot find WEBBPSF_PATH. If you want to use WebbPSF to generate PSFs, please make sure the ancillary data files are installed properly.')
+		WEBBPSF_PATH = None
+		print('Cannot find WEBBPSF_PATH. If you want to use WebbPSF to generate PSFs, please make sure the ancillary data files are installed properly.')
 
 	if WEBBPSF_PATH:
 		wex = fits.open('./test_data/wout.fits')

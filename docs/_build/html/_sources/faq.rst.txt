@@ -19,7 +19,7 @@ Probably not. If the data appear corrupted prior to any of the processing steps 
 
 2. **Roman hasn't launched yet; how do I access data to play with spike.psf.roman?**
 
-There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. `Troxel et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract>`_ has some nice examples of single detector data and you can generate your own Roman imaging with `STIPS <https://github.com/spacetelescope/STScI-STIPS>`_ (`STIPS Development Team 2024 <https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract>`_) The pipeline is very similar to JWST's, with the notable exception that the image from each of the detectors is stored in its own file, so ``spike.psf.roman`` is, at its core, a modified version of ``spike.psf.jwst``.
+There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. `Troxel et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract>`_ has some nice examples of single detector data and you can generate your own Roman imaging with `STIPS <https://github.com/spacetelescope/STScI-STIPS>`_ (`STIPS Development Team 2024 <https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract>`_) The pipeline is very similar to JWST's, with the image from each of the detectors is stored in its own file, so ``spike.psf.roman`` is, at its core, a modified version of ``spike.psf.jwst``.
 
 
 spike
@@ -31,17 +31,19 @@ The most likely reason you'd get this sort of error is that the object name is n
 
 2. **I am encountering a problem with one of the pipeline modules (spike.jwstcal, spike.romancal, or spike.stcal). How much has changed from the official Space Telescope release?**
 
-Each of ``spike.jwstcal``, ``spike.romancal``, and ``spike.stcal`` are subtly reworked versions of the STScI releases. Since namespace packages aren not enabled (and would not be workable with the many interlocking dependencies) for ``jwst`` and ``romancal``, the relevant portions of the JWST and Roman pipelines are installed directly with ``spike`` with pared down dependencies and install requirements. The code has been reorganized and reworked to have a more straightforward file structure and get rid of dependencies that are extraneous for the tweak and resample pipeline steps, so none of the scientific functionality has been changed. 
+Each of ``spike.jwstcal``, ``spike.romancal``, and ``spike.stcal`` are subtly reworked versions of the STScI releases. Since namespace packages are not enabled (and would not be workable with the many interlocking dependencies) for ``jwst`` and ``romancal``, the relevant portions of the JWST and Roman pipelines are installed directly with ``spike`` with pared down dependencies and install requirements. The code has been reorganized and reworked to have a more straightforward file structure and get rid of dependencies that are extraneous for the tweak and resample pipeline steps, so none of the scientific functionality has been changed. 
 
-If your seems to come from one of these modules, you can always start with the `jwst <https://jwst-pipeline.readthedocs.io/en/latest/>`_ or `romancal <https://roman-pipeline.readthedocs.io/en/latest/>`_ documentation to better understand the problem. Most interaction with these pipeline commands is through other ``spike`` functions, though, so it will also serve to toggle ``verbose = True`` and confirm that all prior steps are proceeding as expected (confirming the outputs look as you expect may help, as well). If the problem actually occurs at an intermediate step and the pipeline error is due to missing inputs, you can fix this by resolving the concern with that intermediate step (see the `spike documentation <https://spike-psf.readthedocs.io>`_ or the other FAQ sections).
+If your error seems to come from one of these modules, you can always start with the `jwst <https://jwst-pipeline.readthedocs.io/en/latest/>`_ or `romancal <https://roman-pipeline.readthedocs.io/en/latest/>`_ documentation to better understand the problem. Most interaction with these pipeline commands is through other ``spike`` functions, though, so it will also serve to toggle ``verbose = True`` and confirm that all prior steps are proceeding as expected (confirming the outputs look as you expect may help, as well). If the problem actually occurs at an intermediate step and the pipeline error is due to missing inputs, you can fix this by resolving the concern with that intermediate step (see the `spike documentation <https://spike-psf.readthedocs.io>`_ or the other FAQ sections).
 
 If you encounter a bug that ultimately traces back to ``spike.jwstcal``, ``spike.romancal``, or ``spike.stcal``, and you would like to open an issue, please tag your issue with the "pipeline" label. 
 
+Note that ``spike.jwstcal`` and ``spike.romancal`` are dependent on ``crds``, which means that the two environment variables CRDS_PATH and CRDS_SERVER_URL must be set according to the instructions `here <https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html>`_.
+
 3. **I'm encountering an AttributeError when I enable parallelization and define my own function to generate PSFs. How do I fix this?**
 
-As it turns out, ``multiprocessing`` specifically requires that functions be *imported*. It is possible that you will have to create a dummy script that houses your custom PSF generation function. There's a good example of this on `StackOverflow <https://stackoverflow.com/a/42383397>`_.
+As it turns out, ``multiprocessing`` specifically requires that functions be *imported*. It is possible that you will have to create a dummy script that houses your custom PSF generation function. There's a good example of this on `StackOverflow <https://stackoverflow.com/a/42383397>`_ and in the `spike tests <https://github.com/avapolzin/spike/blob/master/tests/tests.py>`_.
 
-4. **I'm working with Jupyter Lab/Notebook, and my environment variables are loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH. How do I access them from Jupyter?**
+4. **I'm working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH/$CRDS_PATH. How do I access them from Jupyter?**
 
 There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_.
 

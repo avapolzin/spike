@@ -89,13 +89,13 @@
 <p>Functions included here relate to the creation of PSFs, which will later be drizzled by the HST, JWST, or Roman pipeline functions.</p>
 <dl class="py function" id="module-spike.psfgen">
 <dt class="sig sig-object py" id="spike.psfgen.effpsf">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">effpsf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.effpsf" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">effpsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crclean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.effpsf" title="Link to this definition"></a></dt>
 <dd><p>Generate PSFs using the empirical photutils.epsf routine.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psfgen.jwpsf">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">jwpsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">calckwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.jwpsf" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">jwpsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">calckwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.jwpsf" title="Link to this definition"></a></dt>
 <dd><p>Generate JWST and Roman PSFs using WebbPSF.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -106,13 +106,17 @@
 <li><p><strong>pos</strong></p></li>
 <li><p><strong>plot</strong></p></li>
 <li><p><strong>verbose</strong></p></li>
+<li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
+suffix) and will amend relevant image WCS information/remove extraneous extensions.
+This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).</p></li>
 <li><p><strong>fov</strong></p></li>
-<li><p><strong>oversample</strong></p></li>
+<li><p><strong>sample</strong></p></li>
 <li><p><strong>regrid</strong></p></li>
 <li><p><strong>image_mask</strong></p></li>
 <li><p><strong>pupil_mask</strong></p></li>
 <li><p><strong>**calckwargs</strong> – Additional arguments for calc_psf() – see
-<a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf">https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf</a></p></li>
+<a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf">https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf</a>
+Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.</p></li>
 </ul>
 </dd>
 </dl>
@@ -121,7 +125,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psfgen.sepsf">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">sepsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psfconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.sepsf" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">sepsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsfex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crclean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psfconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.sepsf" title="Link to this definition"></a></dt>
 <dd><p>Generate PSFs using PSFEx.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -129,11 +133,17 @@
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>imcam</strong></p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
-<li><p><strong>pos</strong></p></li>
+<li><p><strong>pos</strong> (<em>list</em>) – [X, Y, chip, filter] as output from spike.tools.checkpixloc.</p></li>
 <li><p><strong>plot</strong> (<em>bool</em>) – If True, saves .pngs of the model PSFs.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
-<li><p><strong>seconf</strong></p></li>
-<li><p><strong>peconf</strong></p></li>
+<li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
+suffix) and will amend relevant image WCS information/remove extraneous extensions.
+This is in addition to the .psf file saved by PSFEx. No 2D PSF model is saved by PSFEx
+by default, but this can be toggled in the tools.pypsfex arguments.</p></li>
+<li><p><strong>savepsfex</strong> (<em>str</em>) – If ‘fits’ or ‘arr’ save 2D model to that format.</p></li>
+<li><p><strong>crclean</strong> (<em>bool</em>) – If True, use CR-cleaned image as SExtractor input.</p></li>
+<li><p><strong>seconf</strong> (<em>str</em>) – Path to SExtractor configuration file if not using default.</p></li>
+<li><p><strong>peconf</strong> (<em>str</em>) – Path to PSFEx configuration file if not using default.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -144,15 +154,16 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psfgen.stdpsf">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">stdpsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretweaked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keeporig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.stdpsf" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">stdpsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretweaked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keeporig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.stdpsf" title="Link to this definition"></a></dt>
 <dd><p>Read in HST STDPSFs.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psfgen.tinygillispsf">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">tinygillispsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.tinygillispsf" title="Link to this definition"></a></dt>
-<dd><p>Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al (2020),
-which were tested on ACS imaging.</p>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">tinygillispsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specchoice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blackbody'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listchoice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'G5V'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6000.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specbeta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">despace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.tinygillispsf" title="Link to this definition"></a></dt>
+<dd><p>Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al. (2020),
+which were tested on ACS imaging. As such, this method is not recommended for instruments
+other than ACS or cameras other than WFC.</p>
 <p>Note that the Gillis et al. (2020) code will be downloaded to your working directory. If keep = False (default),
 it will be removed after use.</p>
 <dl class="field-list simple">
@@ -160,12 +171,28 @@ it will be removed after use.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
+<li><p><strong>imcam</strong> (<em>str</em>) – ‘ACS/WFC’ is the only recommended instrument/camera combination for this PSF generation method.</p></li>
 <li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
-<li><p><strong>img_type</strong> (<em>str</em>) – ‘flc’, ‘flt’, ‘c0f’, ‘c1f’ – specifies which file-type to include.</p></li>
-<li><p><strong>inst</strong> (<em>str</em>) – ‘ACS’, ‘WFC3’, ‘WFPC2’, ‘FOC’, ‘NICMOS’</p></li>
 <li><p><strong>plot</strong> (<em>bool</em>) – If True, saves .pngs of the model PSFs.</p></li>
 <li><p><strong>keep</strong> (<em>bool</em>) – If True, retains make_psf.py (Gillis et al. 2020)</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
+<li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
+suffix) and will amend relevant image WCS information/remove extraneous extensions.
+This is in addition to the 2D PSF model saved by TinyTim.</p></li>
+<li><p><strong>specchoice</strong> (<em>str</em>) – ‘list’, ‘blackbody’, ‘plaw_nu’, ‘plaw_lam’ – if ‘list’, must also specify
+listchoice; if ‘blackbody’, must also specify temp; if ‘plaw_nu’, must also specify specalpha;
+and if ‘plaw_lam’, must also specify specbeta.</p></li>
+<li><p><strong>listchoice</strong> (<em>str</em>) – One of ‘O5’, ‘O8F’, ‘O6’, ‘B1V’, ‘B3V’, ‘B6V’, ‘A0V’, ‘A5V’, ‘F6V’, ‘F8V’,
+‘G2V’, ‘G5V’, ‘G8V’, ‘K4V’, ‘K7V’, ‘M1.5V’, ‘M3V’</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – Temperature of blackbody spectrum in K.</p></li>
+<li><p><strong>specalpha</strong> (<em>float</em>) – Spectral index alpha for F(nu)~nu^alpha.</p></li>
+<li><p><strong>specbeta</strong> (<em>float</em>) – Spectral index alpha for F(lambda)~lambda^beta.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>despace</strong> (<em>float</em>) – Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
+the 4th Zernike polynomial.</p></li>
+<li><p><strong>sample</strong> (<em>float</em>) – Factor by which to undersample the PSF. Default is not to undersample.</p></li>
+<li><p><strong>linearfit</strong> (<em>bool</em>) – Use linear fit rather than Gillis et al. amended Zernike polynomials.</p></li>
+<li><p><strong>regrid</strong> (<em>bool</em>) – If True, will (interpolate and) regrid model PSF to image pixel scale.</p></li>
 </ul>
 </dd>
 </dl>
@@ -183,27 +210,30 @@ Tiny Tim PSF model, please use spike.psfgen.tinygillispsf() instead.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
-<li><p><strong>imcam</strong></p></li>
+<li><p><strong>imcam</strong> (<em>str</em>) – Specification of instrument/camera used to capture the images (e.g., ‘ACS/WFC’, ‘WFC3/IR’, ‘WFPC’, ‘WFPC2’).
+For ‘WFPC’ and ‘WFPC2’, the camera is selecte by-chip and should not be specified here.</p></li>
 <li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
 <li><p><strong>plot</strong> (<em>bool</em>) – If True, saves .pngs of the model PSFs.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
-<li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF to copy of img (differentiated with ‘_topsf’
-suffix) and will amend relevant WCS information/remove extraneous extensions.</p></li>
+<li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
+suffix) and will amend relevant image WCS information/remove extraneous extensions.
+This is in addition to the 2D PSF model saved by TinyTim.</p></li>
 <li><p><strong>ebmv</strong> (<em>float</em>)</p></li>
 <li><p><strong>av</strong> (<em>float</em>)</p></li>
 <li><p><strong>wmag</strong> (<em>float</em>)</p></li>
-<li><p><strong>jitter</strong> (<em>float</em>)</p></li>
-<li><p><strong>major</strong> (<em>float</em>)</p></li>
-<li><p><strong>minor</strong> (<em>float</em>)</p></li>
-<li><p><strong>angle</strong> (<em>float</em>)</p></li>
+<li><p><strong>jitter</strong> (<em>float</em>) – Symmetric jitter in mas.</p></li>
+<li><p><strong>major</strong> (<em>float</em>) – Axisymmetric major axis jitter in mas.</p></li>
+<li><p><strong>minor</strong> (<em>float</em>) – Axisymmetric minor axis jitter in mas.</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – Angle of offset for axisymmetric jitter.</p></li>
 <li><p><strong>specchoice</strong> (<em>str</em>) – ‘list’, ‘blackbody’, ‘plaw_nu’, ‘plaw_lam’ – if ‘list’, must also specify
-listchoice; if ‘blackbody’, must also specify temp,</p></li>
+listchoice; if ‘blackbody’, must also specify temp; if ‘plaw_nu’, must also specify specalpha;
+and if ‘plaw_lam’, must also specify specbeta.</p></li>
 <li><p><strong>listchoice</strong> (<em>str</em>) – One of ‘O5’, ‘O8F’, ‘O6’, ‘B1V’, ‘B3V’, ‘B6V’, ‘A0V’, ‘A5V’, ‘F6V’, ‘F8V’,
 ‘G2V’, ‘G5V’, ‘G8V’, ‘K4V’, ‘K7V’, ‘M1.5V’, ‘M3V’</p></li>
-<li><p><strong>temp</strong> (<em>float</em>)</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – Temperature of blackbody spectrum in K.</p></li>
 <li><p><strong>specalpha</strong> (<em>float</em>) – Spectral index alpha for F(nu)~nu^alpha.</p></li>
 <li><p><strong>specbeta</strong> (<em>float</em>) – Spectral index alpha for F(lambda)~lambda^beta.</p></li>
-<li><p><strong>fov_arcsec</strong></p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
 <li><p><strong>despace</strong> (<em>float</em>) – Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 the 4th Zernike polynomial.</p></li>
 </ul>

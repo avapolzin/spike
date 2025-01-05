@@ -54,7 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.psfexim"><code class="docutils literal notranslate"><span class="pre">psfexim()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pypsfex"><code class="docutils literal notranslate"><span class="pre">pypsfex()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pysextractor"><code class="docutils literal notranslate"><span class="pre">pysextractor()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_header"><code class="docutils literal notranslate"><span class="pre">rewrite_header()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_fits"><code class="docutils literal notranslate"><span class="pre">rewrite_fits()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.to_asdf"><code class="docutils literal notranslate"><span class="pre">to_asdf()</span></code></a></li>
 </ul>
 </li>
@@ -152,8 +152,8 @@ HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>psfpath</strong> (<em>str</em>) – Path to the relevant .psf file from the working directory.</p></li>
 <li><p><strong>pixloc</strong> (<em>tuple</em>) – Pixel location of object of interest in (x, y).</p></li>
-<li><p><strong>(</strong><strong>bool</strong> (<em>regrid</em>) – If True, will (interpolate) and regrid model PSF to image pixel scale.</p></li>
-<li><p><strong>save</strong> (<em>str</em>) – If ‘fits’, ‘arr’, ‘txt’, will save in the specified format with name from psfpath.
+<li><p><strong>regrid</strong> (<em>bool</em>) – If True, will (interpolate and) regrid model PSF to image pixel scale.</p></li>
+<li><p><strong>save</strong> (<em>str</em>) – If ‘fits’ or ‘arr’, will save in the specified format with name from psfpath.
 The option to save as an array results in a .npy file.</p></li>
 </ul>
 </dd>
@@ -165,7 +165,7 @@ The option to save as an array results in a .npy file.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.pypsfex">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
 <dd><p>Wrapper to easily call PSFEx from python.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -178,6 +178,7 @@ If not specified, generates generic model assuming basis vectors are equally wei
 user arguments is via specification in the config file as command line arguments simply override the
 corresponding configuration setting.</p></li>
 <li><p><strong>makepsf</strong> (<em>bool</em>) – If True, returns 2D PSF model.</p></li>
+<li><p><strong>savepsf</strong> (<em>str</em>) – If ‘fits’, ‘arr’, or ‘txt’, will save 2D model PSF in that file format with the same name as the catalog.</p></li>
 <li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
 </ul>
 </dd>
@@ -212,9 +213,25 @@ corresponding configuration setting.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spike.tools.rewrite_header">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_header" title="Link to this definition"></a></dt>
-<dd><p>Write HST and JWST image headers to the model PSFs and modify the coordinates and WCS.</p>
+<dt class="sig sig-object py" id="spike.tools.rewrite_fits">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfarr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_fits" title="Link to this definition"></a></dt>
+<dd><p>Write relevant image headers to the model PSFs and modify the coordinates and WCS.
+Creates a full _topsf.fits file with only one SCI extension for use with drizzle/resample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>psfarr</strong> (<em>arr</em>) – The 2D PSF model.</p></li>
+<li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
+<li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
+<li><p><strong>imcam</strong> (<em>str</em>) – ‘ACS/WFC’ is the only recommended instrument/camera combination for this PSF generation method.</p></li>
+<li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generates a new FITS file with a _topsf suffix, which stores the 2D PSF model in the
+‘SCI’ extension and inherits the header information from the original image.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
