@@ -19,8 +19,8 @@ warnings.formatwarning = warning_on_one_line
 ##########
 
 
-def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, 
-		savepath = 'psfs/drizzledpsf.fits', drizzleimgs = False, pretweaked = False,
+def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None, savepath = 'psfs/drizzledpsf.fits', 
+		drizzleimgs = False, pretweaked = False, driz_type = None, totweak = None,
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		tweakparams = {'threshold':6.0, 
 					   'searchrad':3.0, 
@@ -47,8 +47,9 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None,
 
 	Parameters:
 		img_dir (str): Path to directory containing calibrated files for which model PSF will be generated.
+			If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): 'flc', 'flt', 'c0f', 'c1f', 'cal', 'calints' -- specifies which file-type to include.
+		img_type (str): e.g, 'flc', 'flt', 'c0f', 'c1f', 'cal', 'calints' -- specifies which file-type to include.
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS', 'STIS'
 		camera (str): 
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
@@ -64,6 +65,11 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None,
 		savepath (str): Where/with what name output drizzled PSF will be saved. Defaults to 'psfs/drizzledpsf.fits'.
 		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
 		pretweaked (bool): If True, skips TweakReg steps to include sub-pixel corrections.
+		driz_type (str): e.g., 'drz', 'drc'. If no drizzled images in directory, None.
+		totweak (str): If pretweaked = False, refers to totweak. Options are 'tweak', 'tweakback', 'skip', or None.
+			If 'tweak', uses tweakreg; if 'tweakback', uses tweakback (must have drizzled image files available);
+			if 'skip', skips the tweak step entirely; and if None, selects between 'tweak'/'tweakback' based on available 
+			data. 'tweakback' is generally preferred due to lower computational load.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
@@ -117,24 +123,45 @@ def hst(img_dir, obj, img_type, inst, camera, method, usermethod = None,
 		if type(usermethod) != str: #or function
 			psffunc = method
 
-	filelist = {} # generate list of files to tweak -- by filter
-	for fi in imgs:
-		hdu = fits.open(fi)
-		try: #get filter
-		filt = hdu[0].header['FILTER']
-		except:
-			if hdu[0].header['FILTER1'].startswith('F'):
-				filt = hdu[0].header['FILTER1']
-			else:
-				filt = hdu[0].header['FILTER2']
-		if filt not in filelist.keys():
-			filelist[filt] = []
-		filelist[filt].append(fi)
 
 	if not pretweaked:
-		# need to add these arguments to options above
-		for fk in filelist.keys():
-			tweakreg.TweakReg(filelist[fk], **tweakparams)
+
+		filelist = {} # generate list of files to tweak -- by filter
+		filelist['cal'], filelist['driz'] = [], []
+		for fi in imgs:
+			hdu = fits.open(fi)
+			try: #get filter
+			filt = hdu[0].header['FILTER']
+			except:
+				if hdu[0].header['FILTER1'].startswith('F'):
+					filt = hdu[0].header['FILTER1']
+				else:
+					filt = hdu[0].header['FILTER2']
+			if filt not in filelist.keys():
+				filelist['cal'][filt] = []
+				filelist['driz'][filt] = []
+			filelist['cal'][filt].append(fi)
+
+		if driz_type:
+			drimgs = sorted(glob.glob(img_dir+'/*'+driz_type+'.fits'))
+			for fdi in drimgs:
+				hdu = fits.open(fdi)
+				try: #get filter
+				filt = hdu[0].header['FILTER']
+				except:
+					if hdu[0].header['FILTER1'].startswith('F'):
+						filt = hdu[0].header['FILTER1']
+					else:
+						filt = hdu[0].header['FILTER2']
+				if filt not in filelist.keys():
+					filelist['driz'][filt] = []
+				filelist['driz'][filt].append(fdi)
+
+		if totweak == 'tweak':
+			for fk in filelist['cal'].keys():
+				if filelist['driz'][fk] != []:
+					tweakreg.TweakReg(filelist['cal'][fk], 
+						refimage = filelist['driz'][fk][0], **tweakparams)
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
