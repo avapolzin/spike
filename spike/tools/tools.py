@@ -7,6 +7,7 @@ from astropy.wcs import WCS, utils
 import numpy as np
 import os
 import pkg_resources
+from scipy.interpolate import RectBivariateSpline
 
 CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
 
@@ -270,6 +271,31 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 		os.system('rm *.conv')
 
 
+def regrid (im, sample):
+	"""
+	Regrid PSF model to input pixel scale.
+
+	Parameters:
+		im (arr): PSF image array.
+		sample (float): If sample > 1, oversampled; if sample < 1, undersampled.
+
+	Returns:
+		Interpolated and regridded PSF model.
+
+	"""
+
+	if sample == 1.:
+		return im
+
+	x,y = im.shape
+	xnew = np.linspace(0, x, 1/sample)
+	ynew = np.linspace(0, y, 1/sample)
+
+	spline = RectBivariateSpline(np.arange(x), np.arange(y), im)
+	out = spline(xnew, ynew)
+
+	return out	
+
 
 def psfexim(psfpath, pixloc, regrid = True, save = False):
 	"""
@@ -310,11 +336,7 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 
 	if regrid:
 		if psfexmodel[1].header['PSF_SAMP'] != 1.:
-			import scipy.interpolate
-
-		# use some scipy interpolation
-		# add scipy to references in paper draft
-		# and to requirements.txt
+			psfmodel = regrid(psfmodel, psfexmodel[1].header['PSF_SAMP'])
 
 	if save:
 		if save.lower() not in ['arr', 'fits']:
@@ -323,8 +345,6 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 			np.save(psfpath.replace('.psf', '_psfex_psf.npy'), psfmodel)
 		if save.lower() == 'fits':
 			fits.writeto(psfpath.replace('.psf', '_psfex_psf.fits'), psfmodel)
-
-
 
 	return psfmodel
 
@@ -430,6 +450,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos):
 	hdr['CRVAL2'] = CRVAL2
 	hdr['CRPIX1'] = CRPIX1
 	hdr['CRPIX2'] = CRPIX2
+	# have to add the pixel-corrected tweak parameters
 	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
 
 	coordstring = str(coords.ra)
@@ -442,6 +463,5 @@ def rewrite_fits(psfarr, coords, img, imcam, pos):
 
 	hdulist = fits.HDUList([cphdr, cihdr])
 	hdulist.writeto(modname)
-
 
 

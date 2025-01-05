@@ -176,8 +176,24 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	# NICMOS has time complication since the cryo-cooler etc. matter
 	# set date of change over at April 3, 2002: https://ui.adsabs.harvard.edu/abs/2008AIPC..985..799S/abstract
 
+	if imcam not in  ['ACS/WFC', 'ACS/HRC']:
+		psfmodel = fits.open(modname+'00_psf.fits')[0].data
+
+	if imcam in ['ACS/WFC', 'ACS/HRC']:
+		psfmodel = fits.open(modname+'00.fits')[0].data
+
+
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
+
+		if verbose:
+			print('PSF model image written to %s.png'%(modname))
+
 	
-	return placeholder
+	return psfmodel
 
 
 
@@ -262,18 +278,32 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 			print('Removed make_psf.py')
 
 
-	# if regrid:
-	# 	if sample != 1.:
-	# 		## need to interpolate the returned values
-	# 		# will just return the relevant array, which can be written to the FITS file
-	# 		# for tweaking etc
+	if imcam not in  ['ACS/WFC', 'ACS/HRC']:
+		psfmodel = fits.open(modname+'00_psf.fits')[0].data
+
+	if imcam in ['ACS/WFC', 'ACS/HRC']:
+		psfmodel = fits.open(modname+'00.fits')[0].data
 
 
+	if regrid:
+		if sample != 1.:
+			psfmodel = regrid(psfmodel, sample)
+
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
+
+		if verbose:
+			print('PSF model image written to %s.png'%(modname))
+
+	return psfmodel
 
 
 def stdpsf(coords, img, imcam, pos, pretweaked = False, keeporig = True, plot = False, keep = False, verbose = False, writeto = True):
 	"""
-	Read in HST STDPSFs.
+	Read in STDPSFs.
 
 	"""
 
@@ -365,29 +395,30 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	psfmodel = psfmod[3].data
 
-	# if regrid:
-	# 	if sample != 1.:
-	# 		## need to interpolate the returned values
-	# 		# will just return the relevant array, which can be written to the FITS file
-	# 		# for tweaking etc
+	if regrid:
+		if sample != 1.:
+			psfmodel = regrid(psfmodel, sample)
 
 
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
-	return placeholder
+		if verbose:
+			print('PSF model image written to %s.png'%(modname))
 
-def effpsf( crclean = True,):
+
+	return psfmodel
+
+def effpsf():
 	"""
 	Generate PSFs using the empirical photutils.epsf routine.
 
 	
 	"""
 
-	if not crclean:
-		im = img
-	if crclean:
-		# generate CR-cleaned image
-		astrodrizzle.drizzle(img, driz_cr_corr = True, drizz_combine = False)
-		im = img.replace('.fits', '_crclean.fits')
 
 # https://photutils.readthedocs.io/en/stable/api/photutils.psf.GriddedPSFModel.html#photutils.psf.GriddedPSFModel
 # also relevant for STDPSFs		
@@ -395,7 +426,7 @@ def effpsf( crclean = True,):
 
 	return placeholder
 
-def sepsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
+def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
 	savepsfex = False, crclean = True, seconf = None, psfconf = None):
 	"""
 	Generate PSFs using PSFEx.
@@ -420,19 +451,18 @@ def sepsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		2D PSFEx PSF model
 	"""
 
-	if not crclean:
-		im = img
-	if crclean:
-		# generate CR-cleaned image
-		astrodrizzle.drizzle(img, driz_cr_corr = True, drizz_combine = False)
-		if verbose:
-			print('Created CR-corrected image, running SExtractor')
-		im = img.replace('.fits', '_crclean.fits')
+	ext = 1 #run SExtractor only on relevant SCI extension
+	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
+		ext = 4
+	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
+		ext = 1 #yes, it's already 1, but this is to make things explicit
+	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
+		ext = pos[2]
 
-	tools.pysextractor(im, config = seconf)
+	tools.pysextractor(img+'[%i]'%ext, config = seconf)
 	if verbose:
 		print('Finished SExtractor, running PSFEx')
-	psfmodel = tools.pypsfex(im.replace('fits', 'cat'), config = psfconf)
+	psfmodel = tools.pypsfex(img.replace('fits', 'cat'), config = psfconf)
 	if verbose:
 		print('Finished PSFEx, generating image')
 
@@ -446,7 +476,7 @@ def sepsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel)
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 

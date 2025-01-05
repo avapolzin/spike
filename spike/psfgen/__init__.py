@@ -1,1 +1,1 @@
-from .psfgen import tinypsf, tinygillispsf, stdpsf, jwpsf, effpsf, sepsf
+from .psfgen import tinypsf, tinygillispsf, stdpsf, jwpsf, effpsf, psfex
