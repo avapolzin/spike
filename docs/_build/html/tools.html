@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.psfexim"><code class="docutils literal notranslate"><span class="pre">psfexim()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pypsfex"><code class="docutils literal notranslate"><span class="pre">pypsfex()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pysextractor"><code class="docutils literal notranslate"><span class="pre">pysextractor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.regrid"><code class="docutils literal notranslate"><span class="pre">regrid()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_fits"><code class="docutils literal notranslate"><span class="pre">rewrite_fits()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.to_asdf"><code class="docutils literal notranslate"><span class="pre">to_asdf()</span></code></a></li>
 </ul>
@@ -208,6 +209,23 @@ corresponding configuration setting.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Generates a .cat file with the same name as img_path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.regrid">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">regrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.regrid" title="Link to this definition"></a></dt>
+<dd><p>Regrid PSF model to input pixel scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im</strong> (<em>arr</em>) – PSF image array.</p></li>
+<li><p><strong>sample</strong> (<em>float</em>) – If sample &gt; 1, oversampled; if sample &lt; 1, undersampled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated and regridded PSF model.</p>
 </dd>
 </dl>
 </dd></dl>
