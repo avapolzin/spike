@@ -5,7 +5,7 @@ PSF Generation
 
 Functions included here relate to the creation of PSFs, which will later be drizzled by the HST, JWST, or Roman pipeline functions.
 
-.. automodule:: spike.psfgen
+.. automodule:: spike.spike.psfgen
 	:imported-members:
 	:members:
 	:undoc-members:
