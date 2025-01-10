@@ -1,11 +1,13 @@
+from astropy.nddata import NDData
+import matplotlib.pyplot as plot
 import os
-import subprocess
+from photutils.detection import DAOStarFinder, IRAFStarFinder, find_peaks
+from photutils.psf import extract_stars, stdpsf_reader, EPSFBuilder, GriddedPSFModel
 import pkg_resources
 from spike import tools
-import matplotlib.pyplot as plot
+import subprocess
 import warnings
 import webbpsf
-from drizzlepac import astrodrizzle
 
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
 	return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
@@ -29,6 +31,9 @@ try:
 except:
 	TINY_PATH = None
 
+
+stdpsf_jwdet = {'NRCA1':1, 'NRCA2':2, 'NRCA3':3, 'NRCA4':4, 
+'NRCB1':5, 'NRCB2':6, 'NRCB3':7, 'NRCB7':8} #for STDPSFs
 
 ##########
 # * * * *
@@ -75,6 +80,9 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		fov_arcsec (float): Diameter of model PSF image in arcsec.
 		despace (float): Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 			the 4th Zernike polynomial.
+
+	Returns:
+		TinyTim model PSF
 	"""
 	if not TINY_PATH:
 		# this is a warning and not an error on the off chance that the TinyTim executables are 
@@ -192,7 +200,10 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		if verbose:
 			print('PSF model image written to %s.png'%(modname))
 
-	
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim')
+
+
 	return psfmodel
 
 
@@ -234,6 +245,9 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		sample (float): Factor by which to undersample the PSF. Default is not to undersample.
 		linearfit (bool): Use linear fit rather than Gillis et al. amended Zernike polynomials.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
+
+	Returns:
+		TinyTim model PSF using amended Gillis et al. (2020) parameters
 	"""
 
 	if not TINY_PATH:
@@ -298,32 +312,118 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		if verbose:
 			print('PSF model image written to %s.png'%(modname))
 
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim (Gillis+ mod)')
+
 	return psfmodel
 
 
-def stdpsf(coords, img, imcam, pos, pretweaked = False, keeporig = True, plot = False, keep = False, verbose = False, writeto = True):
+def stdpsf(coords, img, imcam, pos, plot = False, keep = False, verbose = False, 
+	writeto = True, norm = 1, regrid = True):
 	"""
-	Read in STDPSFs.
+	Coordinate-specific PSFs from STDPSF model grids for HST, JWST.
+
+	Makes use of https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/ and 
+	https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/.
+
+	Parameters:
+		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		img (str): Path to image for which PSF is generated.
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selecte by-chip and 
+			should not be specified here.
+		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+		plot (bool): If True, saves .pngs of the model PSFs.
+		verbose (bool): If True, prints progress messages.
+		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
+			suffix) and will amend relevant image WCS information/remove extraneous extensions.
+		norm (float): Flux normalization for output PSF model.
+		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
+
+	Returns:
+		STDPSF model PSF
 
 	"""
 
-	if not os.path.exists('psf_utilities.py'):
-		# download STScI code for handling Jay Anderson's STDPSFs: https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/
-		rawurl = 'https://github.com/spacetelescope/hst_notebooks/blob/main/notebooks/WFC3/point_spread_function/psf_utilities.py'
-		os.system('wget ' + rawurl)
-		if verbose:
-			print('Retrieved psf_utilities.py')
-	
-	from psf_utilities import download_psf_model
+	# build the url that points to the STDPSF
+	imcamurl = imcam.replace('/', '')
+	if imcamurl == 'WFC3UVIS':
+		imcamurl = 'WFC3UV'
+
+	if imcamurl == 'NIRCAM':
+		imcamurl = 'NIRCam'
+
+	if imcamurl == 'NIRISSImaging':
+		imcamurl = 'NIRISS'
 
 
+	if imcam in ['WFPC', 'WFPC1']:
+		raise ValueError("There is no available STDPSF grid for WFPC imaging. Please select a different PSF generation method.")
+
+	if imcam in ['ACS/WFC', 'ACS/HRC', 'WFC3/UVIS', 'WFC3/IR', 'WFPC2']:
+		baseurl = 'https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/'
+
+		url = baseurl+imcamurl+'/STDPSF_%s_%s'%(imcamurl, pos[3])
+		
+		if imcam == 'ACS/WFC':
+			url += '_SM3.fits'
+		elif (imcam == 'WFC3/IR') and (pos[3] == 'F139M'):
+			url += '_1x1.fits'
+		else:
+			url += '.fits'
 
 
-	if os.path.exists('psf_utilities.py') and not keep:
-		os.remove('psf_utilities.py')
-		if verbose:
-			print('Removed psf_utilities.py')
+	if imcam in ['NIRCAM', 'MIRI', 'NIRISS/Imaging']:
+		baseurl = 'https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/'
 
+		if imcam in ['MIRI', 'NIRISS/Imaging']:
+			url = baseurl+imcamurl+'/STDPSF_%s_%s.fits'%(imcamurl, pos[3])
+
+		if imcam == 'NIRCAM':
+			if pos[3] in ['F250M', 'F277W', 'F356W', 'F360M', 'F410M', 'F444W', 'F480M']:
+				det = pos[2][:-1]+'L'
+				url = baseurl+imcamurl+'/LWC/STDPSF_%s_%s.fits'%(det, pos[3])
+
+			if pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 'F182M', 'F200W'
+							'F210M', 'F212N']:
+				url = baseurl+imcamurl+'/SWC/%s/STDPSF_%s_%s.fits'%(pos[3], pos[3], pos[2])
+
+	det = None #set detector for photutils
+	if imcam in ['WFPC2', 'ACS/WFC']:
+		det = pos[2]
+	if (imcam == 'NIRCAM') and (pos[2] not in ['NGCA5', 'NRCB5']):
+		det = stdpsf_jwdet[pos[2]]
+
+	coordstring = str(coords.ra)
+	if coords.dec.deg > 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg >= 0:
+		coordstring += str(coords.dec)
+
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
+
+	#preferred equivalent to using photutils.psf.stdpsf_reader directly
+	model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
+	psfmodel = model.evaluate(x = np.ndarray(int(pos[0])), y = np.ndarray(int(pos[1])), 
+		flux = norm, x_0 = 0., y_0 = 0.)
+	# pos given as ndarray to satisfy internal check and taking x0, y0 from detaults listed in the documentation
+	# https://photutils.readthedocs.io/en/stable/api/photutils.psf.GriddedPSFModel.html#photutils.psf.GriddedPSFModel.x_0
+
+	if regrid:
+		# sample determined by stated assumed oversampling factor in photutils documentation
+		# https://photutils.readthedocs.io/en/stable/api/photutils.psf.stdpsf_reader.html
+		psfmodel = regrid(psfmodel, sample = 4)
+
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
+
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
+
+	return psfmodel
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
@@ -352,9 +452,18 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 			Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
 
 	Returns:
+		WebbPSF model PSF
 
 	"""
 	x, y, chip, filt = post
+
+	coordstring = str(coords.ra)
+	if coords.dec.deg > 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg >= 0:
+		coordstring += str(coords.dec)
+
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 	if imcam.upper() == 'NIRCAM':
 		psf = webbpsf.NIRCam()
@@ -408,6 +517,10 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 		if verbose:
 			print('PSF model image written to %s.png'%(modname))
+
+
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF')
 
 
 	return psfmodel
@@ -472,7 +585,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	if coords.dec.deg >= 0:
 		coordstring += str(coords.dec)
 
-	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
@@ -482,6 +595,9 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 		if verbose:
 			print('PSF model image written to %s.png'%(modname))
+
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'PSFEx')
 
 	return psfmodel
 

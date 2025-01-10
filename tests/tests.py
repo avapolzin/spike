@@ -49,8 +49,8 @@ def test_psfgen():
 	import shutil
 	import spike
 
-	coords = spike.tools.objloc() # will need to work out my choice
-	img = './test_data/imexample.fits'
+	coords = spike.tools.objloc('10:00:33.0178 +02:09:52.304') # will need to work out my choice
+	img = './test_data/imexample_hst.fits'
 	imcam = 'ACS/WFC'
 	pos = spike.tools.checkpixloc(coords, img, imcam)
 
@@ -63,7 +63,7 @@ def test_psfgen():
 
 	if TINY_PATH:
 		ttex = fits.open('./test_data/ttout.fits')
-		outtiny = spike.psfgen.tinypsf(coords, img, imcam, pos)
+		outtiny = spike.psfgen.tinypsf(coords, img, imcam, pos, writeto = False)
 		assert outtiny == ttex[0].data #check extension number here
 
 	## test PSFEx
@@ -75,7 +75,7 @@ def test_psfgen():
 		print('Cannot find PSFEx. If you want to use PSFEx to generate PSFs, please make sure it is installed properly.')
 	if SE_PATH and PSFEX_PATH:
 		psfexex = np.load('./test_data/psfexout.npy')
-		outpsfex = spike.psfgen.sepsf(coords, img, imcam, pos)
+		outpsfex = spike.psfgen.sepsf(coords, img, imcam, pos, writeto = False)
 		assert outpsfex == psfexex
 
 	## test WebbPSF
@@ -87,7 +87,7 @@ def test_psfgen():
 
 	if WEBBPSF_PATH:
 		wex = fits.open('./test_data/wout.fits')
-		outw = spike.psfgen.jwpsf(coords, img, imcam, pos)
+		outw = spike.psfgen.jwpsf(coords, img, imcam, pos, writeto = False)
 		assert outw == wex[3].data
 
 

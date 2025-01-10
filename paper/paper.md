@@ -38,7 +38,7 @@ Though a generic empirical PSF can be computed from the drizzled image, `spike` 
 
 ![Comparison of drizzled PSFs generated for _HST_ images. Top: PSFs for the WFPC2 F814W imaging of the COSMOS field. Middle: PSFs for the ACS/WFC F814W imaging of the COSMOS field. Bottom: PSFs for the WFC3/UVIS imaging of the COSMOS field. \label{fig:hstcomparison}](spike_psf_hstcompare.png)
 
-The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gillis.etal.2020 modification [@Gillis.2019], `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], `photutils` effective PSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], `PSFEx` [@Bertin.2011; @Bertin.2013], and Space Telescope Science Institute's library of empirical STDPSFs [^1] [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are chosen for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for _HST_ and \autoref{fig:jwstcomparison} compares output drizzled PSFs for _JWST_. 
+The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gillis.etal.2020 modification [@Gillis.2019], `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], `photutils` effective PSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], `PSFEx` [@Bertin.2011; @Bertin.2013], and Space Telescope Science Institute's library of empirical STDPSFs [^1] [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are included for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for _HST_ and \autoref{fig:jwstcomparison} compares output drizzled PSFs for _JWST_. 
 
 [^1]: <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>; <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>
 
@@ -48,7 +48,7 @@ In most cases, users will only ever interact with the top-level functions `spike
 
 `spike` is also parallelized for use with large sets of coordinates using `multiprocess`, and the option to run the code in parallel is togglable. 
 
-Optionally, `spike` can complete the "drizzle" steps on the original imaging data, as well, making for one-time processing of both the PSFs and the original images. As some users will prefer to analyze high-level data products directly from the _HST_, _JWST_, and, eventually, Roman pipelines, this feature is opt-in.
+Optionally, `spike` can complete the "drizzle" steps on the original imaging data, as well, making for one-time, _consistent_ processing of both the PSFs and the original images. As some users will prefer to analyze high-level data products directly from the _HST_, _JWST_, and, eventually, Roman pipelines, this feature is opt-in.
 
 In addition to .fits outputs, users can specify whether they would like a .asdf file returned, too, and it is possible to write .png images of the individual PSF models and the final co-add, which allows users to do quick visual inspection.
 
@@ -92,6 +92,6 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
 
 # Acknowledgments
 
-AP is supported by the Quad Fellowship administered by IIE and thanks ....
+AP is supported by the Quad Fellowship administered by IIE and thanks Juan Guerra for his comments and his help deciding how to handle external C dependencies.
 
 # References

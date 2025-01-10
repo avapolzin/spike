@@ -112,6 +112,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			warnings.warn('The Gillis (2019) code is made for/tested on ACS/WFC and no modification is made here to generalize it to other HST instruments/cameras.')
 		psffunc = spike.psfgen.tinygillispsf
 	if method.upper() == 'STDPSF':
+		if inst.upper() in ['WFPC', 'WFPC1']:
+			raise ValueError("There is no available STDPSF grid for WFPC imaging. Please select a different PSF generation method.")
 		psffunc = spike.psfgen.stdpsf
 	if method.upper() == 'EPSF':
 		psffunc = spike.psfgen.effpsf
@@ -150,10 +152,18 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			skycoords = tools.objloc(o)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
+
+				coordstring = str(skycoords.ra)
+				if skycoords.dec.deg > 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg >= 0:
+					coordstring += str(skycoords.dec)
+
+				modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist.keys():
 						drizzlelist[pos[3]] = []
-					drizzlelist[obj][pos[3]].append(i)
+					drizzlelist[obj][pos[3]].append(modname)
 
 					psffunc(coords, i, imcam, pos, **kwargs)
 
@@ -173,10 +183,17 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						warnings.warn('Warning: Check your config and param files to ensure output files have unique names.', Warning, stacklevel = 2)
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
+						coordstring = str(skycoords[j].ra)
+						if skycoords[j].dec.deg > 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg >= 0:
+							coordstring += str(skycoords[j].dec)
+
+						modname = img.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
 						if np.isfinite(p[0]): #confirm that object falls onto detector
-							if pos[3] not in drizzlelist[obj[j]].keys():
-								drizzlelist[obj[j]][pos[3]] = []
-							drizzlelist[obj[j]][pos[3]].append(i)
+							if p[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][p[3]] = []
+							drizzlelist[obj[j]][p[3]].append(modname)
 
 							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
 					pool.close()
@@ -216,6 +233,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		for fk in filelist.keys():
 			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
 
+	## have to figure out what the drizzled image's name will be
+	# will then write to that header to note that it is a spike product
+	# really only need to do that for the method = USER case, but good to
+	# have backup, so people know what was used
+
 
 	# clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
@@ -229,7 +251,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		sufs = ['drc', 'drz']
-		dout = np.concatenate((sorted(glob.glob('*_drc.fits')), sorted(glob.glob('*_drz.fits'))))
+		dout = np.concatenate((sorted(glob.glob('savedir/*_drc.fits')), sorted(glob.glob('savedir/*_drz.fits'))))
 		for di in dout:
 			tools.to_asdf(di)
 
@@ -322,13 +344,13 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 			filelist[filt] = []
 		filelist[filt].append(fi)
 
-	# if not pretweaked:
+	if not pretweaked:
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
-		# for fk in filelist.keys():
-			#######################################
-			# TWEAK STEP GOES HERE
-			#######################################
+		for fk in filelist.keys():
+			######################################
+			tweakreg_tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
+			######################################
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -384,29 +406,27 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 			drizzlelist[obj][filt].append(im)
 
 	#####################################################################
-	if keeporig:
-		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
+	for do in drizzlelist.keys():
+		if parallel:
+			pool = Pool(processes=(cpu_count() - 1))
+			for dk in drizzlelist[do].keys():
+				# input_models = # association based on file list
+				resamp = resample.ResampleData(input_models, 
+					output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams)
+				pool.apply_async(resamp.do_drizzle)
+			pool.close()
+			pool.join()
+		if not parallel:
+			for dk in drizzlelist[do].keys():
+				resample.ResampleData(input_models, output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams).do_drizzle()
 
-	# for do in drizzlelist.keys():
-	# 	if parallel:
-	# 		pool = Pool(processes=(cpu_count() - 1))
-	# 		# for dk in drizzlelist[do].keys():
-	# 			# INSERT RESAMPLE STEP BELOW
-	# 			# pool.apply_async(, args = (drizzlelist[do][dk]), kwds = drizzleparams)
-	# 		pool.close()
-	# 		pool.join()
-		# if not parallel:
-		# 	for dk in drizzlelist[do].keys():
-				# RESAMPLE STEP GOES HERE
 
 	
-	# if drizzleimgs: # useful for processing all images + PSFs simultaneously
-	# 	for fk in filelist.keys():
-			# RESAMPLE STEP GOES HERE
+	if drizzleimgs: # useful for processing all images + PSFs simultaneously
+		for fk in filelist.keys():
+			# input_models = # association based on file list
+			resample.ResampleData(input_models, output='%s_img_i2d.fits'%fk, **drizzleparams).do_drizzle()
 
-	#relevant portion of romancal.resample_step
-	resamp = resample.ResampleData(input_models, output=output, **kwargs)
-	result = resamp.do_drizzle()
     #####################################################################
 
     # clean up step to move all of the PSF files to the relevant directory
@@ -420,9 +440,8 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
-		# defining suffix from resample output -- will update when Roman pipeline has standard
-		# level 3 product suffix
-		dout = sorted(glob.glob('*_driz.fits')) 
+		# defining suffix from resample output -- using typical suffix for JWST mosaics
+		dout = sorted(glob.glob('savedir/*_i2d.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 
@@ -442,7 +461,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		img_type (str): e.g, 'cal' -- specifies which file-type to include.
 		inst (str): 'WFI', 'CGI'
 		camera (str): None
-		method (str): 'WebbPSF', 'STDPSF' (empirical), 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
+		method (str): 'WebbPSF', 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
 				imgprefix_195.78-46.52_F555W_psf.fits
@@ -485,12 +504,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 	imcam = inst.upper()
 
 	genpsf = True
-	if method.upper() not in ['WEBBPSF', 'STDPSF', 'EPSF', 'PSFEX', 'USER']:
-		raise Exception('tool must be one of WEBBPSF, STDPSF, EPSF, PSFEX, USER')
+	if method.upper() not in ['WEBBPSF', 'EPSF', 'PSFEX', 'USER']:
+		raise Exception('tool must be one of WEBBPSF, EPSF, PSFEX, USER')
 	if method.upper() == 'WEBBPSF':
 		psffunc = spike.psfgen.jwpsf
-	if method.upper() == 'STDPSF':
-		psffunc = spike.psfgen.stdpsf
 	if method.upper() == 'EPSF':
 		psffunc = spike.psfgen.effpsf
 	if method.upper() == 'PSFEX':
@@ -515,12 +532,12 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 			filelist[filt] = []
 		filelist[filt].append(fi)
 
-	# if not pretweaked:
+	if not pretweaked:
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
-		# for fk in filelist.keys():
+		for fk in filelist.keys():
 			#######################################
-			# TWEAK STEP GOES HERE
+			tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
 			#######################################
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
@@ -577,29 +594,29 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 			drizzlelist[obj][filt].append(im)
 
 	#####################################################################
-	if keeporig:
-		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
-
-	# for do in drizzlelist.keys():
-	# 	if parallel:
-	# 		pool = Pool(processes=(cpu_count() - 1))
-	# 		# for dk in drizzlelist[do].keys():
-	# 			# INSERT RESAMPLE STEP BELOW
-	# 			# pool.apply_async(, args = (drizzlelist[do][dk]), kwds = drizzleparams)
-	# 		pool.close()
-	# 		pool.join()
-		# if not parallel:
-		# 	for dk in drizzlelist[do].keys():
-				# RESAMPLE STEP GOES HERE
+	for do in drizzlelist.keys():
+		if parallel:
+			pool = Pool(processes=(cpu_count() - 1))
+			for dk in drizzlelist[do].keys():
+				# input_models = # association based on file list
+				resamp = resample.ResampleData(input_models, 
+					output='%s_%s_psf_driz.fits'%(do, dk), **drizzleparams)
+				pool.apply_async(resamp.do_drizzle)
+			pool.close()
+			pool.join()
+		if not parallel:
+			for dk in drizzlelist[do].keys():
+				resample.ResampleData(input_models, output='%s_%s_psf_driz.fits'%(do, dk), **drizzleparams).do_drizzle()
 
 	
-	# if drizzleimgs: # useful for processing all images + PSFs simultaneously
-	# 	for fk in filelist.keys():
-			# RESAMPLE STEP GOES HERE
+	if drizzleimgs: # useful for processing all images + PSFs simultaneously
+		for fk in filelist.keys():
+			# input_models = # association based on file list
+			resample.ResampleData(input_models, output='%s_img_driz.fits'%fk, **drizzleparams).do_drizzle()
 
-	#relevant portion of romancal.resample_step
-	resamp = resample.ResampleData(input_models, output=output, **kwargs)
-	result = resamp.do_drizzle()
+	# #relevant portion of romancal.resample_step
+	# resamp = resample.ResampleData(input_models, output=output, **kwargs)
+	# result = resamp.do_drizzle()
     #####################################################################
 
     # clean up step to move all of the PSF files to the relevant directory
@@ -615,7 +632,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output -- will update when Roman pipeline has standard
 		# level 3 product suffix
-		dout = sorted(glob.glob('*_driz.fits')) 
+		dout = sorted(glob.glob('savedir/*_driz.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 

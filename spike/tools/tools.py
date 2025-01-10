@@ -60,10 +60,8 @@ def checkpixloc(coords, img, inst, camera = None):
 				JWST/NIRISS: 'Imaging', 'AMI' #AMI has different multi-extension mode
 
 	Returns:
-		[X, Y, chip, filter] (list): Pixel coordinates, chip number (HST) or detector name (JWST/Roman) -- 
-			if relevant, and filter name.
+		[X, Y, chip, filter] (list): Pixel coordinates, chip number (HST) or detector name (JWST/Roman) if relevant, and filter name.
 			Only returned if object coordinates fall onto detector - returns NaNs if not.
-			Also generates duplicate "topsf" image which will be used in PSF drizzling.
 
 	"""
 	hdu = fits.open(img)
@@ -406,11 +404,7 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 		return psfmodel
 
 
-def photutils_seg():
-	return placeholder
-
-
-def rewrite_fits(psfarr, coords, img, imcam, pos):
+def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	"""
 	Write relevant image headers to the model PSFs and modify the coordinates and WCS.
 	Creates a full _topsf.fits file with only one SCI extension for use with drizzle/resample.
@@ -421,6 +415,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos):
 		img (str): Path to image for which PSF is generated.
 		imcam (str): 'ACS/WFC' is the only recommended instrument/camera combination for this PSF generation method.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+		method (list): Method used to generate PSF.
 
 	Returns: 
 		Generates a new FITS file with a _topsf suffix, which stores the 2D PSF model in the 
@@ -450,6 +445,10 @@ def rewrite_fits(psfarr, coords, img, imcam, pos):
 	hdr['CRVAL2'] = CRVAL2
 	hdr['CRPIX1'] = CRPIX1
 	hdr['CRPIX2'] = CRPIX2
+	if method:
+		hdr['COMMENT'] = "PSF generated using %s via spike."%method
+	if not method:
+		hdr['COMMENT'] = "PSF generated via spike."
 	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
 
 	coordstring = str(coords.ra)

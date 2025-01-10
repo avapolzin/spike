@@ -67,7 +67,7 @@ STDPSF
 
 1. **Why am I getting an HTTPS error when my PSF generation method is 'STDPSF'?**
 
-There are two points of potential failure here -- if you don't already have the `handling script <https://github.com/spacetelescope/hst_notebooks/blob/main/notebooks/WFC3/point_spread_function/>`_ downloaded locally, it's possible that GitHub is down or there's a problem with your connection; similarly, the STDPSFs are downloaded as needed, so there could also be an issue connecting to the `Space Telescope website <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>`_. If you already have psf_utilities.py downloaded locally, copying that script into your working directory should resolve an inability to connect to GitHub, as the code will preferentially use your local version.
+The STDPSFs are read into ``photutils`` as URLs as needed, so there could also be an issue connecting to the Space Telescope website for `HST <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>`_ or `JWST <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>`_ STDPSFs.
 
 
 PSFEx
