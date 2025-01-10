@@ -1,8 +1,10 @@
 from astropy.nddata import NDData
+from astropy.table import Table
 import matplotlib.pyplot as plot
 import os
-from photutils.detection import DAOStarFinder, IRAFStarFinder, find_peaks
-from photutils.psf import extract_stars, stdpsf_reader, EPSFBuilder, GriddedPSFModel
+from photutils.detection import DAOStarFinder, IRAFStarFinder
+from photutils.psf import extract_stars, EPSFBuilder, GriddedPSFModel
+from astropy.stats import sigma_clipped_stats
 import pkg_resources
 from spike import tools
 import subprocess
@@ -34,6 +36,12 @@ except:
 
 stdpsf_jwdet = {'NRCA1':1, 'NRCA2':2, 'NRCA3':3, 'NRCA4':4, 
 'NRCB1':5, 'NRCB2':6, 'NRCB3':7, 'NRCB7':8} #for STDPSFs
+
+plate_scale = {'ACS/WFC':0.05, 'ACS/HRC':0.025 , 'WFC3/IR':0.13, 'WFC3/UVIS':0.039, 'WFPC_wf':0.1016 , 
+'WFPC_pc':0.0439, 'WFPC1_wf':0.1016, 'WFPC1_pc':0.0439, 'WFPC2_wf':0.1, 'WFPC2_pc':0.046, 
+'NIRCAM_long':0.063, 'NIRCAM_short':0.031, 'MIRI':0.11, 'NIRISS/Imaging':0.066, 
+'WFI':0.11, 'CGI':0.0218} #arseconds/pixel -- some are averaged across filter/position
+# including both WFPC1 and WFPC so that either name can be used
 
 ##########
 # * * * *
@@ -318,8 +326,8 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 	return psfmodel
 
 
-def stdpsf(coords, img, imcam, pos, plot = False, keep = False, verbose = False, 
-	writeto = True, norm = 1, regrid = True):
+def stdpsf(coords, img, imcam, pos, plot = False, verbose = False, 
+	writeto = True, fov_arcsec = 6, norm = 1, regrid = True):
 	"""
 	Coordinate-specific PSFs from STDPSF model grids for HST, JWST.
 
@@ -337,8 +345,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, keep = False, verbose = False,
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
+		fov_arcsec (float): Diameter of model PSF image in arcsec.
 		norm (float): Flux normalization for output PSF model.
-		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 
 	Returns:
 		STDPSF model PSF
@@ -402,17 +410,35 @@ def stdpsf(coords, img, imcam, pos, plot = False, keep = False, verbose = False,
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
+
+	pixkey = imcam #set pixel scale to get the dimensions of x, y
+	if imcam in ['WFPC', 'WFPC1']:
+		if pos[2] <= 4:
+			pixkey += '_wf'
+		if pos[2] >= 5:
+			pixkey += '_pc'
+	if (imcam == 'WFPC2') and (pos[2] == 1):
+		pixkey += '_pc'
+	if (imcam == 'WFPC2') and (pos[2] >= 2):
+		pixkey += 'wf'
+	if imcam == 'NIRCAM':
+		if pos[2] in ['NRCA5', 'NRCB5', 'NRCALONG', 'NRCBLONG']:
+			pixkey += '_long'
+		if pos[2] not in ['NRCA5', 'NRCB5', 'NRCALONG', 'NRCBLONG']:
+			pixkey += '_short'
+
+	dimxy = fov_arcsec/plate_scale[pixkey] #make square PSF
+	halfdim = dimxy//2
+	xmin = int(pos[0]) - halfdim
+	xmax = int(pos[0]) + halfdim
+	ymin = int(pos[1]) - halfdim
+	ymax = int(pos[1]) + halfdim
+
+	x, y = np.meshgrid(np.arange(xmin, xmax+1), np.arange(ymin, ymax+1))
+
 	#preferred equivalent to using photutils.psf.stdpsf_reader directly
 	model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
-	psfmodel = model.evaluate(x = np.ndarray(int(pos[0])), y = np.ndarray(int(pos[1])), 
-		flux = norm, x_0 = 0., y_0 = 0.)
-	# pos given as ndarray to satisfy internal check and taking x0, y0 from detaults listed in the documentation
-	# https://photutils.readthedocs.io/en/stable/api/photutils.psf.GriddedPSFModel.html#photutils.psf.GriddedPSFModel.x_0
-
-	if regrid:
-		# sample determined by stated assumed oversampling factor in photutils documentation
-		# https://photutils.readthedocs.io/en/stable/api/photutils.psf.stdpsf_reader.html
-		psfmodel = regrid(psfmodel, sample = 4)
+	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
@@ -525,19 +551,128 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	return psfmodel
 
-def effpsf():
+def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
+	writeto = True, fov_arcsec = 6, norm = 1, starselect = 'DAO', starselectargs = {}, 
+	epsfargs = {'oversampling':1, 'progress_bar':False}):
 	"""
 	Generate PSFs using the empirical photutils.epsf routine.
 
+	Parameters:
+		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		img (str): Path to image for which PSF is generated.
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selecte by-chip and 
+			should not be specified here.
+		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+		plot (bool): If True, saves .pngs of the model PSFs.
+		verbose (bool): If True, prints progress messages.
+		mask (bool): If True, uses data quality array to mask some pixels.
+		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
+			suffix) and will amend relevant image WCS information/remove extraneous extensions.
+		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		norm (float): Flux normalization for output PSF model.
+		starselect (str): 'DAO', 'IRAF', or 'peak', which use DAOStarFinder, IRAFStarFinder, and 
+			find_peaks from photutils respectively.
+		starselectargs (dict): Keyword arguments for the chosen star detection method.
+		epsfargs (dict): Keyword arguments for the EPSFBuilder. Default in spike is to not oversample
+			the PSF, but the regridding is all handled during the creation of the coord-specific model.
+
+	Returns:
+		ePSF model PSF
 	
 	"""
 
+	ext = 1 #read data from relevant SCI extension
+	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
+		ext = 4
+	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
+		ext = 1 #yes, it's already 1, but this is to make things explicit
+	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
+		ext = pos[2]
 
-# https://photutils.readthedocs.io/en/stable/api/photutils.psf.GriddedPSFModel.html#photutils.psf.GriddedPSFModel
-# also relevant for STDPSFs		
+	coordstring = str(coords.ra)
+	if coords.dec.deg > 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg >= 0:
+		coordstring += str(coords.dec)
+
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 
-	return placeholder
+	pixkey = imcam #set pixel scale to get the dimensions of x, y
+	if imcam in ['WFPC', 'WFPC1']:
+		if pos[2] <= 4:
+			pixkey += '_wf'
+		if pos[2] >= 5:
+			pixkey += '_pc'
+	if (imcam == 'WFPC2') and (pos[2] == 1):
+		pixkey += '_pc'
+	if (imcam == 'WFPC2') and (pos[2] >= 2):
+		pixkey += 'wf'
+	if imcam == 'NIRCAM':
+		if pos[2] in ['NRCA5', 'NRCB5', 'NRCALONG', 'NRCBLONG']:
+			pixkey += '_long'
+		if pos[2] not in ['NRCA5', 'NRCB5', 'NRCALONG', 'NRCBLONG']:
+			pixkey += '_short'
+
+	dat = fits.open(img)[ext].data
+
+	mean, median, std = sigma_clipped_stats(dat, sigma=3.0)
+
+	if starselect.upper() == 'DAO':
+		# take default FWHM to be 2x the detector plate scale, can overwrite with starselectargs
+		find = DAOStarFinder(threshold = 5*std, fwhm = 2*plate_scale[pixkey], **starselectargs)
+
+	if starselect.upper() == 'IRAF':
+		find = IRAFStarFinder(threshold = 5*std, fwhm = 2*plate_scale[pixkey], **starselectargs)
+
+	if mask:
+		maskarr = fits.open(img)[ext+2].data
+		sources = find(dat - median, mask = maskarr)
+
+	if not mask:
+		sources = find(dat - median)
+
+	exsize = 35 #size of extraction box
+	xs = sources['xcentroid']
+	ys = sources['ycentroid']
+	exmask = ((xs > (exsize//2)) & (xs < (dat.shape[1] -1 - (exsize//2))) &
+        (ys > (exsize//2)) & (ys < (dat.shape[0] -1 - (exsize//2))))
+	tab = Table()
+	tab['x'] = xs[exmask]
+	tab['y'] = ys[exmask]
+	nddata = NDData(data = dat - median) 
+	stars = extract_stars(nddata, tab, size = exsize)
+
+	dimxy = fov_arcsec/plate_scale[pixkey] #make square PSF
+	halfdim = dimxy//2
+	xmin = int(pos[0]) - halfdim
+	xmax = int(pos[0]) + halfdim
+	ymin = int(pos[1]) - halfdim
+	ymax = int(pos[1]) + halfdim
+
+	x, y = np.meshgrid(np.arange(xmin, xmax+1), np.arange(ymin, ymax+1))
+
+	if verbose:
+		# ensure progress bar is toggled if verbose is true
+		epsfargs['progress_bar'] = True
+
+	epsfbuilder = EPSFBuilder(**epsfargs)
+
+	model, fitstars = epsfbuilder(stars)
+	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
+
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
+
+	if writeto:
+		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs')
+
+	return psfmodel
+
 
 def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
 	savepsfex = False, crclean = True, seconf = None, psfconf = None):
