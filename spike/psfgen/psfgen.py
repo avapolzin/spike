@@ -553,9 +553,14 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 	writeto = True, fov_arcsec = 6, norm = 1, starselect = 'DAO', starselectargs = {}, 
-	epsfargs = {'oversampling':1, 'progress_bar':False}):
+	epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':3}):
 	"""
-	Generate PSFs using the empirical photutils.epsf routine.
+	Generate PSFs using the empirical photutils.epsf routine. 
+
+	NOTE: The construction of the ePSFs is very time intensive, and so this method is 
+	*not* recommended for use with spike, where a PSF is generated for each object for each
+	input file. The function is included as an option, bearing in mind that it will be very
+	slow compared to other included methods.
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
@@ -642,6 +647,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 	tab['x'] = xs[exmask]
 	tab['y'] = ys[exmask]
 	nddata = NDData(data = dat - median) 
+	print('begin extract stars')
 	stars = extract_stars(nddata, tab, size = exsize)
 
 	dimxy = fov_arcsec/plate_scale[pixkey] #make square PSF
@@ -657,8 +663,10 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 		# ensure progress bar is toggled if verbose is true
 		epsfargs['progress_bar'] = True
 
+	print('create builder')
 	epsfbuilder = EPSFBuilder(**epsfargs)
 
+	print('start psf construction')
 	model, fitstars = epsfbuilder(stars)
 	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
 
