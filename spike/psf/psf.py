@@ -1,7 +1,7 @@
 import os
 import glob
 from multiprocessing import Pool, cpu_count
-from spike.tools import objloc
+from spike import psfgen, tools
 from astropy.io import fits
 from astropy.wcs import WCS, utils
 import numpy as np
@@ -33,14 +33,15 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					   'updatehdr':True,
 					   'wcsname': 'TWEAK'}, 
 		drizzleparams = {'preserve':False,
-	    				 'driz_cr_corr':True,
+	    				 'driz_cr_corr':False,
 						 'clean':False,
 					     'configobj':None,
 					     'final_pixfrac':0.8,
-					     'wcskey':'TWEAK',
 					     'build':True,
 					     'combine_type':'imedian', 
-					     'combine_nhigh':3}, 
+					     # 'combine_nhigh':3,
+					     # 'group':1,
+					     'static':False},
 		**kwargs):
 	"""
 	Generate drizzled HST PSFs.
@@ -83,8 +84,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 
 	if keeporig and not pretweaked:
-		os.system('mkdir '+img_dir+'_orig')
-		os.system('cp -r '+img_dir+' '+'img_dir'+'_copy')
+		if not os.path.exists(img_dir+'_orig'):
+			os.makedirs(img_dir+'_orig')
+		os.system('cp -r '+img_dir+'*_'+img_type+'.fits '+img_dir+'_orig')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -106,19 +108,19 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if inst.upper() == 'WFC3':
 			warnings.warn('TinyTim is not recommended for modeling WFC3 PSFs. See https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling.',
 				Warning, stacklevel = 2)
-		psffunc = spike.psfgen.tinypsf
+		psffunc = psfgen.tinypsf
 	if method.upper() == 'TINYTIM_GILLIS':
 		if (inst.upper() != 'ACS') and (camera.upper() != 'WFC'):
 			warnings.warn('The Gillis (2019) code is made for/tested on ACS/WFC and no modification is made here to generalize it to other HST instruments/cameras.')
-		psffunc = spike.psfgen.tinygillispsf
+		psffunc = psfgen.tinygillispsf
 	if method.upper() == 'STDPSF':
 		if inst.upper() in ['WFPC', 'WFPC1']:
 			raise ValueError("There is no available STDPSF grid for WFPC imaging. Please select a different PSF generation method.")
-		psffunc = spike.psfgen.stdpsf
+		psffunc = psfgen.stdpsf
 	if method.upper() == 'EPSF':
-		psffunc = spike.psfgen.effpsf
+		psffunc = psfgen.effpsf
 	if method.upper() == 'PSFEX':
-		psffunc = spike.psfgen.psfex
+		psffunc = psfgen.psfex
 	if method.upper() == 'USER':
 		if type(usermethod) == str: #check if user input is path to directory
 			genpsf = False
@@ -149,7 +151,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
-			skycoords = tools.objloc(o)
+			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
@@ -159,13 +161,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				if skycoords.dec.deg >= 0:
 					coordstring += str(skycoords.dec)
 
-				modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist.keys():
-						drizzlelist[pos[3]] = []
+						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
-					psffunc(coords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -189,7 +191,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						if skycoords[j].dec.deg >= 0:
 							coordstring += str(skycoords[j].dec)
 
-						modname = img.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
 						if np.isfinite(p[0]): #confirm that object falls onto detector
 							if p[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][p[3]] = []
@@ -230,6 +232,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
+		drizzleparams['driz_cr_corr'] = True #reset parameters turned off for PSF
+		drizzleparams['static'] = True
 		for fk in filelist.keys():
 			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
 
@@ -241,11 +245,15 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	# clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
-	if not os.exists(savedir):
-		os.mkdirs(savedir)
-	os.system('mv *_psf* %s'%savedir) # generated PSF models
-	os.system('mv *.psf %s'%savedir)
-	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
+	if not os.path.exists(savedir):
+		os.makedirs(savedir)
+	os.system('mv %s*_psf* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*.psf %s'%(img_dir, savedir))
+	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
+
+	## clean up other files generated in the process
+	os.system('mv %s*.cat %s'%(img_dir, savedir))
+	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
 
 
 	if out == 'asdf':
@@ -303,8 +311,9 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	from spike.jwstcal import tweakreg_tweakreg_step, resample
 
 	if keeporig and not pretweaked:
-		os.system('mkdir '+img_dir+'_orig')
-		os.system('cp -r '+img_dir+' '+'img_dir'+'_copy')
+		if not os.path.exists(img_dir+'_orig'):
+			os.makedirs(img_dir+'_orig')
+		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_copy')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -317,13 +326,13 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	if method.upper() not in ['WEBBPSF', 'STDPSF', 'EPSF', 'PSFEX', 'USER']:
 		raise Exception('tool must be one of WEBBPSF, STDPSF, EPSF, PSFEX, USER')
 	if method.upper() == 'WEBBPSF':
-		psffunc = spike.psfgen.jwpsf
+		psffunc = psfgen.jwpsf
 	if method.upper() == 'STDPSF':
-		psffunc = spike.psfgen.stdpsf
+		psffunc = psfgen.stdpsf
 	if method.upper() == 'EPSF':
-		psffunc = spike.psfgen.effpsf
+		psffunc = psfgen.effpsf
 	if method.upper() == 'PSFEX':
-		psffunc = spike.psfgen.psfex
+		psffunc = psfgen.psfex
 	if method.upper() == 'USER':
 		if type(usermethod) == str: #check if user input is path to directory
 			genpsf = False
@@ -356,15 +365,23 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
-			skycoords = tools.objloc(o)
+			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
+
+				coordstring = str(skycoords.ra)
+				if skycoords.dec.deg > 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg >= 0:
+					coordstring += str(skycoords.dec)
+
+				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist.keys():
-						drizzlelist[pos[3]] = []
-					drizzlelist[obj][pos[3]].append(i)
+						drizzlelist[obj][pos[3]] = []
+					drizzlelist[obj][pos[3]].append(modname)
 
-					psffunc(coords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -382,10 +399,17 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 						warnings.warn('Warning: Check your config and param files to ensure output files have unique names.', Warning, stacklevel = 2)
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
+						coordstring = str(skycoords[j].ra)
+						if skycoords[j].dec.deg > 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg >= 0:
+							coordstring += str(skycoords[j].dec)
+
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
 						if np.isfinite(p[0]): #confirm that object falls onto detector
-							if pos[3] not in drizzlelist[obj[j]].keys():
-								drizzlelist[obj[j]][pos[3]] = []
-							drizzlelist[obj[j]][pos[3]].append(i)
+							if p[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][p[3]] = []
+							drizzlelist[obj[j]][p[3]].append(i)
 
 							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
 					pool.close()
@@ -431,8 +455,8 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 
     # clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
-	if not os.exists(savedir):
-		os.mkdirs(savedir)
+	if not os.path.exists(savedir):
+		os.makedirs(savedir)
 	os.system('mv *_psf* %s'%savedir) # generated PSF models
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
@@ -493,8 +517,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 	from spike.romancal import tweakreg_step, resample
 
 	if keeporig and not pretweaked:
-		os.system('mkdir '+img_dir+'_orig')
-		os.system('cp -r '+img_dir+' '+'img_dir'+'_copy')
+		if not os.path.exists(img_dir+'_orig'):
+			os.makedirs(img_dir+'_orig')
+		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_copy')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -507,11 +532,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 	if method.upper() not in ['WEBBPSF', 'EPSF', 'PSFEX', 'USER']:
 		raise Exception('tool must be one of WEBBPSF, EPSF, PSFEX, USER')
 	if method.upper() == 'WEBBPSF':
-		psffunc = spike.psfgen.jwpsf
+		psffunc = psfgen.jwpsf
 	if method.upper() == 'EPSF':
-		psffunc = spike.psfgen.effpsf
+		psffunc = psfgen.effpsf
 	if method.upper() == 'PSFEX':
-		psffunc = spike.psfgen.psfex
+		psffunc = psfgen.psfex
 	if method.upper() == 'USER':
 		if type(usermethod) == str: #check if user input is path to directory
 			genpsf = False
@@ -544,15 +569,22 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
-			skycoords = tools.objloc(o)
+			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
+				coordstring = str(skycoords.ra)
+				if skycoords.dec.deg > 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg >= 0:
+					coordstring += str(skycoords.dec)
+
+				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist.keys():
-						drizzlelist[pos[3]] = []
+						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(i)
 
-					psffunc(coords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -570,10 +602,17 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 						warnings.warn('Warning: Check your config and param files to ensure output files have unique names.', Warning, stacklevel = 2)
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
+						coordstring = str(skycoords[j].ra)
+						if skycoords[j].dec.deg > 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg >= 0:
+							coordstring += str(skycoords[j].dec)
+							
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
 						if np.isfinite(p[0]): #confirm that object falls onto detector
-							if pos[3] not in drizzlelist[obj[j]].keys():
-								drizzlelist[obj[j]][pos[3]] = []
-							drizzlelist[obj[j]][pos[3]].append(i)
+							if p[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][p[3]] = []
+							drizzlelist[obj[j]][p[3]].append(i)
 
 							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
 					pool.close()
@@ -621,8 +660,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 
     # clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
-	if not os.exists(savedir):
-		os.mkdirs(savedir)
+	if not os.path.exists(savedir):
+		os.makedirs(savedir)
 	os.system('mv *_psf* %s'%savedir) # generated PSF models
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models

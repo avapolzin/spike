@@ -24,5 +24,5 @@ setuptools.setup(
 	"drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git", "gwcs", 
 	"jsonschema", "matplotlib", "numpy", "photutils", "psutil", "pyyaml", "roman-datamodels", 
 	"scipy", "spherical-geometry", "stdatamodels", "tweakwcs", "webbpsf"],
-	package_data={'spike': ['configs/*']}
+	package_data={'spike': ['configs/*/*']}
 )

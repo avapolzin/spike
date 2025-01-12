@@ -114,7 +114,7 @@ def checkpixloc(coords, img, inst, camera = None):
 						chip = 1
 					if a == chip2:
 						chip = 2
-		if np.isnan(chip):
+		if (type(chip) != str) and (np.isnan(chip)):
 			out = [np.nan, np.nan, chip, np.nan]
 		else:
 			out = [float(x_coord), float(y_coord), chip, filt]
@@ -166,7 +166,7 @@ def checkpixloc(coords, img, inst, camera = None):
 
 					chip = np.where(np.array(chips) == a)[0][0] + 1
 					
-		if np.isnan(chip):
+		if (type(chip) != str) and (np.isnan(chip)):
 			out = [np.nan, np.nan, chip, np.nan]
 		else:
 			out = [float(x_coord), float(y_coord), chip, filt]
@@ -251,6 +251,7 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 			configpath = CONFIG_PATH + 'sextractor_config/default_psf.sex'
 		if not psf:
 			configpath = CONFIG_PATH + 'sextractor_config/default.sex'
+		os.system('cp '+ CONFIG_PATH +'sextractor_config/default.conv .')
 		os.system('cp '+ CONFIG_PATH +'sextractor_config/* .')
 	if config:
 		configpath = config
@@ -261,7 +262,11 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 		sextractor_args += ' '+userargs
 
 	os.system(sextractor_args)
-	os.system('mv test.cat ' + img_path.replace('fits', 'cat')) #move to img name
+
+	imgpath = img_path.split('[')[0]
+	if imgpath.split('_')[-1].startswith('mask'):
+		imgpath = imgpath.replace('_mask.fits', '.fits')
+	os.system('mv test.cat ' + imgpath.replace('fits', 'cat')) #move to img name
 
 	if (not keepconfig) and (not config):
 		# clean up user directory by removing copied files
@@ -269,7 +274,7 @@ def pysextractor(img_path, config = None, psf = True, userargs = None, keepconfi
 		os.system('rm *.conv')
 
 
-def regrid (im, sample):
+def regridarr (im, sample):
 	"""
 	Regrid PSF model to input pixel scale.
 
@@ -286,11 +291,11 @@ def regrid (im, sample):
 		return im
 
 	x,y = im.shape
-	xnew = np.linspace(0, x, 1/sample)
-	ynew = np.linspace(0, y, 1/sample)
+	xnew = np.arange(0, x, 1/sample)
+	ynew = np.arange(0, y, 1/sample)
 
 	spline = RectBivariateSpline(np.arange(x), np.arange(y), im)
-	out = spline(xnew, ynew)
+	out = spline(xnew[xnew <= x-1], ynew[ynew <= y-1])
 
 	return out	
 
@@ -334,7 +339,7 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 
 	if regrid:
 		if psfexmodel[1].header['PSF_SAMP'] != 1.:
-			psfmodel = regrid(psfmodel, psfexmodel[1].header['PSF_SAMP'])
+			psfmodel = regridarr(psfmodel, psfexmodel[1].header['PSF_SAMP'])
 
 	if save:
 		if save.lower() not in ['arr', 'fits']:
@@ -348,14 +353,14 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 
 
 def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True, 
-	savepsf = False, keepconfig = False):
+	savepsf = False, keepconfig = False, regrid = True):
 	"""
 	Wrapper to easily call PSFEx from python. 
 
 	Parameters:
 		cat_path (str): Path to the SExtractor catalog from the working directory.
 		pos(tuple): Pixel (and spectral) location of object of interest in (x, y, chip, filter) - as from spike.tools.checkpixloc.
-			If not specified, generates generic model assuming basis vectors are equally weighted.
+			If not specified, generates generic model assuming central pixel.
 		config (str): If specifying custom config, path to config file. If none, uses default.psfex.
 		userargs (str): Any additional command line arguments to feed to PSFEx. The preferred way to include
 			user arguments is via specification in the config file as command line arguments simply override the 
@@ -363,6 +368,7 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 		makepsf (bool): If True, returns 2D PSF model.
 		savepsf (str): If 'fits', 'arr', or 'txt', will save 2D model PSF in that file format with the same name as the catalog.
 		keepconfig (str): If True, retain parameter files and convolutional kernels moved to working dir.
+		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 
 	Returns:
 		Generates a .psf file that stores linear bases of PSF.
@@ -390,16 +396,16 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 
 	if makepsf:
 
-		if coords:
+		if pos:
 			x, y, chip, filts = pos
 
-		if not coords:
+		if not pos:
 			#assumes that .cat and .fits file are in the same directory
 			im = fits.open(cat_path.replace('cat', 'fits'))[1].data
 			x, y = im.shape/2 #select central pixel if not specified
 
 
-		psfmodel = psfexim(cat_path.replace('cat', 'psf'), pixloc = (x, y), save = savepsf)
+		psfmodel = psfexim(cat_path.replace('cat', 'psf'), pixloc = (x, y), save = savepsf, regrid = regrid)
 			
 		return psfmodel
 
@@ -423,11 +429,6 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 
 	"""
 
-	CRVAL1 = coords.ra.deg #reference RA/Dec set to location at which PSF was generated
-	CRVAL2 = coords.dec.deg
-	CRPIX1 = psfarr.shape[1]//2 #reference pixel (center) set to nearest integer, order doesn't 
-	CRPIX2 = psfarr.shape[0]//2 #matter since psf should be square, but this follows np vs fits
-
 	ext = 1
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
 		ext = 4
@@ -438,18 +439,30 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 
 	imgdat = fits.open(img)
 
+	psfim = np.zeros_like(imgdat[ext].data)
+	xmin = int(pos[0]) - psfarr.shape[0]//2
+	xmax = int(pos[0]) + psfarr.shape[0]//2
+	ymin = int(pos[1]) - psfarr.shape[1]//2
+	ymax = int(pos[1]) + psfarr.shape[1]//2
+
+	if psfarr.shape[0] % 2 == 0:
+		psfim[ymin:ymax, xmin:xmax] += psfarr
+	if psfarr.shape[0] % 2 != 0:
+		psfim[ymin:ymax+1, xmin:xmax+1] += psfarr
+
 	cphdr = fits.PrimaryHDU(header = imgdat[0].header)
 
 	hdr = imgdat[ext].header
-	hdr['CRVAL1'] = CRVAL1
-	hdr['CRVAL2'] = CRVAL2
-	hdr['CRPIX1'] = CRPIX1
-	hdr['CRPIX2'] = CRPIX2
 	if method:
 		hdr['COMMENT'] = "PSF generated using %s via spike."%method
 	if not method:
 		hdr['COMMENT'] = "PSF generated via spike."
-	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
+	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI')
+
+	ehdrdat = np.zeros_like(imgdat[ext+1].data) #shouldn't matter, but doing this explicitly anyway
+	dqhdrdat = np.zeros_like(imgdat[ext+2].data)
+	cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[ext+1].header, name = 'ERR')
+	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[ext+2].header, name = 'DQ')
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
@@ -459,7 +472,165 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 
-	hdulist = fits.HDUList([cphdr, cihdr])
+	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
+
+	try: #get WCSDVARR
+		dp1 = hdr['DP1']
+	except:
+		dp1 = None
+
+	try: #get WCSDVARR
+		dp2 = hdr['DP2']
+	except:
+		dp2 = None
+
+	try: #get D2IMARR
+		d2im1 = hdr['D2IM1']
+	except:
+		d2im1 = None
+
+	try: #get D2IMARR
+		d2im2 = hdr['D2IM2']
+	except:
+		d2im2 = None
+
+
+	if (d2im1 == 'EXTVER: 1') & (d2im2 == 'EXTVER: 2'):
+		hdlist.append(fits.ImageHDU(data = imgdat[7].data, header = imgdat[7].header, 
+			name = 'D2IMARR', ver = 1))
+		hdlist.append(fits.ImageHDU(data = imgdat[8].data, header = imgdat[8].header, 
+			name = 'D2IMARR', ver = 2))
+	if (d2im1 == 'EXTVER: 3') & (d2im2 == 'EXTVER: 4'):
+		hdlist.append(fits.ImageHDU(data = imgdat[9].data, header = imgdat[9].header, 
+			name = 'D2IMARR', ver = 3))
+		hdlist.append(fits.ImageHDU(data = imgdat[10].data, header = imgdat[10].header, 
+			name = 'D2IMARR', ver = 4))
+
+	if (dp1 == 'EXTVER: 1') & (dp2 == 'EXTVER: 2'):
+		hdlist.append(fits.ImageHDU(data = imgdat[11].data, header = imgdat[11].header, 
+			name = 'WCSDVARR', ver = 1))
+		hdlist.append(fits.ImageHDU(data = imgdat[12].data, header = imgdat[12].header, 
+			name = 'WCSDVARR', ver = 2))
+	if (dp1 == 'EXTVER: 3') & (dp2 == 'EXTVER: 4'):
+		hdlist.append(fits.ImageHDU(data = imgdat[13].data, header = imgdat[13].header, 
+			name = 'WCSDVARR', ver = 3))
+		hdlist.append(fits.ImageHDU(data = imgdat[14].data, header = imgdat[14].header, 
+			name = 'WCSDVARR', ver = 4))
+
+	hdulist = fits.HDUList(hdlist)
 	hdulist.writeto(modname)
 
+
+def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0, 
+	maskerr = False, errthresh = 20, usermask = None, fillval = 0):
+	"""
+	Generate a FITS file that fills in masked pixels with a specified value. Useful for
+	feeding to e.g., SExtractor. Preserves truncated FITS extension structure, for the specified
+	extension on which the the mask was applied plus ERR and DQ extensions. 
+	(Assumes that extensions are ordered SCI, ERR, DQ, so that ext+1 corresponds to the 
+	ERR image, and ext+2 corresponds to the DQ image.)
+
+	Parameters:
+		img (str): Path to image to which mask is applied.
+		ext (int): Integer index of extension to which mask should be applied.
+		maskdq (bool): If True, masks values above dqthresh.
+		dqthresh (float): Maximum acceptable value in DQ image. Pixels above dqthresh will be masked.
+		maskerr (bool): If True, masks values above errthresh.
+		errthresh (float): Maximum acceptable value in ERR image. Pixels above errthresh will be masked.
+		usermask (arr): If specified, used as mask on data array (good pixels should have value of 0). 
+			Must be the same dimensions as the data array. (Can be used in addition to DQ and ERR masking.)
+		fillval (float): Value with which to fill the masked pixels.
+
+	Returns: 
+		Generates a new FITS file with a _mask suffix with masked pixels filled in by fillval.
+
+	"""
+
+	imgdat = fits.open(img)
+
+	cphdr = fits.PrimaryHDU(header = imgdat[0].header)
+
+	hdr = imgdat[ext].header
+	dat = imgdat[ext].data
+
+	dq = imgdat[ext+2].data
+	err = imgdat[ext+1].data
+
+	if maskdq:
+		dat[dq > dqthresh] = fillval
+	if maskerr:
+		dat[err > errthresh] = fillval
+	if usermask:
+		dat[usermask > 0] = fillval
+
+	cihdr = fits.ImageHDU(data = dat, header = hdr, name = 'SCI')
+	cehdr = fits.ImageHDU(data = err, header = imgdat[ext+1].header, name = 'ERR')
+	cdqhdr = fits.ImageHDU(data = dq, header = imgdat[ext+2].header, name = 'DQ')
+
+
+	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
+
+	hdulist = fits.HDUList(hdlist)
+	hdulist.writeto(img.replace('.fits', '_mask.fits'))
+
+
+def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
+	"""
+	Get cutout of image around some coordinates.
+
+	Parameters:
+		img (str): Path to image for to crop.
+		coords (astropy skycoords object): Coordinates of object of interest or list of skycoord objects.
+			Easiest is to feed in the output of spike.tools.objloc.
+		ext (int): Integer index of extension to crop.
+		fov_pixel (int): Diameter of square cutout region in pixels.
+		save (bool): If True, will save a FITS file containing cropped region.
+
+	Returns: 
+		cutoutim (arr): Array containing cutout region of the image.
+
+		If save = True, will save a cropped version of the .fits file (given 
+		image name + _crop suffix), including modified WCS.
+	"""
+
+	imgdat = fits.open(img)
+
+	cphdr = fits.PrimaryHDU(header = imgdat[0].header)
+
+	dat = imgdat[ext].data
+	hdr = imgdat[ext].header
+
+	wcs = WCS(hdr, imgdat)
+	pos = utils.skycoord_to_pixel(coords, wcs)
+
+	x0 = int(pos[0])
+	y0 = int(pos[1])
+
+	xmin = x0 - fov_pixel//2
+	xmax = x0 + fov_pixel//2
+	ymin = y0 - fov_pixel//2
+	ymax = y0 + fov_pixel//2
+
+	if fov_pixel % 2 == 0:
+		coords0 = utils.pixel_to_skycoords((x0, y0), wcs)
+		ra = coords0.ra.deg
+		dec = coords0.dec.deg
+		cutoutim = dat[ymin:ymax, xmin:xmax]
+	if fov_pixel % 2 != 0:
+		ra = coords.ra.deg
+		dec = coords.dec.deg
+		cutoutim = dat[ymin:ymax+1, xmin:xmax+1]
+
+	hdr['CRVAL1'] = ra
+	hdr['CRVAL2'] = deg
+	hdr['CRPIX1'] = x0
+	hdr['CRPIX2'] = y0
+	hdr['NAXIS1'] = fov_pixel
+	hdr['NAXIS2'] = fov_pixel
+
+	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
+
+	hdlist = [cphdr, cihdr]
+	hdulist = fits.HDUList(hdlist)
+	hdulist.writeto(img.replace('.fits', '_crop.fits'))
 

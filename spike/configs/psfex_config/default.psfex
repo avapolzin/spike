@@ -6,9 +6,9 @@
  
 BASIS_TYPE      PIXEL_AUTO      # NONE, PIXEL, GAUSS-LAGUERRE or FILE
 BASIS_NUMBER    20              # Basis number or parameter
-PSF_SAMPLING    0.0             # Sampling step in pixel units (0.0 = auto)
+PSF_SAMPLING    1             # Sampling step in pixel units (0.0 = auto)
 PSF_ACCURACY    0.01            # Accuracy to expect from PSF "pixel" values
-PSF_SIZE        35,35           # Image size of the PSF model
+PSF_SIZE        121,121           # Image size of the PSF model
  
 #------------------------- Point source measurements -------------------------
  

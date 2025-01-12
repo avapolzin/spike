@@ -1,13 +1,16 @@
+from astropy.io import fits
 from astropy.nddata import NDData
+from astropy.stats import sigma_clipped_stats
 from astropy.table import Table
 import matplotlib.pyplot as plot
+import numpy as np
 import os
 from photutils.detection import DAOStarFinder, IRAFStarFinder
 from photutils.psf import extract_stars, EPSFBuilder, GriddedPSFModel
-from astropy.stats import sigma_clipped_stats
 import pkg_resources
 from spike import tools
 import subprocess
+import urllib
 import warnings
 import webbpsf
 
@@ -103,8 +106,8 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		warnings.warn("Only one of ebmv and Av can be specified. Proceeding using only ebmv.", Warning, stacklevel = 2)
 		tiny1 += ' ebmv='+str(ebmv)
 	
-	if None in [embv, av]:
-		if embv:
+	if None in [ebmv, av]:
+		if ebmv:
 			tiny1 += ' ebmv='+str(ebmv)
 
 		if av:
@@ -171,11 +174,12 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
 
 
+	commandlist = [str(clt) for clt in command_list]
 
 	tiny = subprocess.Popen(tiny1, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 	newline = os.linesep
 
-	tiny.communicate(newline.join(command_list).encode())
+	tiny.communicate(newline.join(commandlist).encode())
 
 	
 	os.system(TINY_PATH+'/tiny2 tiny.param')
@@ -209,7 +213,9 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 			print('PSF model image written to %s.png'%(modname))
 
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim')
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim')
 
 
 	return psfmodel
@@ -266,9 +272,28 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 	if not os.path.exists('make_psf.py'):
 		# download Gillis et al. (2020) code; https://bitbucket.org/brgillis/tinytim_psfs/src/master/
 		rawurl = 'https://bitbucket.org/brgillis/tinytim_psfs/raw/55299ae1a9b3c299b7910a14622e88c0ffd9d8a1/make_psf.py'
-		os.system('wget ' + rawurl)
+		urllib.request.urlretrieve(rawurl, 'make_psf.py')
 		if verbose:
 			print('Retrieved make_psf.py')
+
+
+	if specchoice == 'list':
+		spec = 1
+		specparam = tinyparams['specparam'][listchoice]
+
+	if specchoice == 'blackbody':
+		spec = 2
+		specparam = temp
+
+	if specchoice == 'plaw_fnu':
+		spec = 3
+		specparam = specalpha
+
+	if specchoice == 'plaw_flam':
+		spec = 4
+		specparam = specbeta
+
+	speccall = (spec, specparam)
 	
 	from make_psf import make_subsampled_model_psf
 
@@ -280,11 +305,11 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		
 	modname = img.replace('.fits', coordstring+'_%s'%pos[3]+'_psf')
 
-	make_subsampled_model_psf(modname,
+	make_subsampled_model_psf(modname+'.fits',
 		    psf_position=(pos[0], pos[1]),
 		    focus=despace,
 		    chip=pos[2],
-		    spec_type=specchoice,
+		    spec_type=speccall,
 		    detector=tinyparams['imcam'][imcam],
 		    filter_name=pos[3],
 		    psf_size=fov_arcsec,
@@ -299,17 +324,19 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		if verbose:
 			print('Removed make_psf.py')
 
+	try:
+		psfmodel = fits.open(modname+'.fits')[0].data
+	except:
+		if imcam not in  ['ACS/WFC', 'ACS/HRC']:
+			psfmodel = fits.open(modname+'00_psf.fits')[0].data
 
-	if imcam not in  ['ACS/WFC', 'ACS/HRC']:
-		psfmodel = fits.open(modname+'00_psf.fits')[0].data
-
-	if imcam in ['ACS/WFC', 'ACS/HRC']:
-		psfmodel = fits.open(modname+'00.fits')[0].data
+		if imcam in ['ACS/WFC', 'ACS/HRC']:
+			psfmodel = fits.open(modname+'00.fits')[0].data
 
 
 	if regrid:
 		if sample != 1.:
-			psfmodel = regrid(psfmodel, sample)
+			psfmodel = tools.regridarr(psfmodel, sample)
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
@@ -321,7 +348,9 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 			print('PSF model image written to %s.png'%(modname))
 
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim (Gillis+ mod)')
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim (Gillis+ mod)')
 
 	return psfmodel
 
@@ -338,7 +367,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
-			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selecte by-chip and 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
@@ -447,7 +476,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
 
 	return psfmodel
 
@@ -460,7 +489,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
-		img
+		img (str): Path to image for which PSF is generated.
 		imcam
 		pos
 		plot
@@ -532,7 +561,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if regrid:
 		if sample != 1.:
-			psfmodel = regrid(psfmodel, sample)
+			psfmodel = tools.regridarr(psfmodel, sample)
 
 
 	if plot:
@@ -546,21 +575,20 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF')
 
 
 	return psfmodel
 
-def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
-	writeto = True, fov_arcsec = 6, norm = 1, starselect = 'DAO', starselectargs = {}, 
-	epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':3}):
+def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, writeto = True, 
+	fov_arcsec = 6, norm = 1., starselect = 'DAO', starselectargs = {'fwhm':10}, thresh = 125,
+	usermask = None, epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':10}):
 	"""
 	Generate PSFs using the empirical photutils.epsf routine. 
 
-	NOTE: The construction of the ePSFs is very time intensive, and so this method is 
-	*not* recommended for use with spike, where a PSF is generated for each object for each
-	input file. The function is included as an option, bearing in mind that it will be very
-	slow compared to other included methods.
+	NOTE: For frames with fewer stars, this method is prone to artifacts. This can be 
+	ameliorated by using a lower detection threshold, but the overall quality of the output 
+	PSF may be lower.
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
@@ -579,6 +607,11 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 		starselect (str): 'DAO', 'IRAF', or 'peak', which use DAOStarFinder, IRAFStarFinder, and 
 			find_peaks from photutils respectively.
 		starselectargs (dict): Keyword arguments for the chosen star detection method.
+		thresh (float): Threshold for star detection (in multiples of standard deviations). 
+			Note that the output ePSF is *incredibly* sensitive to this parameter, as it sets
+			which stars are used to build the model.
+		usermask (arr): If mask = True, used in addition to the DQ array to mask bad pixels. Must be
+			the same dimensions as the data array.
 		epsfargs (dict): Keyword arguments for the EPSFBuilder. Default in spike is to not oversample
 			the PSF, but the regridding is all handled during the creation of the coord-specific model.
 
@@ -625,20 +658,24 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 	mean, median, std = sigma_clipped_stats(dat, sigma=3.0)
 
 	if starselect.upper() == 'DAO':
-		# take default FWHM to be 2x the detector plate scale, can overwrite with starselectargs
-		find = DAOStarFinder(threshold = 5*std, fwhm = 2*plate_scale[pixkey], **starselectargs)
+		# take default FWHM to be 4x the detector plate scale, can overwrite with starselectargs
+		find = DAOStarFinder(threshold = thresh*std, **starselectargs)
 
 	if starselect.upper() == 'IRAF':
-		find = IRAFStarFinder(threshold = 5*std, fwhm = 2*plate_scale[pixkey], **starselectargs)
+		find = IRAFStarFinder(threshold = thresh*std  **starselectargs)
 
 	if mask:
 		maskarr = fits.open(img)[ext+2].data
-		sources = find(dat - median, mask = maskarr)
+		dat[maskarr > 0] = 0 # only retain good pixels
+		maskarr[maskarr > 0] = True
+		if usermask:
+			dat[usermask] = 0
+		sources = find(dat, mask = maskarr)
 
 	if not mask:
-		sources = find(dat - median)
+		sources = find(dat)
 
-	exsize = 35 #size of extraction box
+	exsize = int(2 * (fov_arcsec/plate_scale[pixkey])//2 + 1) #size of extraction box
 	xs = sources['xcentroid']
 	ys = sources['ycentroid']
 	exmask = ((xs > (exsize//2)) & (xs < (dat.shape[1] -1 - (exsize//2))) &
@@ -647,7 +684,8 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 	tab['x'] = xs[exmask]
 	tab['y'] = ys[exmask]
 	nddata = NDData(data = dat - median) 
-	print('begin extract stars')
+	if verbose:
+		print('Beginning stellar extraction.')
 	stars = extract_stars(nddata, tab, size = exsize)
 
 	dimxy = fov_arcsec/plate_scale[pixkey] #make square PSF
@@ -663,11 +701,16 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 		# ensure progress bar is toggled if verbose is true
 		epsfargs['progress_bar'] = True
 
-	print('create builder')
+	if verbose:
+		print('Creating ePSF builder.')
 	epsfbuilder = EPSFBuilder(**epsfargs)
 
-	print('start psf construction')
+	if verbose:
+		print('Starting PSF construction.')
 	model, fitstars = epsfbuilder(stars)
+
+	if verbose:
+		print('Evaluating model at (%i, %i).'%(pos[0], pos[1]))
 	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
 
 	if plot:
@@ -676,20 +719,31 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True,
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
+		if verbose:
+			print('PSF model image written to %s.png.'%(modname))
+
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs')
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs')
 
 	return psfmodel
 
 
 def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
-	savepsfex = False, crclean = True, seconf = None, psfconf = None):
+	savepsfex = False, crclean = True, seconf = None, psfconf = None, regrid = True, 
+	mask = True, maskparams = {}):
 	"""
 	Generate PSFs using PSFEx.
 
+	NOTE: For frames with fewer stars, this method is prone to artifacts, which is exacerbated by 
+	using a lower detection threshold.
+
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
-		imcam
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
+			should not be specified here.
 		img (str): Path to image for which PSF is generated.
 		pos (list): [X, Y, chip, filter] as output from spike.tools.checkpixloc.
 		plot (bool): If True, saves .pngs of the model PSFs.
@@ -702,6 +756,9 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		crclean (bool): If True, use CR-cleaned image as SExtractor input.
 		seconf (str): Path to SExtractor configuration file if not using default.
 		peconf (str): Path to PSFEx configuration file if not using default.
+		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
+		mask (bool): If mask, apply mask generated by spike.tools.mask_fits to remove bad pixels.
+		maskparams (dict): Any additional parameters to pass to spike.tools.mask_fits.
 
 	Returns:
 		2D PSFEx PSF model
@@ -715,10 +772,14 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
 		ext = pos[2]
 
-	tools.pysextractor(img+'[%i]'%ext, config = seconf)
+	if mask:
+		tools.mask_fits(img, ext, **maskparams)
+		tools.pysextractor(img.replace('.fits', '_mask.fits')+'[%i]'%ext, config = seconf)	
+	if not mask:
+		tools.pysextractor(img+'[%i]'%ext, config = seconf)
 	if verbose:
 		print('Finished SExtractor, running PSFEx')
-	psfmodel = tools.pypsfex(img.replace('fits', 'cat'), config = psfconf, save = savepsfex)
+	psfmodel = tools.pypsfex(img.replace('fits', 'cat'), pos, config = psfconf, savepsf = savepsfex)
 	if verbose:
 		print('Finished PSFEx, generating image')
 
@@ -740,7 +801,9 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 			print('PSF model image written to %s.png'%(modname))
 
 	if writeto:
-		rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'PSFEx')
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'PSFEx')
 
 	return psfmodel
 
