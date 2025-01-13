@@ -21,6 +21,10 @@ Probably not. If the data appear corrupted prior to any of the processing steps 
 
 There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. `Troxel et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract>`_ has some nice examples of single detector data and you can generate your own Roman imaging with `STIPS <https://github.com/spacetelescope/STScI-STIPS>`_ (`STIPS Development Team 2024 <https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract>`_) The pipeline is very similar to JWST's, with the image from each of the detectors is stored in its own file, so ``spike.psf.roman`` is, at its core, a modified version of ``spike.psf.jwst``.
 
+3. **Tweakreg keeps failing, noting that I'm out of memory. How should I proceed?**
+
+This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well aligned for you purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resource. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run ``spike``.
+
 
 spike
 -----
@@ -81,7 +85,7 @@ There is also a bug in the PSFEx installation code -- discussed nicely `here <ht
 
 1. **My output single-image PSFs look funny/there's an issue with my SExtractor catalog. How do I fix this?**
 
-The first step if you aren't happy with your PSFEx output is to try adjusting the SExtractor and PSFEx parameters in their respective config files. ``spike.psfgen`` uses the default settings for each of these codes unless an overriding user input is specified. As a result, the star catalog and subsequent PSF generation are not fine-tuned for any specific use case.
+The first step if you aren't happy with your PSFEx output is to try adjusting the SExtractor and PSFEx parameters in their respective config files. ``spike.psfgen`` uses the default settings for each of these codes unless an overriding user input is specified. As a result, the star catalog and subsequent PSF generation are not fine-tuned for any specific use case beyond the parameters that were altered for high-resolution, space-based images.
 
 Within spike/configs, there are example configuration and parameter files for PSFEx and SExtractor. These can be used as guides and can be *copied* and directly modified. (I recommend against modifying any of the files in spike/configs themselves unless you are interested in making global changes.)
 
