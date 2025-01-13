@@ -177,6 +177,9 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
 
 
+	if verbose:
+		print('Generating parameter file.')
+
 	commandlist = [str(clt) for clt in command_list]
 
 	tiny = subprocess.Popen(tiny1, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -308,6 +311,9 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		
 	modname = img.replace('.fits', coordstring+'_%s'%pos[3]+'_psf')
 
+	if verbose:
+		print('Generating model PSF')
+
 	make_subsampled_model_psf(modname+'.fits',
 		    psf_position=(pos[0], pos[1]),
 		    focus=despace,
@@ -339,6 +345,8 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 
 	if regrid:
 		if sample != 1.:
+			if verbose:
+				print('Regridding PSF model to instrument resolution')
 			psfmodel = tools.regridarr(psfmodel, sample)
 
 	if plot:
@@ -470,6 +478,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 	#preferred equivalent to using photutils.psf.stdpsf_reader directly
 	model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
+	if verbose:
+		print('Finished reading STDPSF grid, generating PSF model')
 	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
 
 	if plot:
@@ -478,7 +488,12 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
+		if verbose:
+			print('PSF model image written to %s.png'%(modname))
+
 	if writeto:
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
 		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
 
 	return psfmodel
@@ -559,13 +574,16 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	aperturename = img[0].header['APERNAME']
 	psf.aperturename = aperturename
 
-
+	if verbose:
+		print('Producing PSF model')
 	psfmod = psf.calc_psf(fov_arcsec = fov_arcsec, ovesample = sample, **calckwargs)
 
 	psfmodel = psfmod[3].data
 
 	if regrid:
 		if sample != 1.:
+			if verbose:
+				print('Regridding PSF to instrument resolution')
 			psfmodel = tools.regridarr(psfmodel, sample)
 
 
@@ -580,6 +598,8 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 
 	if writeto:
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
 		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF')
 
 
@@ -680,9 +700,13 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		maskarr[maskarr > 0] = True
 		if usermask:
 			dat[usermask] = 0
+		if verbose:
+			print('Identifying stars to use in ePSF')
 		sources = find(dat, mask = maskarr)
 
 	if not mask:
+		if verbose:
+			print('Identifying stars to use in ePSF')
 		sources = find(dat)
 
 	exsize = int(2 * (fov_arcsec/plate_scale[pixkey])//2 + 1) #size of extraction box
@@ -788,8 +812,12 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if mask:
 		tools.mask_fits(img, extv, **maskparams)
+		if verbose:
+			print('Finished masking data, running SExtractor')
 		tools.pysextractor(img.replace('.fits', '_mask.fits')+'[%i]'%ext, config = seconf)	
 	if not mask:
+		if verbose:
+			print('Running SExtractor')
 		tools.pysextractor(img+'[%i]'%ext, config = seconf)
 	if verbose:
 		print('Finished SExtractor, running PSFEx')

@@ -632,11 +632,14 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	hdr['NAXIS1'] = fov_pixel
 	hdr['NAXIS2'] = fov_pixel
 
-	cihdr = fits.ImageHDU(data = psfarr, header = hdr, name = 'SCI')
+	cihdr = fits.ImageHDU(data = cutoutim, header = hdr, name = 'SCI')
 
 	hdlist = [cphdr, cihdr]
 	hdulist = fits.HDUList(hdlist)
-	hdulist.writeto(img.replace('.fits', '_crop.fits'))
+	if save:
+		hdulist.writeto(img.replace('.fits', '_crop.fits'))
+
+	return cutoutim
 
 
 def combine_extensions():

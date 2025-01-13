@@ -40,6 +40,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					     'build':True,
 					     'combine_type':'imedian',
 					     'static':False},
+		returnpsf = 'full',
+		cutout_fov = 151,
+		savecutout = True,
 		**kwargs):
 	"""
 	Generate drizzled HST PSFs.
@@ -48,7 +51,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		img_dir (str): Path to directory containing calibrated files for which model PSF will be generated.
 			If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): e.g, 'flc', 'flt', 'cal', 'calints' -- specifies which file-type to include.
+		img_type (str): e.g, 'flc', 'flt' -- specifies which file-type to include.
 			spike currently only works with MEF files that include both SCI and ERR/DQ extensions.
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS', 'STIS'
 		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC
@@ -74,10 +77,16 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
 			documentation for a full list.
+		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.hst does not return anything.
+		cutout_fov (int): Side length of square cutout region centered on PSF. Used if returnpsf = 'crop'.
+		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
+
+		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
+		if returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
 	from drizzlepac import tweakreg, tweakback, astrodrizzle
 
@@ -229,17 +238,23 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for dk in drizzlelist[do].keys():
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
+	drzs = np.concatenate((sorted(glob.glob('*_drc.fits')), sorted(glob.glob('*_drz.fits'))))
+	for dr in drzs: #rename drizzled outputs to something more manageable
+		flist = dr.split('_')
+		suff_ = flist[-1]
+		filt_ = flist[-3]
+		obj_ = flist[-4]
+
+		os.system('mv %s %s_%s_psf_%s.fits'(dr, obj_, filt_, suff_))
+
+	suff = suff_ # store suffix, as there should be no variation within one run
+
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		drizzleparams['driz_cr_corr'] = True #reset parameters turned off for PSF
 		drizzleparams['static'] = True
 		for fk in filelist.keys():
 			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
-
-	## have to figure out what the drizzled image's name will be
-	# will then write to that header to note that it is a spike product
-	# really only need to do that for the method = USER case, but good to
-	# have backup, so people know what was used
 
 
 	# clean up step to move all of the PSF files to the relevant directory
@@ -254,13 +269,36 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
 
+	if verbose:
+		print('Moved PSF files to %s'savedir)
+
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		sufs = ['drc', 'drz']
-		dout = np.concatenate((sorted(glob.glob('savedir/*_drc.fits')), sorted(glob.glob('savedir/*_drz.fits'))))
+		dout = np.concatenate((sorted(glob.glob(savedir+'/*_drc.fits')), sorted(glob.glob(savedir+'/*_drz.fits'))))
 		for di in dout:
 			tools.to_asdf(di)
+
+		if verbose:
+			print('Generated ASDF output')
+
+	if returnarr:
+		returndict = {}
+		for do in drizzlelist.keys():
+			returndict[do] = {}
+			for dk in drizzlelist[do].keys()
+
+				if returnarr == 'full':	
+					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
+					returndict[do][dk] = dr_psf[1].data
+
+				if returnarr == 'crop':
+					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff), 
+									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+					returndict[do][dk] = crop
+
+		return returndict
 
 
 
@@ -275,7 +313,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		img_dir (str): Path to directory containing calibrated files for which model PSF will be generated.
 				If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): e.g, 'cal', 'calints' -- specifies which file-type to include.
+		img_type (str): e.g, 'cal', 'calints', 'crf', 'crfints' -- specifies which file-type to include.
 		inst (str): 'MIRI', 'NIRCAM', 'NIRISS'
 		camera (str): 'Imaging', 'AMI' -- MUST BE SPECIFIED FOR NIRISS
 		method (str): 'WebbPSF', 'STDPSF' (empirical), 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
@@ -356,7 +394,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
 		for fk in filelist.keys():
-			input_models = 
+			# input_models = 
 			######################################
 			tweakreg_tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
 			######################################
@@ -461,6 +499,9 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
+	if verbose:
+		print('Moved PSF files to %s'savedir)
+
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
@@ -468,6 +509,8 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		dout = sorted(glob.glob('savedir/*_i2d.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
+		if verbose:
+			print('Generated ASDF output')
 
 	return placeholder
 
@@ -674,8 +717,4 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		dout = sorted(glob.glob('savedir/*_driz.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
-
-
-### ADD COMMENT TO FINAL PSF FITS HEADER THAT IT WAS GENERATED WITH spike
-## Will do this on the clean up step
 
