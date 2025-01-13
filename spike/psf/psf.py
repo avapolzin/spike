@@ -38,9 +38,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					     'configobj':None,
 					     'final_pixfrac':0.8,
 					     'build':True,
-					     'combine_type':'imedian', 
-					     # 'combine_nhigh':3,
-					     # 'group':1,
+					     'combine_type':'imedian',
 					     'static':False},
 		**kwargs):
 	"""

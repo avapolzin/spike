@@ -73,9 +73,12 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF model saved by TinyTim.
-		ebmv (float):
-		av (float):
-		wmag (float):
+		ebmv (float): Interstellar extinction, specified by reddening in mag. 
+			If specified, av should not be.
+		av (float): Interstellar extinction, specified by visual extinction in mag. 
+			If specified, ebmv should not be.
+		wmag (float): Fraction of wavelengths to use in generating polychromatic PSFs 
+			(if wmag > 1, uses more than the default; if wmag < 1, uses fewer).
 		jitter (float): Symmetric jitter in mas.
 		major (float): Axisymmetric major axis jitter in mas.
 		minor (float): Axisymmetric minor axis jitter in mas.
