@@ -70,7 +70,7 @@ class ValidationError(Exception):
 
 
 def _get_input_file_check(root_dir):
-    from . import cmdline
+    from spike.stpipe import cmdline
 
     root_dir = root_dir or ""
 
@@ -93,7 +93,7 @@ def _get_input_file_check(root_dir):
 
 
 def _get_output_file_check(root_dir):
-    from . import cmdline
+    from spike.stpipe import cmdline
 
     root_dir = root_dir or ""
 

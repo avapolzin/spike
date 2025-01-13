@@ -270,7 +270,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
 
 	if verbose:
-		print('Moved PSF files to %s'savedir)
+		print('Moved PSF files to %s'%savedir)
 
 
 	if out == 'asdf':
@@ -287,7 +287,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		returndict = {}
 		for do in drizzlelist.keys():
 			returndict[do] = {}
-			for dk in drizzlelist[do].keys()
+			for dk in drizzlelist[do].keys():
 
 				if returnarr == 'full':	
 					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
@@ -335,7 +335,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
-				for a full list.
+				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
 				documentation for a full list.
 		**kwargs: Keyword arguments for PSF generation function.
@@ -345,7 +345,12 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	"""
 
 	os.environ['CRDS_SERVER_URL']="https://jwst-crds.stsci.edu"
-	from spike.jwstcal import tweakreg_tweakreg_step, resample
+
+	if not usecrds:
+		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
+
+	from spike.jwstcal import resample
+	from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
 
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
@@ -394,10 +399,11 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
 		for fk in filelist.keys():
-			# input_models = 
-			######################################
-			tweakreg_tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
-			######################################
+			#output_dir, save_results are ostensibly redundant, but writing out requires both
+			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
+					output_dir = img_dir, save_results = True)
+
+		imgs = sorted(glob.glob(img_dir+'/*'+img_type+'_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -500,13 +506,13 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
 	if verbose:
-		print('Moved PSF files to %s'savedir)
+		print('Moved PSF files to %s'%savedir)
 
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output -- using typical suffix for JWST mosaics
-		dout = sorted(glob.glob('savedir/*_i2d.fits')) 
+		dout = sorted(glob.glob(savdir+'/*_i2d.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 		if verbose:
@@ -557,6 +563,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 
 	"""
 	os.environ['CRDS_SERVER_URL']="https://roman-crds.stsci.edu"
+
+	if not usecrds:
+		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
+
 	from spike.romancal import tweakreg_step, resample
 
 	if keeporig and not pretweaked:
@@ -604,9 +614,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
 		for fk in filelist.keys():
-			#######################################
-			tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
-			#######################################
+			#output_dir, save_results are ostensibly redundant, but writing out requires both
+			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
+					output_dir = img_dir, save_results = True)
+
+		imgs = sorted(glob.glob(img_dir+'/*'+img_type+'_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -714,7 +726,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output -- will update when Roman pipeline has standard
 		# level 3 product suffix
-		dout = sorted(glob.glob('savedir/*_driz.fits')) 
+		dout = sorted(glob.glob(savedir+'/*_driz.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 
