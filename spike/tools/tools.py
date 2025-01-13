@@ -172,7 +172,7 @@ def checkpixloc(coords, img, inst, camera = None):
 			out = [float(x_coord), float(y_coord), chip, filt]
 
 
-	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS/IMAGING', 'WFI', 'CGI']:
+	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS', 'NIRISS/IMAGING', 'WFI', 'CGI']:
 		# for WFC3, only checks the final readout by design
 		chip = 0 #no chip
 		wcs1 = WCS(hdu[1].header, fobj = hdu)

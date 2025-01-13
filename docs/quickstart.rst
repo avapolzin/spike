@@ -6,6 +6,7 @@ Quickstart Guide
 ``spike`` is intended to be simple to use. At minimum, one just needs to a working directory and object coordinates to begin. The working directory should be structured to include CTE-corrected, but not yet combined .fits files from a single instrument on a single telescope. For example:
 
 .. code-block:: python
+
 	from spike import psf
 
 	acs_path = '/path/to/acs/data/'
@@ -39,6 +40,7 @@ Quickstart Guide
 In lieu of passing coordinates to obj, you can also provide an object name (as long as it's resolvable by NED/Simbad). For example:
 
 .. code-block:: python
+
 	from spike import psf
 
 	acs_path = '/path/to/acs/data/'
@@ -51,7 +53,7 @@ In lieu of passing coordinates to obj, you can also provide an object name (as l
 	psf.jwst(img_dir = nircam_path, obj = 'M51', img_type = 'cal', inst = 'NIRCam')
 
 
-The last code block shows minimal examples, which includes all of the required inputs (camera is only required for ACS, WFC3, and NIRISS). ``spike`` handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.
+The last code block shows minimal examples, which includes all of the required inputs (camera is only required for ACS and WFC3). ``spike`` handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.
 
 Note that it will often be preferred to provide a savedir argument, as otherwise files with the same name may be overwritten in the default /psfs directory.
 

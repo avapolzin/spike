@@ -42,7 +42,7 @@ stdpsf_jwdet = {'NRCA1':1, 'NRCA2':2, 'NRCA3':3, 'NRCA4':4,
 
 plate_scale = {'ACS/WFC':0.05, 'ACS/HRC':0.025 , 'WFC3/IR':0.13, 'WFC3/UVIS':0.039, 'WFPC_wf':0.1016 , 
 'WFPC_pc':0.0439, 'WFPC1_wf':0.1016, 'WFPC1_pc':0.0439, 'WFPC2_wf':0.1, 'WFPC2_pc':0.046, 
-'NIRCAM_long':0.063, 'NIRCAM_short':0.031, 'MIRI':0.11, 'NIRISS/Imaging':0.066, 
+'NIRCAM_long':0.063, 'NIRCAM_short':0.031, 'MIRI':0.11, 'NIRISS/Imaging':0.066, 'NIRISS':0.066,
 'WFI':0.11, 'CGI':0.0218} #arseconds/pixel -- some are averaged across filter/position
 # including both WFPC1 and WFPC so that either name can be used
 
@@ -368,7 +368,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
 			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
-			should not be specified here.
+			should not be specified here. If 'NIRISS' specified alone, assumes the imaging mode.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
@@ -410,10 +410,10 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 			url += '.fits'
 
 
-	if imcam in ['NIRCAM', 'MIRI', 'NIRISS/Imaging']:
+	if imcam in ['NIRCAM', 'MIRI', 'NIRISS', 'NIRISS/Imaging']:
 		baseurl = 'https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/'
 
-		if imcam in ['MIRI', 'NIRISS/Imaging']:
+		if imcam in ['MIRI', 'NIRISS', 'NIRISS/Imaging']:
 			url = baseurl+imcamurl+'/STDPSF_%s_%s.fits'%(imcamurl, pos[3])
 
 		if imcam == 'NIRCAM':
@@ -490,18 +490,20 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image for which PSF is generated.
-		imcam
-		pos
-		plot
-		verbose
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
+			should not be specified here. If 'NIRISS' specified alone, assumes the imaging mode.
+		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+		plot (bool): If True, saves .pngs of the model PSFs.
+		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).
-		fov
-		sample
-		regrid
-		image_mask
-		pupil_mask
+		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		sample (float): Factor by which to oversample the PSF.
+		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
+		image_mask (str): Image mask argument for WebbPSF.
+		pupil_mask (str): Pupil mask argument for WebbPSF.
 		**calckwargs: Additional arguments for calc_psf() -- see 
 			https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf
 			Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
@@ -555,7 +557,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	psf.aperturename = aperturename
 
 
-	psfmod = psf.calc_psf(fov_arcsec = fov, ovesample = sample, **calckwargs)
+	psfmod = psf.calc_psf(fov_arcsec = fov_arcsec, ovesample = sample, **calckwargs)
 
 	psfmodel = psfmod[3].data
 

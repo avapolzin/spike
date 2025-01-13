@@ -55,16 +55,31 @@ Since both JWST and Roman CRDS servers may be defined, these variables are added
 
 ## Getting Started
 
-To get a drizzled PSF, ...
+To get a drizzled PSF, only minimal inputs are required:
 
-fairly simple and can require as little as a working directory for images and the coordinates of an object of interest.
+``` python
+
+from spike import psf
+
+	acs_path = '/path/to/acs/data/'
+
+	psf.hst(img_dir = acs_path, obj = 'M51', img_type = 'flc', inst = 'ACS', camera = 'WFC')
+
+
+	nircam_path = 'path/to/nircam/data/'
+
+	psf.jwst(img_dir = nircam_path, obj = 'M51', img_type = 'cal', inst = 'NIRCam')
+
+```
+
+`spike` is intended to be fairly simple and can require as little as a working directory for images, the coordinates of an object of interest (where the PSF will be generated), the used to identify relevant data (e.g., 'flc', crf', 'cal'), and the instrument used to take the data. For ACS and WFC3, a camera should also be specified. `spike` handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions `spike.psf.hst`, `spike.psf.jwst`, and `spike.psf.roman` also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.
 
 
 Ultimately, some of the other functions included in `spike`, may be useful. For instance, the functions in `spike.psfgen` are methods to compute and save (to .fits) various model PSFs for a variety of telescopes/instruments which share similar syntax and required inputs and are callable from python directly. Similarly, `spike.tools` houses generic functions, which may be broadly applicable, including a python wrapper for `SExtractor` (not to be confused with `sep`), a utility to convert between `PSFEx` .psf files and images, and a means of rewriting FITS files to an ASDF format. Please refer to [spike-psf.readthedocs.io](https://spike-psf.readthedocs.io) for details.
 
 ## Testing `spike`
 
-Since `spike` has utility for working with data, the most useful test of the code is to actually generate and drizzle PSFs from imaging. The code to generate Figures 1 and 2 from Polzin in prep is in test_outputs.py, which can be used to confirm the package works. Note that the input file structure is such that each instrument's data should be partitioned in its own directory, where all included data may be included in the final drizzled product. 
+Since `spike` has utility for working with data, the most useful test of the code is to actually generate and drizzle PSFs from imaging. The code to generate Figures 1 and 2 from Polzin in prep is in tests/test_outputs.py, which can be used to confirm the package works. Note that the input file structure is such that each instrument's data should be partitioned in its own directory, where all included data may be included in the final drizzled product. 
 
 An example file structure:
 
