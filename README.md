@@ -61,14 +61,14 @@ To get a drizzled PSF, only minimal inputs are required:
 
 from spike import psf
 
-	acs_path = '/path/to/acs/data/'
+acs_path = '/path/to/acs/data/'
 
-	psf.hst(img_dir = acs_path, obj = 'M79', img_type = 'flc', inst = 'ACS', camera = 'WFC')
+psf.hst(img_dir = acs_path, obj = 'M79', img_type = 'flc', inst = 'ACS', camera = 'WFC')
 
 
-	nircam_path = 'path/to/nircam/data/'
+nircam_path = 'path/to/nircam/data/'
 
-	psf.jwst(img_dir = nircam_path, obj = 'M79', img_type = 'cal', inst = 'NIRCam')
+psf.jwst(img_dir = nircam_path, obj = 'M79', img_type = 'cal', inst = 'NIRCam')
 
 ```
 

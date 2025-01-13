@@ -48,7 +48,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		img_dir (str): Path to directory containing calibrated files for which model PSF will be generated.
 			If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): e.g, 'flc', 'flt', 'c0f', 'c1f', 'cal', 'calints' -- specifies which file-type to include.
+		img_type (str): e.g, 'flc', 'flt', 'cal', 'calints' -- specifies which file-type to include.
+			spike currently only works with MEF files that include both SCI and ERR/DQ extensions.
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS', 'STIS'
 		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
@@ -355,6 +356,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		# note that if there are many input files, tweakreg will be very slow and prone
 		# to overuse of RAM	
 		for fk in filelist.keys():
+			input_models = 
 			######################################
 			tweakreg_tweakreg_step.TweakRegStep().process(input_models, **tweakparams)
 			######################################

@@ -430,12 +430,16 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	"""
 
 	ext = 1
+	extv = 1
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
 		ext = 4
+		ext = 2
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
 		ext = 1 #yes, it's already 1, but this is to make things explicit
+		extv = 1
 	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
 		ext = pos[2]
+		extv = pos[2]
 
 	imgdat = fits.open(img)
 
@@ -459,10 +463,10 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		hdr['COMMENT'] = "PSF generated via spike."
 	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI')
 
-	ehdrdat = np.zeros_like(imgdat[ext+1].data) #shouldn't matter, but doing this explicitly anyway
-	dqhdrdat = np.zeros_like(imgdat[ext+2].data)
-	cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[ext+1].header, name = 'ERR')
-	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[ext+2].header, name = 'DQ')
+	ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
+	dqhdrdat = np.zeros_like(imgdat[('DQ', exvt)].data)
+	cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR')
+	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', exvt)].header, name = 'DQ')
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
@@ -496,25 +500,25 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 
 
 	if (d2im1 == 'EXTVER: 1') & (d2im2 == 'EXTVER: 2'):
-		hdlist.append(fits.ImageHDU(data = imgdat[7].data, header = imgdat[7].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 1)].data, header = imgdat[('D2IMARR', 1)].header, 
 			name = 'D2IMARR', ver = 1))
-		hdlist.append(fits.ImageHDU(data = imgdat[8].data, header = imgdat[8].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 2)].data, header = imgdat[('D2IMARR', 2)].header, 
 			name = 'D2IMARR', ver = 2))
 	if (d2im1 == 'EXTVER: 3') & (d2im2 == 'EXTVER: 4'):
-		hdlist.append(fits.ImageHDU(data = imgdat[9].data, header = imgdat[9].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 3)].data, header = imgdat[('D2IMARR', 3)].header, 
 			name = 'D2IMARR', ver = 3))
-		hdlist.append(fits.ImageHDU(data = imgdat[10].data, header = imgdat[10].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 4)].data, header = imgdat[('D2IMARR', 4)].header, 
 			name = 'D2IMARR', ver = 4))
 
 	if (dp1 == 'EXTVER: 1') & (dp2 == 'EXTVER: 2'):
-		hdlist.append(fits.ImageHDU(data = imgdat[11].data, header = imgdat[11].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 1)].data, header = imgdat[('WCSDVARR', 1)].header, 
 			name = 'WCSDVARR', ver = 1))
-		hdlist.append(fits.ImageHDU(data = imgdat[12].data, header = imgdat[12].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 2)].data, header = imgdat[('WCSDVARR', 2)].header, 
 			name = 'WCSDVARR', ver = 2))
 	if (dp1 == 'EXTVER: 3') & (dp2 == 'EXTVER: 4'):
-		hdlist.append(fits.ImageHDU(data = imgdat[13].data, header = imgdat[13].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 3)].data, header = imgdat[('WCSDVARR', 3)].header, 
 			name = 'WCSDVARR', ver = 3))
-		hdlist.append(fits.ImageHDU(data = imgdat[14].data, header = imgdat[14].header, 
+		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 4)].data, header = imgdat[('WCSDVARR', 4)].header, 
 			name = 'WCSDVARR', ver = 4))
 
 	hdulist = fits.HDUList(hdlist)
@@ -527,12 +531,12 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 	Generate a FITS file that fills in masked pixels with a specified value. Useful for
 	feeding to e.g., SExtractor. Preserves truncated FITS extension structure, for the specified
 	extension on which the the mask was applied plus ERR and DQ extensions. 
-	(Assumes that extensions are ordered SCI, ERR, DQ, so that ext+1 corresponds to the 
-	ERR image, and ext+2 corresponds to the DQ image.)
+	(Assumes that extensions are named SCI, ERR, DQ.)
 
 	Parameters:
 		img (str): Path to image to which mask is applied.
-		ext (int): Integer index of extension to which mask should be applied.
+		ext (int): Integer index for *version* of extension to which mask should be applied.
+			This will be used to index dat[('SCI', ext)] etc.
 		maskdq (bool): If True, masks values above dqthresh.
 		dqthresh (float): Maximum acceptable value in DQ image. Pixels above dqthresh will be masked.
 		maskerr (bool): If True, masks values above errthresh.
@@ -550,11 +554,11 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 
 	cphdr = fits.PrimaryHDU(header = imgdat[0].header)
 
-	hdr = imgdat[ext].header
-	dat = imgdat[ext].data
+	hdr = imgdat[('SCI', ext)].header
+	dat = imgdat[('SCI', ext)].data
 
-	dq = imgdat[ext+2].data
-	err = imgdat[ext+1].data
+	dq = imgdat[('DQ', ext)].data
+	err = imgdat[('ERR', ext)].data
 
 	if maskdq:
 		dat[dq > dqthresh] = fillval
@@ -564,8 +568,8 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 		dat[usermask > 0] = fillval
 
 	cihdr = fits.ImageHDU(data = dat, header = hdr, name = 'SCI')
-	cehdr = fits.ImageHDU(data = err, header = imgdat[ext+1].header, name = 'ERR')
-	cdqhdr = fits.ImageHDU(data = dq, header = imgdat[ext+2].header, name = 'DQ')
+	cehdr = fits.ImageHDU(data = err, header = imgdat[('ERR', ext)].header, name = 'ERR')
+	cdqhdr = fits.ImageHDU(data = dq, header = imgdat[('DQ', ext)].header, name = 'DQ')
 
 
 	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
@@ -633,4 +637,21 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	hdlist = [cphdr, cihdr]
 	hdulist = fits.HDUList(hdlist)
 	hdulist.writeto(img.replace('.fits', '_crop.fits'))
+
+
+def combine_extensions():
+	"""
+	Combine SCI and DQ/ERR extensions for c0f/c1f and c0m/c1m files into one multi-extension
+	FITS file that's readable by spike.
+
+	
+	"""
+
+def waivered_to_mef():
+	"""
+	Write waivered FITS files to multi-extension FITS files to facilitate PSF generation for 
+	WFPC, WFPC2, etc. 
+
+
+	"""
 

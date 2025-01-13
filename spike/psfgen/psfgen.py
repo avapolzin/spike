@@ -626,12 +626,17 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 	"""
 
 	ext = 1 #read data from relevant SCI extension
+	extv = 1
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
 		ext = 4
+		extv = 2
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
 		ext = 1 #yes, it's already 1, but this is to make things explicit
+		extv = 1
 	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
 		ext = pos[2]
+		extv = pos[2]
+
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
@@ -670,7 +675,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		find = IRAFStarFinder(threshold = thresh*std  **starselectargs)
 
 	if mask:
-		maskarr = fits.open(img)[ext+2].data
+		maskarr = fits.open(img)[('DQ', extv)].data
 		dat[maskarr > 0] = 0 # only retain good pixels
 		maskarr[maskarr > 0] = True
 		if usermask:
@@ -770,15 +775,19 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	"""
 
 	ext = 1 #run SExtractor only on relevant SCI extension
+	extv = 1
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
 		ext = 4
+		extv = 2
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
 		ext = 1 #yes, it's already 1, but this is to make things explicit
+		extv = 1
 	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
 		ext = pos[2]
+		extv = pos[2]
 
 	if mask:
-		tools.mask_fits(img, ext, **maskparams)
+		tools.mask_fits(img, extv, **maskparams)
 		tools.pysextractor(img.replace('.fits', '_mask.fits')+'[%i]'%ext, config = seconf)	
 	if not mask:
 		tools.pysextractor(img+'[%i]'%ext, config = seconf)
