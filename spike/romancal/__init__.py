@@ -5,7 +5,7 @@ def libpath(filepath):
     return join(dirname(abspath(__file__)), "lib", filepath)
 
 
-__all__ = ['resample',
+__all__ = ['resample', 'resample_step',
 'associations_lib_product_utils', 'associations_config',
 'associations_lib_rules_elpp_base', 'associations_lib_member', 'associations_lib_diff',
 'associations_lib_constraint', 'associations_pool', 'associations_lib_dms_base', 
@@ -32,7 +32,7 @@ __all__ = ['resample',
 # import .lib_signal_slot, .associations_config
 # import .tweakreg_step, .stpipe_core, .lib_suffix
 
-from . import resample
+from . import resample, resample_step
 from . import associations_lib_rules_elpp_base, associations_association, associations_lib_constraint
 from . import associations_pool, associations_lib_dms_base, associations_lib_member
 from . import associations_lib_ioregistry, associations_lib_keyvalue_registry, associations_lib_utilities

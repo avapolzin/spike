@@ -478,22 +478,25 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
-				# input_models = # association based on file list
-				resamp = resample_step.ResampleStep().call(input_models, 
-					output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams)
-				pool.apply_async(resamp.do_drizzle)
+				resamp = resample_step.ResampleStep(**drizzleparams)
+				resampkwds = {'input_models': drizzlelist[do][dk], 
+							  'output_file': '%s_%s_psf_i2d'%(do, dk),
+							  'output_dir':img_dir, 
+							  'save_results':True}
+				pool.apply_async(resamp.call, kwds = resampkwds)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				resamp = resample_step.ResampleStep(input_models, output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams).do_drizzle()
+				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
+					output_file = '%s_%s_psf'%(do, dk), output_dir = img_dir, save_results = True)
 
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		for fk in filelist.keys():
-			# input_models = # association based on file list
-			resample.ResampleData(input_models, output='%s_img_i2d.fits'%fk, **drizzleparams).do_drizzle()
+			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
+					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
 
     #####################################################################
 
@@ -511,8 +514,8 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
-		# defining suffix from resample output -- using typical suffix for JWST mosaics
-		dout = sorted(glob.glob(savdir+'/*_i2d.fits')) 
+		# defining suffix from resample output
+		dout = sorted(glob.glob(savdir+'/*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 		if verbose:
@@ -567,7 +570,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 	if not usecrds:
 		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
 
-	from spike.romancal import tweakreg_step, resample
+	from spike.romancal import tweakreg_step, resample_step
 
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
@@ -692,25 +695,25 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
-				# input_models = # association based on file list
-				resamp = resample.ResampleData(input_models, 
-					output='%s_%s_psf_driz.fits'%(do, dk), **drizzleparams)
-				pool.apply_async(resamp.do_drizzle)
+				resamp = resample_step.ResampleStep(**drizzleparams)
+				resampkwds = {'input_models': drizzlelist[do][dk], 
+							  'output_file': '%s_%s_psf_i2d'%(do, dk),
+							  'output_dir':img_dir, 
+							  'save_results':True}
+				pool.apply_async(resamp.call, kwds = resampkwds)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				resample.ResampleData(input_models, output='%s_%s_psf_driz.fits'%(do, dk), **drizzleparams).do_drizzle()
+				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
+					output_file = '%s_%s_psf'%(do, dk), output_dir = img_dir, save_results = True)
+
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		for fk in filelist.keys():
-			# input_models = # association based on file list
-			resample.ResampleData(input_models, output='%s_img_driz.fits'%fk, **drizzleparams).do_drizzle()
-
-	# #relevant portion of romancal.resample_step
-	# resamp = resample.ResampleData(input_models, output=output, **kwargs)
-	# result = resamp.do_drizzle()
+			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
+					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
     #####################################################################
 
     # clean up step to move all of the PSF files to the relevant directory
@@ -724,9 +727,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
-		# defining suffix from resample output -- will update when Roman pipeline has standard
-		# level 3 product suffix
-		dout = sorted(glob.glob(savedir+'/*_driz.fits')) 
+		# defining suffix from resample output
+		dout = sorted(glob.glob(savedir+'/*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 

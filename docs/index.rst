@@ -13,7 +13,7 @@ If you plan to use the ``PSFEx`` empirical PSF modeling, that will similarly nee
 
 If you are using ``WebbPSF``, you will need to install the relevant data and include it in your path. Instructions to do this are available `here <https://webbpsf.readthedocs.io/en/latest/installation.html#data-install>`_.
 
-The ``jwst`` and ``romancal`` pipelines -- which are used in tweak/resample steps for JWST and Roman -- require the setup of the CRDS_PATH environment variable. The amended version of the code also relies on ``crds``, so it is necessary to set these environment variables according to the instructions `here <https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html>`_ if you plan to use ``spike`` with JWST or Roman data. 
+The ``jwst`` and ``romancal`` pipelines -- which house the tweak/resample steps for JWST and Roman -- require the setup of the CRDS_PATH environment variable. The amended version of the code also relies on ``crds``, so it is necessary to set these environment variables according to the instructions `here <https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html>`_ if you plan to use ``spike`` with JWST or Roman data. 
 
 If you install all of the optional dependencies described above, your shell's startup file will look something like:
 

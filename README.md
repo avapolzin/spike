@@ -32,7 +32,7 @@ If you install from PyPI, you will also need to install `DrizzlePac` from the [G
 
 *If you are using `WebbPSF`, you will need to install the relevant data and include it in your path. Instructions to do this are available [here](https://webbpsf.readthedocs.io/en/latest/installation.html#data-install).*
 
-*The `jwst` and `romancal` pipelines -- which are used in tweak/resample steps for JWST and Roman -- require the setup of CRDS_PATH and CRDS_SERVER_URL environment variables. The amended version of the code also relies on `crds`, so it is necessary to set these environment variables according to the instructions [here](https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html) if you plan to use `spike` with JWST or Roman data.*
+*The `jwst` and `romancal` pipelines -- which house the tweak/resample steps for JWST and Roman -- require the setup of CRDS_PATH and CRDS_SERVER_URL environment variables. The amended version of the code also relies on `crds`, so it is necessary to set these environment variables according to the instructions [here](https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html) if you plan to use `spike` with JWST or Roman data.*
 
 If you install all of the optional dependencies described above, your shell's startup file will look something like:
 
