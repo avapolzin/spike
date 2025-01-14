@@ -53,7 +53,7 @@ from roman_datamodels import datamodels
 import spike.stcal.alignment_util as util
 
 from spike.romancal.datamodels_library import ModelLibrary
-from spike.romancal.stpipe_cpre import RomanStep
+from spike.romancal.stpipe_core import RomanStep
 from spike.romancal import resample
 
 if TYPE_CHECKING:

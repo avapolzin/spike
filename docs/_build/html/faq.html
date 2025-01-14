@@ -99,6 +99,10 @@
 <li><p><strong>Roman hasn’t launched yet; how do I access data to play with spike.psf.roman?</strong></p></li>
 </ol>
 <p>There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract">Troxel et al. (2023)</a> has some nice examples of single detector data and you can generate your own Roman imaging with <a class="reference external" href="https://github.com/spacetelescope/STScI-STIPS">STIPS</a> (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract">STIPS Development Team 2024</a>) The pipeline is very similar to JWST’s, with the image from each of the detectors is stored in its own file, so <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> is, at its core, a modified version of <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code>.</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>Tweakreg keeps failing, noting that I’m out of memory. How should I proceed?</strong></p></li>
+</ol>
+<p>This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well aligned for you purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resource. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run <code class="docutils literal notranslate"><span class="pre">spike</span></code>.</p>
 </section>
 <section id="spike">
 <h2>spike<a class="headerlink" href="#spike" title="Link to this heading"></a></h2>
@@ -139,7 +143,7 @@
 <ol class="arabic simple">
 <li><p><strong>Why am I getting an HTTPS error when my PSF generation method is ‘STDPSF’?</strong></p></li>
 </ol>
-<p>There are two points of potential failure here – if you don’t already have the <a class="reference external" href="https://github.com/spacetelescope/hst_notebooks/blob/main/notebooks/WFC3/point_spread_function/">handling script</a> downloaded locally, it’s possible that GitHub is down or there’s a problem with your connection; similarly, the STDPSFs are downloaded as needed, so there could also be an issue connecting to the <a class="reference external" href="https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/">Space Telescope website</a>. If you already have psf_utilities.py downloaded locally, copying that script into your working directory should resolve an inability to connect to GitHub, as the code will preferentially use your local version.</p>
+<p>The STDPSFs are read into <code class="docutils literal notranslate"><span class="pre">photutils</span></code> as URLs as needed, so there could also be an issue connecting to the Space Telescope website for <a class="reference external" href="https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/">HST</a> or <a class="reference external" href="https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/">JWST</a> STDPSFs.</p>
 </section>
 <section id="psfex">
 <h2>PSFEx<a class="headerlink" href="#psfex" title="Link to this heading"></a></h2>
@@ -149,7 +153,7 @@
 <ol class="arabic simple">
 <li><p><strong>My output single-image PSFs look funny/there’s an issue with my SExtractor catalog. How do I fix this?</strong></p></li>
 </ol>
-<p>The first step if you aren’t happy with your PSFEx output is to try adjusting the SExtractor and PSFEx parameters in their respective config files. <code class="docutils literal notranslate"><span class="pre">spike.psfgen</span></code> uses the default settings for each of these codes unless an overriding user input is specified. As a result, the star catalog and subsequent PSF generation are not fine-tuned for any specific use case.</p>
+<p>The first step if you aren’t happy with your PSFEx output is to try adjusting the SExtractor and PSFEx parameters in their respective config files. <code class="docutils literal notranslate"><span class="pre">spike.psfgen</span></code> uses the default settings for each of these codes unless an overriding user input is specified. As a result, the star catalog and subsequent PSF generation are not fine-tuned for any specific use case beyond the parameters that were altered for high-resolution, space-based images.</p>
 <p>Within spike/configs, there are example configuration and parameter files for PSFEx and SExtractor. These can be used as guides and can be <em>copied</em> and directly modified. (I recommend against modifying any of the files in spike/configs themselves unless you are interested in making global changes.)</p>
 </section>
 <section id="webbpsf">

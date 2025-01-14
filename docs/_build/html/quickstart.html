@@ -78,8 +78,54 @@
              
   <section id="quickstart-guide">
 <span id="spike-quickstart"></span><h1>Quickstart Guide<a class="headerlink" href="#quickstart-guide" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">spike</span></code> is intended to be simple to use. At minimum, one just needs to a working directory and object coordinates to begin. The working directory should be structured to include CTE-corrected, but not yet combined .fits files from a single instrument on a single telescope.</p>
-<p>Add some basic code too.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spike</span></code> is intended to be simple to use. At minimum, one just needs to a working directory and object coordinates to begin. The working directory should be structured to include CTE-corrected, but not yet combined .fits files from a single instrument on a single telescope. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spike</span> <span class="kn">import</span> <span class="n">psf</span>
+
+<span class="n">acs_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/acs/data/&#39;</span>
+
+<span class="c1">### TinyTim ###</span>
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;10:00:33.0178 +02:09:52.304&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;TinyTim&#39;</span><span class="p">,</span> <span class="n">savedir</span> <span class="o">=</span> <span class="s1">&#39;psfs_tiny&#39;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pretweaked</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="c1">### TinyTim (Gillis et al. mod) ###</span>
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;10:00:33.0178 +02:09:52.304&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;TinyTim_Gillis&#39;</span><span class="p">,</span> <span class="n">savedir</span> <span class="o">=</span> <span class="s1">&#39;psfs_tinygillis&#39;</span><span class="p">,</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pretweaked</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">### STDPSF ###</span>
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;10:00:33.0178 +02:09:52.304&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;stdpsf&#39;</span><span class="p">,</span> <span class="n">savedir</span> <span class="o">=</span> <span class="s1">&#39;psfs_stdpsf&#39;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pretweaked</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">### ePSF ###</span>
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;10:00:33.0178 +02:09:52.304&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;epsf&#39;</span><span class="p">,</span> <span class="n">savedir</span> <span class="o">=</span> <span class="s1">&#39;psfs_epsf&#39;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pretweaked</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">### PSFEx ###</span>
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;10:00:33.0178 +02:09:52.304&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;PSFEx&#39;</span><span class="p">,</span> <span class="n">savedir</span> <span class="o">=</span> <span class="s1">&#39;psfs_psfex&#39;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">pretweaked</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In lieu of passing coordinates to obj, you can also provide an object name (as long as it’s resolvable by NED/Simbad). For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spike</span> <span class="kn">import</span> <span class="n">psf</span>
+
+<span class="n">acs_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/acs/data/&#39;</span>
+
+<span class="n">psf</span><span class="o">.</span><span class="n">hst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">acs_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;M79&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;flc&#39;</span><span class="p">,</span> <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;ACS&#39;</span><span class="p">,</span> <span class="n">camera</span> <span class="o">=</span> <span class="s1">&#39;WFC&#39;</span><span class="p">)</span>
+
+
+<span class="n">nircam_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/nircam/data/&#39;</span>
+
+<span class="n">psf</span><span class="o">.</span><span class="n">jwst</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">=</span> <span class="n">nircam_path</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="s1">&#39;M79&#39;</span><span class="p">,</span> <span class="n">img_type</span> <span class="o">=</span> <span class="s1">&#39;cal&#39;</span><span class="p">,</span> <span class="n">inst</span> <span class="o">=</span> <span class="s1">&#39;NIRCam&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The last code block shows minimal examples, which includes all of the required inputs (camera is only required for ACS and WFC3). <code class="docutils literal notranslate"><span class="pre">spike</span></code> handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions <code class="docutils literal notranslate"><span class="pre">spike.psf.hst</span></code>, <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code>, and <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.</p>
+<p>Note that it will often be preferred to provide a savedir argument, as otherwise files with the same name may be overwritten in the default /psfs directory.</p>
+<p>The output drizzled/resampled PSF is placed in the full spatial context of the processed frames. A convenience function is included to crop the data to the region immediately around the PSF, <code class="docutils literal notranslate"><span class="pre">spike.tools.cutout</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spike.tools</span></code> and <code class="docutils literal notranslate"><span class="pre">spike.psfgen</span></code> functions can also be used in isolation. Note that the PSF generation functions in <code class="docutils literal notranslate"><span class="pre">spike.psfgen</span></code> assume that the “coords” argument will be the output of <code class="docutils literal notranslate"><span class="pre">spike.tools.objloc</span></code> and the “pos” argument will be the output of <code class="docutils literal notranslate"><span class="pre">spike.tools.checkpixloc</span></code>. An <code class="docutils literal notranslate"><span class="pre">astropy</span></code> SkyCoord object and a list following [X, Y, chip, filter] can be input respectively instead.</p>
 </section>
 
 

@@ -245,7 +245,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		filt_ = flist[-3]
 		obj_ = flist[-4]
 
-		os.system('mv %s %s_%s_psf_%s.fits'(dr, obj_, filt_, suff_))
+		os.system('mv %s %s_%s_psf_%s.fits'%(dr, obj_, filt_, suff_))
 
 	suff = suff_ # store suffix, as there should be no variation within one run
 
@@ -396,10 +396,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		filelist[filt].append(fi)
 
 	if not pretweaked:
-		# note that if there are many input files, tweakreg will be very slow and prone
-		# to overuse of RAM	
 		for fk in filelist.keys():
-			#output_dir, save_results are ostensibly redundant, but writing out requires both
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 
@@ -614,10 +611,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 		filelist[filt].append(fi)
 
 	if not pretweaked:
-		# note that if there are many input files, tweakreg will be very slow and prone
-		# to overuse of RAM	
 		for fk in filelist.keys():
-			#output_dir, save_results are ostensibly redundant, but writing out requires both
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 

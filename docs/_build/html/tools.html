@@ -49,14 +49,17 @@
 <li class="toctree-l1"><a class="reference internal" href="psfgen.html">PSF Generation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.checkpixloc"><code class="docutils literal notranslate"><span class="pre">checkpixloc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.combine_extensions"><code class="docutils literal notranslate"><span class="pre">combine_extensions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.cutout"><code class="docutils literal notranslate"><span class="pre">cutout()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.mask_fits"><code class="docutils literal notranslate"><span class="pre">mask_fits()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.objloc"><code class="docutils literal notranslate"><span class="pre">objloc()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spike.tools.photutils_seg"><code class="docutils literal notranslate"><span class="pre">photutils_seg()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.psfexim"><code class="docutils literal notranslate"><span class="pre">psfexim()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pypsfex"><code class="docutils literal notranslate"><span class="pre">pypsfex()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.pysextractor"><code class="docutils literal notranslate"><span class="pre">pysextractor()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spike.tools.regrid"><code class="docutils literal notranslate"><span class="pre">regrid()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.regridarr"><code class="docutils literal notranslate"><span class="pre">regridarr()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.rewrite_fits"><code class="docutils literal notranslate"><span class="pre">rewrite_fits()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spike.tools.to_asdf"><code class="docutils literal notranslate"><span class="pre">to_asdf()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spike.tools.waivered_to_mef"><code class="docutils literal notranslate"><span class="pre">waivered_to_mef()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
@@ -111,15 +114,75 @@ JWST/NIRISS: ‘Imaging’, ‘AMI’ #AMI has different multi-extension mode</p
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>Pixel coordinates, chip number (HST) or detector name (JWST/Roman) –</dt><dd><p>if relevant, and filter name.
-Only returned if object coordinates fall onto detector - returns NaNs if not.
-Also generates duplicate “topsf” image which will be used in PSF drizzling.</p>
+<dt>Pixel coordinates, chip number (HST) or detector name (JWST/Roman) if relevant, and filter name.</dt><dd><p>Only returned if object coordinates fall onto detector - returns NaNs if not.</p>
 </dd>
 </dl>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>[X, Y, chip, filter] (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.combine_extensions">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">combine_extensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.combine_extensions" title="Link to this definition"></a></dt>
+<dd><p>Combine SCI and DQ/ERR extensions for c0f/c1f and c0m/c1m files into one multi-extension
+FITS file that’s readable by spike.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.cutout">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">cutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov_pixel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.cutout" title="Link to this definition"></a></dt>
+<dd><p>Get cutout of image around some coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>str</em>) – Path to image for to crop.</p></li>
+<li><p><strong>coords</strong> (<em>astropy skycoords object</em>) – Coordinates of object of interest or list of skycoord objects.
+Easiest is to feed in the output of spike.tools.objloc.</p></li>
+<li><p><strong>ext</strong> (<em>int</em>) – Integer index of extension to crop.</p></li>
+<li><p><strong>fov_pixel</strong> (<em>int</em>) – Diameter of square cutout region in pixels.</p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – If True, will save a FITS file containing cropped region.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Array containing cutout region of the image.</p>
+<p>If save = True, will save a cropped version of the .fits file (given
+image name + _crop suffix), including modified WCS.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cutoutim (arr)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.mask_fits">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">mask_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maskdq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dqthresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maskerr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errthresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usermask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.mask_fits" title="Link to this definition"></a></dt>
+<dd><p>Generate a FITS file that fills in masked pixels with a specified value. Useful for
+feeding to e.g., SExtractor. Preserves truncated FITS extension structure, for the specified
+extension on which the the mask was applied plus ERR and DQ extensions.
+(Assumes that extensions are named SCI, ERR, DQ.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>str</em>) – Path to image to which mask is applied.</p></li>
+<li><p><strong>ext</strong> (<em>int</em>) – Integer index for <em>version</em> of extension to which mask should be applied.
+This will be used to index dat[(‘SCI’, ext)] etc.</p></li>
+<li><p><strong>maskdq</strong> (<em>bool</em>) – If True, masks values above dqthresh.</p></li>
+<li><p><strong>dqthresh</strong> (<em>float</em>) – Maximum acceptable value in DQ image. Pixels above dqthresh will be masked.</p></li>
+<li><p><strong>maskerr</strong> (<em>bool</em>) – If True, masks values above errthresh.</p></li>
+<li><p><strong>errthresh</strong> (<em>float</em>) – Maximum acceptable value in ERR image. Pixels above errthresh will be masked.</p></li>
+<li><p><strong>usermask</strong> (<em>arr</em>) – If specified, used as mask on data array (good pixels should have value of 0).
+Must be the same dimensions as the data array. (Can be used in addition to DQ and ERR masking.)</p></li>
+<li><p><strong>fillval</strong> (<em>float</em>) – Value with which to fill the masked pixels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generates a new FITS file with a _mask suffix with masked pixels filled in by fillval.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -138,11 +201,6 @@ HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spike.tools.photutils_seg">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">photutils_seg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.photutils_seg" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.psfexim">
@@ -166,14 +224,14 @@ The option to save as an array results in a .npy file.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.pypsfex">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">pypsfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cat_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">makepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.pypsfex" title="Link to this definition"></a></dt>
 <dd><p>Wrapper to easily call PSFEx from python.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cat_path</strong> (<em>str</em>) – Path to the SExtractor catalog from the working directory.</p></li>
 <li><p><strong>pos</strong> (<em>tuple</em>) – Pixel (and spectral) location of object of interest in (x, y, chip, filter) - as from spike.tools.checkpixloc.
-If not specified, generates generic model assuming basis vectors are equally weighted.</p></li>
+If not specified, generates generic model assuming central pixel.</p></li>
 <li><p><strong>config</strong> (<em>str</em>) – If specifying custom config, path to config file. If none, uses default.psfex.</p></li>
 <li><p><strong>userargs</strong> (<em>str</em>) – Any additional command line arguments to feed to PSFEx. The preferred way to include
 user arguments is via specification in the config file as command line arguments simply override the
@@ -181,6 +239,7 @@ corresponding configuration setting.</p></li>
 <li><p><strong>makepsf</strong> (<em>bool</em>) – If True, returns 2D PSF model.</p></li>
 <li><p><strong>savepsf</strong> (<em>str</em>) – If ‘fits’, ‘arr’, or ‘txt’, will save 2D model PSF in that file format with the same name as the catalog.</p></li>
 <li><p><strong>keepconfig</strong> (<em>str</em>) – If True, retain parameter files and convolutional kernels moved to working dir.</p></li>
+<li><p><strong>regrid</strong> (<em>bool</em>) – If True, will (interpolate and) regrid model PSF to image pixel scale.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -214,8 +273,8 @@ corresponding configuration setting.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spike.tools.regrid">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">regrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.regrid" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="spike.tools.regridarr">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">regridarr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.regridarr" title="Link to this definition"></a></dt>
 <dd><p>Regrid PSF model to input pixel scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -232,7 +291,7 @@ corresponding configuration setting.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.tools.rewrite_fits">
-<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfarr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_fits" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">rewrite_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psfarr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.rewrite_fits" title="Link to this definition"></a></dt>
 <dd><p>Write relevant image headers to the model PSFs and modify the coordinates and WCS.
 Creates a full _topsf.fits file with only one SCI extension for use with drizzle/resample.</p>
 <dl class="field-list simple">
@@ -243,6 +302,7 @@ Creates a full _topsf.fits file with only one SCI extension for use with drizzle
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
 <li><p><strong>imcam</strong> (<em>str</em>) – ‘ACS/WFC’ is the only recommended instrument/camera combination for this PSF generation method.</p></li>
 <li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
+<li><p><strong>method</strong> (<em>list</em>) – Method used to generate PSF.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -267,6 +327,13 @@ Creates a full _topsf.fits file with only one SCI extension for use with drizzle
 <dd class="field-even"><p>ASDF file object</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spike.tools.waivered_to_mef">
+<span class="sig-prename descclassname"><span class="pre">spike.tools.</span></span><span class="sig-name descname"><span class="pre">waivered_to_mef</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spike.tools.waivered_to_mef" title="Link to this definition"></a></dt>
+<dd><p>Write waivered FITS files to multi-extension FITS files to facilitate PSF generation for
+WFPC, WFPC2, etc.</p>
 </dd></dl>
 
 </section>
