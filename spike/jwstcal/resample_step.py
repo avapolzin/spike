@@ -45,8 +45,9 @@ from copy import deepcopy
 
 import asdf
 
-from jwst.datamodels import ModelLibrary, ImageModel  # type: ignore[attr-defined]
-from jwst.lib.pipe_utils import match_nans_and_flags
+from spike.jwstcal.datamodels_library import ModelLibrary
+from stdatamodels.jwst.datamodels.image import ImageModel
+from spike.jwstcal.lib_pipe_utils import match_nans_and_flags
 
 from spike.jwstcal import resample
 from spike.jwstcal.stpipe_core import JwstStep as Step

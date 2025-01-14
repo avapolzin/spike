@@ -305,7 +305,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = None, 
 		savedir = 'psfs', drizzleimgs = False, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
-		tweakparams = {}, drizzleparams = {}, **kwargs):
+		tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
 
@@ -349,7 +349,7 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 	if not usecrds:
 		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
 
-	from spike.jwstcal import resample
+	from spike.jwstcal import resample_step
 	from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
 
 	if keeporig and not pretweaked:
@@ -479,14 +479,14 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
 				# input_models = # association based on file list
-				resamp = resample.ResampleData(input_models, 
+				resamp = resample_step.ResampleStep().call(input_models, 
 					output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams)
 				pool.apply_async(resamp.do_drizzle)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				resample.ResampleData(input_models, output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams).do_drizzle()
+				resamp = resample_step.ResampleStep(input_models, output='%s_%s_psf_i2d.fits'%(do, dk), **drizzleparams).do_drizzle()
 
 
 	

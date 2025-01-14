@@ -198,7 +198,8 @@ class ResampleData:
 
         log.debug(f"Output mosaic size: {tuple(self.output_wcs.pixel_shape)}")
 
-        allowed_memory = kwargs['allowed_memory']
+        ## kwargs not being passed properly otherwise, so hardcoding allowed_memory
+        allowed_memory = 0.5 #kwargs['allowed_memory']
         if allowed_memory is None:
             allowed_memory = os.environ.get('DMODEL_ALLOWED_MEMORY', allowed_memory)
         if allowed_memory:
