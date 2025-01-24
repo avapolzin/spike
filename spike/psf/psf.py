@@ -520,10 +520,10 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 
 	return placeholder
 
-def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF', usermethod = None, 
-		savedir = 'psfs', drizzleimgs = False, pretweaked = False, usecrds = False, 
-		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
-		tweakparams = {}, drizzleparams = {}, **kwargs):
+def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
+		usermethod = None, savedir = 'psfs', drizzleimgs = False, pretweaked = False, 
+		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, 
+		out = 'fits', tweakparams = {}, drizzleparams = {}, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -532,6 +532,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', camera = None, method = 'WebbPSF'
 				If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
 		img_type (str): e.g, 'cal' -- specifies which file-type to include.
+		file_type (str): 'fits' or 'asdf' -- format to use for reading and manipulating data files.
 		inst (str): 'WFI', 'CGI'
 		camera (str): None
 		method (str): 'WebbPSF', 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';

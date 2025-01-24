@@ -787,7 +787,6 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 			This is in addition to the .psf file saved by PSFEx. No 2D PSF model is saved by PSFEx 
 			by default, but this can be toggled in the tools.pypsfex arguments.
 		savepsfex (str): If 'fits' or 'arr' save 2D model to that format.
-		crclean (bool): If True, use CR-cleaned image as SExtractor input.
 		seconf (str): Path to SExtractor configuration file if not using default.
 		peconf (str): Path to PSFEx configuration file if not using default.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
