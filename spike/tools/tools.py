@@ -155,7 +155,7 @@ def checkpixloc(coords, img, inst, camera = None):
 						if a == chip2:
 							chip_out.append('2')
 				if len(xcoord_out) >= 1:
-					out = [[xcoord_out[i], ycoord_out[i], chip_out[i], filt] for i in range(len(coords))]
+					out = [[float(xcoord_out[i]), float(ycoord_out[i]), chip_out[i], filt] for i in range(len(coords))]
 				if len(xcoord_out) == 0:
 					out = [np.nan] * 4
 			if type(coords) == astropy.coordinates.sky_coordinate.SkyCoord:
@@ -177,25 +177,49 @@ def checkpixloc(coords, img, inst, camera = None):
 		chip = 0 #no chip
 		wcs1 = WCS(hdu[1].header, fobj = hdu)
 		datshape = hdu[1].data.shape[::-1] #transposed based on numpy vs. fits preference
-		check = utils.skycoord_to_pixel(coord, wcs)
-		if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
-			x_coord = check[0]
-			y_coord = check[1]
-			if imcam == 'NIRCAM':
-				chip = hdu[0].header['DETECTOR']
-				if chip in ['NRCALONG', 'NRCBLONG']:
-					chip = chip.replace('LONG', '5')
-			if imcam == 'WFI':
-				# based on how SCA detector is identified in simulated data: https://roman.ipac.caltech.edu/sims/Simulations_csv.html
-				strlist = img.split('_')
-				chip = 'SCA%s'%strlist[-1].split('.')[0].rjust(2, '0')
-			out = [float(x_coord), float(y_coord), chip, filt]
-		else:
-			out = [np.nan] * 4
+		if type(coords) != astropy.coordinates.sky_coordinate.SkyCoord:
+			xcoord_out = []
+			ycoord_out = []
+			chip_out = []
+			for coord in coords:
+				check = utils.skycoord_to_pixel(coord, wcs1)
+				xcoord_out.append(check[0])
+				ycoord_out.append(check[1])
+				if imcam == 'NIRCAM':
+					chip = hdu[0].header['DETECTOR']
+					if chip in ['NRCALONG', 'NRCBLONG']:
+						chip = chip.replace('LONG', '5')
+				if imcam == 'WFI':
+					# based on how SCA detector is identified in simulated data: https://roman.ipac.caltech.edu/sims/Simulations_csv.html
+					strlist = img.split('_')
+					chip = 'SCA%s'%strlist[-1].split('.')[0].rjust(2, '0')
+				chip_out.append(chip)
+			if len(xcoord_out) >= 1:
+				out = [[float(xcoord_out[i]), float(ycoord_out[i]), chip_out[i], filt] for i in range(len(coords))]
+			if len(xcoord_out) == 0:
+				out = [np.nan] * 4
+
+
+		if type(coords) == astropy.coordinates.sky_coordinate.SkyCoord:
+			check = utils.skycoord_to_pixel(coords, wcs1)
+			if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
+				x_coord = check[0]
+				y_coord = check[1]
+				if imcam == 'NIRCAM':
+					chip = hdu[0].header['DETECTOR']
+					if chip in ['NRCALONG', 'NRCBLONG']:
+						chip = chip.replace('LONG', '5')
+				if imcam == 'WFI':
+					# based on how SCA detector is identified in simulated data: https://roman.ipac.caltech.edu/sims/Simulations_csv.html
+					strlist = img.split('_')
+					chip = 'SCA%s'%strlist[-1].split('.')[0].rjust(2, '0')
+				out = [float(x_coord), float(y_coord), chip, filt]
+			else:
+				out = [np.nan] * 4
 
 	return out
 
-	#STIS and NICMOS?
+	#add support for FOC, STIS, NICMOS, and NIRISS AMI
 
 
 def to_asdf(fitspath, save = True):
@@ -583,7 +607,7 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	Get cutout of image around some coordinates.
 
 	Parameters:
-		img (str): Path to image for to crop.
+		img (str): Path to image to crop.
 		coords (astropy skycoords object): Coordinates of object of interest or list of skycoord objects.
 			Easiest is to feed in the output of spike.tools.objloc.
 		ext (int): Integer index of extension to crop.

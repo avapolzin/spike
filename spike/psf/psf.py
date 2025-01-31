@@ -283,17 +283,17 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if verbose:
 			print('Generated ASDF output')
 
-	if returnarr:
+	if returnpsf:
 		returndict = {}
 		for do in drizzlelist.keys():
 			returndict[do] = {}
 			for dk in drizzlelist[do].keys():
 
-				if returnarr == 'full':	
+				if returnpsf == 'full':	
 					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
 					returndict[do][dk] = dr_psf[1].data
 
-				if returnarr == 'crop':
+				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff), 
 									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
@@ -302,9 +302,10 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 
 
-def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = None, 
+def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF', usermethod = None, 
 		savedir = 'psfs', drizzleimgs = False, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
+		returnpsf = 'full', cutout_fov = 151, savecutout = True,
 		tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
@@ -334,6 +335,9 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
+		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.hst does not return anything.
+		cutout_fov (int): Side length of square cutout region centered on PSF. Used if returnpsf = 'crop'.
+		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -342,6 +346,9 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 
 	Returns:
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
+
+		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
+		if returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
 
 	os.environ['CRDS_SERVER_URL']="https://jwst-crds.stsci.edu"
@@ -518,7 +525,23 @@ def jwst(img_dir, obj,  inst, camera = None, method = 'WebbPSF', usermethod = No
 		if verbose:
 			print('Generated ASDF output')
 
-	return placeholder
+	if returnpsf:
+		returndict = {}
+		for do in drizzlelist.keys():
+			returndict[do] = {}
+			for dk in drizzlelist[do].keys():
+
+				if returnpsf == 'full':	
+					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
+					returndict[do][dk] = dr_psf[1].data
+
+				if returnpsf == 'crop':
+					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff), 
+									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+					returndict[do][dk] = crop
+
+		return returndict
+
 
 def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, pretweaked = False, 

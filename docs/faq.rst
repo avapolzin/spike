@@ -31,7 +31,7 @@ spike
 
 1. **Why am I getting 'NameResolveError: Unable to find coordinates for name ...' when I feed spike.psf an object name?**
 
-The most likely reason you'd get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow ``spike`` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run ``spike`` immediately.
+First, check your internet connection. Name queries require access to the internet. The next most likely reason you'd get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow ``spike`` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run ``spike`` immediately.
 
 2. **I am encountering a problem with one of the pipeline modules (spike.jwstcal, spike.romancal, or spike.stcal). How much has changed from the official Space Telescope release?**
 

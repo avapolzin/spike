@@ -1,21 +1,20 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FAQs &mdash; spike 0.5 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=db78e746"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -85,12 +84,12 @@
            <div itemprop="articleBody">
              
   <section id="faqs">
-<span id="spike-faq"></span><h1>FAQs<a class="headerlink" href="#faqs" title="Link to this heading"></a></h1>
+<span id="spike-faq"></span><h1>FAQs<a class="headerlink" href="#faqs" title="Permalink to this headline"></a></h1>
 <p>This file is also available on the <a class="reference external" href="https://github.com/avapolzin/spike/blob/master/FAQ.md">GitHub</a>, where it will be updated along with the development version of the code (and may be more responsive to common issues).</p>
 <p>Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I’ve tried to project for more common questions here.</p>
 <p>For more detailed questions/concerns about any of <code class="docutils literal notranslate"><span class="pre">spike</span></code>’s dependencies, please refer to the original documentation for that code specifically.</p>
 <section id="space-based-imaging">
-<h2>Space-based Imaging<a class="headerlink" href="#space-based-imaging" title="Link to this heading"></a></h2>
+<h2>Space-based Imaging<a class="headerlink" href="#space-based-imaging" title="Permalink to this headline"></a></h2>
 <ol class="arabic simple">
 <li><p><strong>The image processing steps aren’t working and my data appear corrupted. Did spike cause this?</strong></p></li>
 </ol>
@@ -105,11 +104,11 @@
 <p>This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well aligned for you purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resource. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run <code class="docutils literal notranslate"><span class="pre">spike</span></code>.</p>
 </section>
 <section id="spike">
-<h2>spike<a class="headerlink" href="#spike" title="Link to this heading"></a></h2>
+<h2>spike<a class="headerlink" href="#spike" title="Permalink to this headline"></a></h2>
 <ol class="arabic simple">
 <li><p><strong>Why am I getting ‘NameResolveError: Unable to find coordinates for name …’ when I feed spike.psf an object name?</strong></p></li>
 </ol>
-<p>The most likely reason you’d get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow <code class="docutils literal notranslate"><span class="pre">spike</span></code> to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run <code class="docutils literal notranslate"><span class="pre">spike</span></code> immediately.</p>
+<p>First, check your internet connection. Name queries require access to the internet. The next most likely reason you’d get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow <code class="docutils literal notranslate"><span class="pre">spike</span></code> to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run <code class="docutils literal notranslate"><span class="pre">spike</span></code> immediately.</p>
 <ol class="arabic simple" start="2">
 <li><p><strong>I am encountering a problem with one of the pipeline modules (spike.jwstcal, spike.romancal, or spike.stcal). How much has changed from the official Space Telescope release?</strong></p></li>
 </ol>
@@ -127,7 +126,7 @@
 <p>There are several ways to make sure that your environment variables are accessible. The various options are discussed in this <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">StackOverflow thread</a>.</p>
 </section>
 <section id="tinytim">
-<h2>TinyTim<a class="headerlink" href="#tinytim" title="Link to this heading"></a></h2>
+<h2>TinyTim<a class="headerlink" href="#tinytim" title="Permalink to this headline"></a></h2>
 <p>If you plan to use TinyTim PSFs (for HST), TinyTim must be downloaded and installed separately following the instructions <a class="reference external" href="https://github.com/spacetelescope/tinytim/releases">here</a>.</p>
 <ol class="arabic simple">
 <li><p><strong>Why does tiny1 result in a path error (‘Open_pupil_table : Could not open ~/tinytim-7.5/*.pup’)?</strong></p></li>
@@ -139,14 +138,14 @@
 <p>If you don’t already have the <a class="reference external" href="https://bitbucket.org/brgillis/tinytim_psfs/src/master/">Gillis et al. (2020)</a> code downloaded, the first thing that <code class="docutils literal notranslate"><span class="pre">spike.psfgen</span></code> tries to do is download the relevant script. An HTTPS error may come about if BitBucket is down or if there’s a problem with your connection. If you have the Gillis et al. script downloaded locally, simply copy it to your working directory and the issue should resolve.</p>
 </section>
 <section id="stdpsf">
-<h2>STDPSF<a class="headerlink" href="#stdpsf" title="Link to this heading"></a></h2>
+<h2>STDPSF<a class="headerlink" href="#stdpsf" title="Permalink to this headline"></a></h2>
 <ol class="arabic simple">
 <li><p><strong>Why am I getting an HTTPS error when my PSF generation method is ‘STDPSF’?</strong></p></li>
 </ol>
 <p>The STDPSFs are read into <code class="docutils literal notranslate"><span class="pre">photutils</span></code> as URLs as needed, so there could also be an issue connecting to the Space Telescope website for <a class="reference external" href="https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/">HST</a> or <a class="reference external" href="https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/">JWST</a> STDPSFs.</p>
 </section>
 <section id="psfex">
-<h2>PSFEx<a class="headerlink" href="#psfex" title="Link to this heading"></a></h2>
+<h2>PSFEx<a class="headerlink" href="#psfex" title="Permalink to this headline"></a></h2>
 <p>If you plan to use PSFEx to generate empirical PSFs, both SExtractor and PSFEx must be downloaded and installed separately following the instructions <a class="reference external" href="https://github.com/astromatic/sextractor">here</a> and <a class="reference external" href="https://github.com/astromatic/psfex">here</a> respectively.</p>
 <p>Some notes on PSFEx/SExtractor installation for Macs: You can use <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">automake,</span> <span class="pre">libtool</span></code> to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these <a class="reference external" href="http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69">instructions</a>). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories, so in your PSFEx directory, you will want to run some variation of <code class="docutils literal notranslate"><span class="pre">./configure</span> <span class="pre">--enable-openblas</span> <span class="pre">--with-openblas-incdir=/opt/OpenBLAS/include</span> <span class="pre">--with-openblas-libdir=/opt/OpenBLAS/lib</span></code> when configuring the Makefile for PSFEx.</p>
 <p>There is also a bug in the PSFEx installation code – discussed nicely <a class="reference external" href="https://trac.macports.org/ticket/71003">here</a> – within PSFEx/src/levmar/compiler.h, you will need to change “finite” to “isfinite” before attempting to run <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
@@ -157,7 +156,7 @@
 <p>Within spike/configs, there are example configuration and parameter files for PSFEx and SExtractor. These can be used as guides and can be <em>copied</em> and directly modified. (I recommend against modifying any of the files in spike/configs themselves unless you are interested in making global changes.)</p>
 </section>
 <section id="webbpsf">
-<h2>WebbPSF<a class="headerlink" href="#webbpsf" title="Link to this heading"></a></h2>
+<h2>WebbPSF<a class="headerlink" href="#webbpsf" title="Permalink to this headline"></a></h2>
 <p>If you plan to use WebbPSF PSFs (for JWST and Roman), the relevant data must be downloaded and included in your path following the instructions <a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/installation.html#data-install">here</a>.</p>
 </section>
 </section>
