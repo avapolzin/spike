@@ -51,7 +51,7 @@ def checkpixloc(coords, img, inst, camera = None):
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image.
 		inst (str): Instrument of interest. 
-				HST: 'ACS', 'WFC3', 'WFPC', WFPC2', 'NICMOS', 'STIS'
+				HST: 'ACS', 'WFC3', 'WFPC', WFPC2', 'NICMOS'
 				JWST: 'MIRI', 'NIRCAM', 'NIRISS'
 				Roman: 'WFI', 'CGI'
 		camera (str): Camera associated with instrument.
@@ -172,7 +172,9 @@ def checkpixloc(coords, img, inst, camera = None):
 			out = [float(x_coord), float(y_coord), chip, filt]
 
 
-	if imcam in ['ACS/HRC', 'WFC3/IR', 'MIRI', 'NIRCAM', 'NIRISS', 'NIRISS/IMAGING', 'WFI', 'CGI']:
+	if imcam in ['ACS/HRC', 'WFC3/IR', 'NICMOS',
+				 'MIRI', 'NIRCAM', 'NIRISS', 'NIRISS/IMAGING', 
+				 'WFI', 'CGI']:
 		# for WFC3, only checks the final readout by design
 		chip = 0 #no chip
 		wcs1 = WCS(hdu[1].header, fobj = hdu)
@@ -219,7 +221,7 @@ def checkpixloc(coords, img, inst, camera = None):
 
 	return out
 
-	#add support for FOC, STIS, NICMOS, and NIRISS AMI
+	#add support for FOC and NIRISS AMI
 
 
 def to_asdf(fitspath, save = True):

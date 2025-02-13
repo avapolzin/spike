@@ -59,7 +59,6 @@ In addition to .fits outputs, users can specify whether they would like a .asdf 
 
 Right now, the Roman pipeline uses the same resampling/drizzling implementation as _JWST_ via `romancal` [@romancal], and `WebbPSF` includes a module to simulate Roman PSFs. As a forward looking step, a module is included here to handle the proper co-addition of Roman PSFs. The `spike.psf.roman` module includes step for subpixel alignment, as has been done for _HST_ and _JWST_ by "tweaking" images, and model Roman PSFs are then directly drizzled using a version of `romancal.resample`. When the observatory is actually launched and data become available, `spike` will be updated to reflect the most current version of the Nancy Grace Roman Space Telescope pipeline and the detailed considerations of the real data. Due to the anticipated single pointing file size, `spike.psf.roman` takes as input single detector images, which can be used with `spike.psfgen` -- the working directory need not be local; it just needs to have read/write access. Since Roman is not yet collecting data, `spike.psf.roman` is based on the structure of simulated single detector data from [e.g., @Troxel.etal.2023].
 
-Raw data are not yet available for the European Space Agency's _Euclid_ mission, which was launched in 2023. Initial analyses of the combined and processed _Euclid_ Early Release Observations rely on empirical PSFs, carefully measured from co-added data [@Euclid.I]. A new _Euclid_ function will be added to `spike` as data and PSF modeling tools become available over the next years. Proper PSF co-addition is of particular importance to _Euclid_ to enable carefully calibrated measurements of cosmic shear. 
 
 # Managing Restrictive Dependencies
 
@@ -94,6 +93,6 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
 
 # Acknowledgments
 
-AP is supported by the Quad Fellowship administered by IIE and thanks Juan Guerra for his comments and his help deciding how to handle external C dependencies.
+AP is supported by the Quad Fellowship administered by IIE and thanks Hsiao-Wen Chen and Juan Guerra for their comments.
 
 # References
