@@ -512,14 +512,19 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
+	## clean up other files generated in the process
+	os.system('mv %s*.cat %s'%(img_dir, savedir))
+	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+
 	if verbose:
 		print('Moved PSF files to %s'%savedir)
+
 
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output
-		dout = sorted(glob.glob(savdir+'/*_resamplestep.fits')) 
+		dout = sorted(glob.glob(savedir+'/*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 		if verbose:
@@ -742,6 +747,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
+	## clean up other files generated in the process
+	os.system('mv %s*.cat %s'%(img_dir, savedir))
+	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
