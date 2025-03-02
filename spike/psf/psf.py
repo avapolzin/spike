@@ -515,6 +515,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+	os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
 
 	if verbose:
 		print('Moved PSF files to %s'%savedir)
@@ -750,6 +751,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+	os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
