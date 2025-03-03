@@ -730,7 +730,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 			print('Identifying stars to use in ePSF')
 		sources = find(dat)
 
-	exsize = int(2 * (fov_arcsec/plate_scale[pixkey])//2 + 1) #size of extraction box
+	exsize = int(2 * ((fov_arcsec/plate_scale[pixkey])//2) + 1) #size of extraction box
 	xs = sources['xcentroid']
 	ys = sources['ycentroid']
 	exmask = ((xs > (exsize//2)) & (xs < (dat.shape[1] -1 - (exsize//2))) &

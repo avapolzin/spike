@@ -8,6 +8,12 @@ import numpy as np
 import os
 import pkg_resources
 from scipy.interpolate import RectBivariateSpline
+import warnings
+
+def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
+	return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = warning_on_one_line
 
 CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
 
@@ -341,27 +347,33 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 		2D image of PSFEx model
 	"""
 	psfexmodel = fits.open(psfpath)
-	x_, y_ = pixloc
 
-	x = (x_ - psfexmodel[1].header['POLZERO1'])/psfexmodel[1].header['POLSCAL1']
-	y = (y_ - psfexmodel[1].header['POLZERO2'])/psfexmodel[1].header['POLSCAL2']
+	if psfexmodel[1].header['PSFAXIS3'] == 1:
+		warnings.warn('PSF model is based on only a single component vector.', Warning, stacklevel = 2)
+		psfmodel = psfexmodel[1].data['PSF_MASK'][0, 0, :, :]
 
-	order = psfexmodel[1].header['POLDEG1']
+	else:
+		x_, y_ = pixloc
 
-	xpoly, ypoly = x**np.arange(order+1), y**np.arange(order+1)
+		x = (x_ - psfexmodel[1].header['POLZERO1'])/psfexmodel[1].header['POLSCAL1']
+		y = (y_ - psfexmodel[1].header['POLZERO2'])/psfexmodel[1].header['POLSCAL2']
 
-	# takes X_c * Phi_c, where Phi is the vector and X_c(x, y) is the basis function
-	# see https://psfex.readthedocs.io/en/latest/Working.html and
-	# https://www.astromatic.net/wp-content/uploads/psfex_article.pdf
+		order = psfexmodel[1].header['POLDEG1']
 
-	xc = []
-	for i, yy in enumerate(ypoly):
-		for ii, xx in enumerate(xpoly[:(order+1-i)]):
-			xc.append(xx*yy)
+		xpoly, ypoly = x**np.arange(order+1), y**np.arange(order+1)
 
-	phic = psfexmodel[1].data['PSF_MASK'][0]
+		# takes X_c * Phi_c, where Phi is the vector and X_c(x, y) is the basis function
+		# see https://psfex.readthedocs.io/en/latest/Working.html and
+		# https://www.astromatic.net/wp-content/uploads/psfex_article.pdf
 
-	psfmodel = np.sum(phic * np.array(xc)[:, None, None], axis = 0)
+		xc = []
+		for i, yy in enumerate(ypoly):
+			for ii, xx in enumerate(xpoly[:(order+1-i)]):
+				xc.append(xx*yy)
+
+		phic = psfexmodel[1].data['PSF_MASK'][0]
+
+		psfmodel = np.sum(phic * np.array(xc)[:, None, None], axis = 0)
 
 	if regrid:
 		if psfexmodel[1].header['PSF_SAMP'] != 1.:
