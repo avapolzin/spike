@@ -535,9 +535,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv *_resamplestep* %s'%savedir) # generated PSF models
-	os.system('mv *.psf %s'%savedir)
-	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
+	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*.psf %s'%(img_dir, savedir))
+	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
@@ -805,9 +805,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv *_resamplestep* %s'%savedir) # generated PSF models
-	os.system('mv *.psf %s'%savedir)
-	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
+	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*.psf %s'%(img_dir, savedir))
+	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
