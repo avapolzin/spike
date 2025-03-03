@@ -238,7 +238,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for dk in drizzlelist[do].keys():
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
-	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), sorted(glob.glob('%s*_drz.fits'%img_dir))))
+	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir))))
 	for dr in drzs: #rename drizzled outputs to something more manageable
 		flist = dr.split('_')
 		suff_ = flist[-1].split('.')[0]
@@ -278,8 +279,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if savedir.split('/')[-1] != '':
 			savedir += '/'
 
-		sufs = ['drc', 'drz']
-		dout = np.concatenate((sorted(glob.glob(savedir+'*_drc.fits')), sorted(glob.glob(savedir+'*_drz.fits'))))
+		sufs = ['drc', 'drz', 'mos']
+		dout = np.concatenate((sorted(glob.glob(savedir+'*_drc.fits')), 
+			sorted(glob.glob(savedir+'*_drz.fits')), sorted(glob.glob(savedir+'*_mos.fits'))))
 		for di in dout:
 			tools.to_asdf(di)
 

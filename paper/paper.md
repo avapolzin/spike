@@ -44,7 +44,7 @@ The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gi
 
 [^2]: <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>; <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>
 
-![Same as \autoref{fig:hstcomparison} for \textit{JWST}/NIRCam imaging in F115W. Note that the ePSF model shown here was generated using a lower detection threshold and a different star detection algorithm due to a paucity of stars in this field. \label{fig:jwstcomparison}](spike_psf_jwstcompare.png)
+![Same as \autoref{fig:hstcomparison} for \textit{JWST}/NIRCam imaging in F115W. Note that the ePSF model shown here was generated using a lower detection threshold and a different star selection algorithm due to a paucity of stars in this field. \label{fig:jwstcomparison}](spike_psf_jwstcompare.png)
 
 In most cases, users will only ever interact with the top-level functions `spike.psf.hst`, `spike.psf.jwst`, and `spike.psf.roman`. However, PSF model creation can be accessed directly via the functions in `spike.psfgen`, and this feature may be of added value to users on its own, including for use with telescopes/instruments not explicitly mentioned here, as `spike` smoothes over some of the complication of individual tools as an all-in-one means of accessing model PSFs via simple Python functions. One can, in principle, specify only minimal information (data directory, object name/coordinates, instrument/camera, and PSF generation method) and return a drizzled PSF from the default remaining default settings/arguments.
 
