@@ -704,9 +704,9 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 		cutoutim = dat[ymin:ymax+1, xmin:xmax+1]
 
 	hdr['CRVAL1'] = ra
-	hdr['CRVAL2'] = deg
-	hdr['CRPIX1'] = x0
-	hdr['CRPIX2'] = y0
+	hdr['CRVAL2'] = dec
+	hdr['CRPIX1'] = fov_pixel//2
+	hdr['CRPIX2'] = fov_pixel//2
 	hdr['NAXIS1'] = fov_pixel
 	hdr['NAXIS2'] = fov_pixel
 

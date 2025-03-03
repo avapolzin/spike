@@ -317,7 +317,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff), 
-									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 
 		return returndict
@@ -602,7 +602,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
-									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 
 		return returndict
@@ -867,7 +867,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname, suff), 
-									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 
 		return returndict
