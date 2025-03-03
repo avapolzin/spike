@@ -2,7 +2,7 @@ from astropy.io import fits
 from astropy.nddata import NDData
 from astropy.stats import sigma_clipped_stats
 from astropy.table import Table
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 from photutils.detection import DAOStarFinder, IRAFStarFinder

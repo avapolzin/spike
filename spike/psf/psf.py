@@ -413,7 +413,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 
-		imgs = sorted(glob.glob(img_dir+'/*'+img_type+'_tweakregstep.fits'))
+		imgs = sorted(glob.glob(img_dir+'/*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -536,6 +536,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
 	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*_psf %s'%(img_dir, savedir))
 	os.system('mv %s*.psf %s'%(img_dir, savedir))
 	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
@@ -687,7 +688,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 
-		imgs = sorted(glob.glob(img_dir+'/*'+img_type+'_tweakregstep.fits'))
+		imgs = sorted(glob.glob(img_dir+'/*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -806,6 +807,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
 	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*_psf %s'%(img_dir, savedir))
 	os.system('mv %s*.psf %s'%(img_dir, savedir))
 	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
