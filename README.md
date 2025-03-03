@@ -101,7 +101,7 @@ pip install pytest #necessary if pytest is not installed or in your working envi
 python3 -m pytest tests/tests.py
 ```
 
-All tests should pass by default, *but, if you are not intending to use `spike` without `TinyTim`, `SExtractor`, `PSFEx`, or `WebbPSF` and do not have them installed, the final test may fail*. In that case, the arguments in 
+All tests should pass by default.
 
 
 ## Issues and Contributing
