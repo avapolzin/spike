@@ -490,9 +490,9 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI')
 
 	ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
-	dqhdrdat = np.zeros_like(imgdat[('DQ', exvt)].data)
+	dqhdrdat = np.zeros_like(imgdat[('DQ', extv)].data)
 	cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR')
-	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', exvt)].header, name = 'DQ')
+	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ')
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:

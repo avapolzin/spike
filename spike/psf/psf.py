@@ -175,7 +175,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
-					psffunc(skycoords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -205,12 +205,12 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 								drizzlelist[obj[j]][p[3]] = []
 							drizzlelist[obj[j]][p[3]].append(modname)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
+							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, **kwargs) 
+						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -429,7 +429,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
-					psffunc(skycoords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -457,14 +457,14 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 						if np.isfinite(p[0]): #confirm that object falls onto detector
 							if p[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][p[3]] = []
-							drizzlelist[obj[j]][p[3]].append(i)
+							drizzlelist[obj[j]][p[3]].append(modname)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
+							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, **kwargs) 
+						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -515,7 +515,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
-	os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
+	# retain tweaked version in working directory for re-runs etc.
+	# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
 
 	if verbose:
 		print('Moved PSF files to %s'%savedir)
@@ -664,9 +665,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist.keys():
 						drizzlelist[obj][pos[3]] = []
-					drizzlelist[obj][pos[3]].append(i)
+					drizzlelist[obj][pos[3]].append(modname)
 
-					psffunc(skycoords, i, imcam, pos, **kwargs)
+					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -696,12 +697,12 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 								drizzlelist[obj[j]][p[3]] = []
 							drizzlelist[obj[j]][p[3]].append(i)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p), kwds = kwargs)
+							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, **kwargs) 
+						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -751,7 +752,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	## clean up other files generated in the process
 	os.system('mv %s*.cat %s'%(img_dir, savedir))
 	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
-	os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
+	# retain tweaked version in working directory for re-runs etc.
+	# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits

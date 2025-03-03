@@ -228,7 +228,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 
 
 
-def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose = False, 
+def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep = False, 
 	writeto = True, specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., specalpha = 1., 
 	specbeta = 1., fov_arcsec = 6., despace = 0., sample = 1., linearfit = False, regrid = True):
 	"""
@@ -246,8 +246,8 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, keep = False, verbose =
 		imcam (str): 'ACS/WFC' is the only recommended instrument/camera combination for this PSF generation method.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
-		keep (bool): If True, retains make_psf.py (Gillis et al. 2020)
 		verbose (bool): If True, prints progress messages.
+		keep (bool): If True, retains make_psf.py (Gillis et al. 2020)
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF model saved by TinyTim.
