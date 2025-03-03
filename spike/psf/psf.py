@@ -51,8 +51,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		img_dir (str): Path to directory containing calibrated files for which model PSF will be generated.
 			If using the tweakreg step, best to include a drizzled file, as well, which can be used as a reference.
 		obj(str, arr-like): Name or coordinates of object of interest in HH:MM:DD DD:MM:SS or degree format.
-		img_type (str): e.g, 'flc', 'flt', 'cal' -- specifies which file-type to include.
-			spike currently only works with MEF files that include both SCI and ERR/DQ extensions.
+		img_type (str): e.g, 'flc', 'flt', 'cal', 'c0m' -- specifies which file-type to include.
+			spike currently only works with MEF files (since astrodrizzle only works with MEF files).
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS'
 		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),

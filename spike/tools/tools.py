@@ -501,10 +501,11 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		hdr['COMMENT'] = "PSF generated via spike."
 	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI')
 
-	ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
-	dqhdrdat = np.zeros_like(imgdat[('DQ', extv)].data)
-	cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR')
-	cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ')
+	if img.split('_')[-1] != '_c0m.fits':
+		ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
+		dqhdrdat = np.zeros_like(imgdat[('DQ', extv)].data)
+		cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR')
+		cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ')
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
@@ -514,7 +515,11 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 
-	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
+	if img.split('_')[-1] != '_c0m.fits':
+		hdlist = [cphdr, cihdr, cehdr, cdqhdr]
+
+	if img.split('_')[-1] == '_c0m.fits':
+		hdlist = [cphdr, cihdr]
 
 	try: #get WCSDVARR
 		dp1 = hdr['DP1']
@@ -567,7 +572,14 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		hdlist.append(fits.BinTableHDU(data = imgdat['ASDF', 1].data, header = imgdat['ASDF', 1].header))
 
 	hdulist = fits.HDUList(hdlist)
-	hdulist.writeto(modname)
+
+	if img.split('_')[-1] != '_c0m.fits':
+		hdulist.writeto(modname)
+
+	if img.split('_')[-1] == '_c0m.fits':
+		modname = modname.replace('_topsf.fits', '_topsf_c0m.fits')
+		hdulist.writeto(modname)
+		os.system('cp %s %s'%(img.replace('c0m.fits', 'c1m.fits'), modname.replace('c0m.fits', 'c1m.fits')))
 
 
 def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0, 
@@ -602,19 +614,40 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 	hdr = imgdat[('SCI', ext)].header
 	dat = imgdat[('SCI', ext)].data
 
-	dq = imgdat[('DQ', ext)].data
-	err = imgdat[('ERR', ext)].data
+	if img.split('_')[-1] == '_c0m.fits':
 
-	if maskdq:
-		dat[dq > dqthresh] = fillval
-	if maskerr:
-		dat[err > errthresh] = fillval
-	if usermask:
-		dat[usermask > 0] = fillval
+		errdat = fits.open(img.split('_')[:-1]+'_c1m.fits')
 
-	cihdr = fits.ImageHDU(data = dat, header = hdr, name = 'SCI')
-	cehdr = fits.ImageHDU(data = err, header = imgdat[('ERR', ext)].header, name = 'ERR')
-	cdqhdr = fits.ImageHDU(data = dq, header = imgdat[('DQ', ext)].header, name = 'DQ')
+		dq = errdat[('DQ', ext)].data
+		err = errdat[('ERR', ext)].data
+
+		if maskdq:
+			dat[dq > dqthresh] = fillval
+		if maskerr:
+			dat[err > errthresh] = fillval
+		if usermask:
+			dat[usermask > 0] = fillval
+
+		cihdr = fits.ImageHDU(data = dat, header = hdr, name = 'SCI')
+		cehdr = fits.ImageHDU(data = err, header = errdat[('ERR', ext)].header, name = 'ERR')
+		cdqhdr = fits.ImageHDU(data = dq, header = errdat[('DQ', ext)].header, name = 'DQ')
+
+
+	else:
+
+		dq = imgdat[('DQ', ext)].data
+		err = imgdat[('ERR', ext)].data
+
+		if maskdq:
+			dat[dq > dqthresh] = fillval
+		if maskerr:
+			dat[err > errthresh] = fillval
+		if usermask:
+			dat[usermask > 0] = fillval
+
+		cihdr = fits.ImageHDU(data = dat, header = hdr, name = 'SCI')
+		cehdr = fits.ImageHDU(data = err, header = imgdat[('ERR', ext)].header, name = 'ERR')
+		cdqhdr = fits.ImageHDU(data = dq, header = imgdat[('DQ', ext)].header, name = 'DQ')
 
 
 	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
@@ -685,21 +718,4 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 		hdulist.writeto(img.replace('.fits', '_crop.fits'))
 
 	return cutoutim
-
-
-def combine_extensions():
-	"""
-	Combine SCI and DQ/ERR extensions for c0f/c1f and c0m/c1m files into one multi-extension
-	FITS file that's readable by spike.
-
-	
-	"""
-
-def waivered_to_mef():
-	"""
-	Write waivered FITS files to multi-extension FITS files to facilitate PSF generation for 
-	WFPC, WFPC2, etc. 
-
-
-	"""
 
