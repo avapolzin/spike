@@ -459,7 +459,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	extv = 1
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 1):
 		ext = 4
-		ext = 2
+		extv = 2
 	if (imcam in ['ACS/WFC', 'WFC3/UVIS']) and (pos[2] == 2):
 		ext = 1 #yes, it's already 1, but this is to make things explicit
 		extv = 1
@@ -546,6 +546,13 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 			name = 'WCSDVARR', ver = 3))
 		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 4)].data, header = imgdat[('WCSDVARR', 4)].header, 
 			name = 'WCSDVARR', ver = 4))
+
+	if imcam in ['NIRCAM', 'MIRI', 'NIRISS']:
+		hdlist.append(fits.ImageHDU(data = imgdat['AREA', 1].data, header = imgdat['AREA', 1].header))
+		hdlist.append(fits.ImageHDU(data = imgdat['VAR_POISSON', 1].data, header = imgdat['VAR_POISSON', 1].header))
+		hdlist.append(fits.ImageHDU(data = imgdat['VAR_RNOISE', 1].data, header = imgdat['VAR_RNOISE', 1].header))
+		hdlist.append(fits.ImageHDU(data = imgdat['VAR_FLAT', 1].data, header = imgdat['VAR_FLAT', 1].header))
+		hdlist.append(fits.BinTableHDU(data = imgdat['ASDF', 1].data, header = imgdat['ASDF', 1].header))
 
 	hdulist = fits.HDUList(hdlist)
 	hdulist.writeto(modname)

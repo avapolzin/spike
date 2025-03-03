@@ -482,9 +482,19 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
+
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
 				resamp = resample_step.ResampleStep(**drizzleparams)
 				resampkwds = {'input_models': drizzlelist[do][dk], 
-							  'output_file': '%s_%s_psf_i2d'%(do, dk),
+							  'output_file': resampname,
 							  'output_dir':img_dir, 
 							  'save_results':True}
 				pool.apply_async(resamp.call, kwds = resampkwds)
@@ -492,23 +502,34 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
 				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
-					output_file = '%s_%s_psf'%(do, dk), output_dir = img_dir, save_results = True)
+					output_file = resampname, 
+					output_dir = img_dir, save_results = True)
 
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		for fk in filelist.keys():
 			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+					output_file = '%simg'%fk, output_dir = img_dir, save_results = True)
 
     #####################################################################
+    suff = "resamplestep"
 
     # clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv *_psf* %s'%savedir) # generated PSF models
+	os.system('mv *_resamplestep* %s'%savedir) # generated PSF models
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
@@ -538,12 +559,20 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			returndict[do] = {}
 			for dk in drizzlelist[do].keys():
 
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				if ':' in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
 				if returnpsf == 'full':	
-					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
+					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname ,suff))
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff), 
+					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
 									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 
@@ -717,13 +746,21 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	#####################################################################
 	for do in drizzlelist.keys():
-		print(do)
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
 				resamp = resample_step.ResampleStep(**drizzleparams)
 				resampkwds = {'input_models': drizzlelist[do][dk], 
-							  'output_file': '%s_%s_psf_i2d'%(do, dk),
+							  'output_file': resampname,
 							  'output_dir':img_dir, 
 							  'save_results':True}
 				pool.apply_async(resamp.call, kwds = resampkwds)
@@ -731,8 +768,17 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
 				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
-					output_file = '%s_%s_psf'%(do, dk), output_dir = img_dir, save_results = True)
+					output_file = resampname, output_dir = img_dir, save_results = True)
 
 
 	
@@ -741,12 +787,13 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
 					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
     #####################################################################
+	suff = "resamplestep"
 
     # clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv *_psf* %s'%savedir) # generated PSF models
+	os.system('mv *_resamplestep* %s'%savedir) # generated PSF models
 	os.system('mv *.psf %s'%savedir)
 	os.system('mv *_topsf* %s'%savedir) # tweaked and drizzled PSF models
 
@@ -762,4 +809,30 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		dout = sorted(glob.glob(savedir+'/*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
+
+
+	if returnpsf:
+		returndict = {}
+		for do in drizzlelist.keys():
+			returndict[do] = {}
+			for dk in drizzlelist[do].keys():
+
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				if ':' in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
+
+				resampname = shortdec+shortra+'_'+dk
+				resampname = resampname.replace(':', '').replace(' ', '')
+
+				if returnpsf == 'full':	
+					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname ,suff))
+					returndict[do][dk] = dr_psf[1].data
+
+				if returnpsf == 'crop':
+					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
+									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
+					returndict[do][dk] = crop
+
+		return returndict
 
