@@ -2,12 +2,13 @@ import pytest
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 from paralleltest import paralleltest #local file and function
+from spike.tools import objloc
 
 @pytest.mark.parametrize(
 	"obj, expected",
 	[
-		('M51', 
-		SkyCoord('202.469575 47.1952583', unit = (u.deg, u.deg), frame = 'icrs')),
+		(objloc('M51'), 
+		SkyCoord('202.469575 47.19525833', unit = (u.deg, u.deg), frame = 'icrs')),
 
 		(objloc('10:00:30.03 +02:08:59.47'), 
 		SkyCoord('10:00:30.03 +02:08:59.47', unit = (u.hour, u.deg), frame = 'icrs')),
@@ -19,7 +20,7 @@ from paralleltest import paralleltest #local file and function
 
 def test_objloc(obj, expected):
 	from spike.tools import objloc
-	assert objloc(obj) == expected
+	assert obj == expected
 
 
 def test_multiprocessing():
@@ -33,7 +34,7 @@ def test_multiprocessing():
 	pool.close()
 	pool.join()
 	for i in ['a', 'b', 'c', 'd', 'e', 'f']:
-		with open(i+'_test.txt') as file:
+		with open(i+'.txt') as file:
 			checkstring = file.read()
 		assert i+'\n' == checkstring
 		os.system('rm '+i+'_test.txt')

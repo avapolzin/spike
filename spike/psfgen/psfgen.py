@@ -797,7 +797,9 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	Generate PSFs using PSFEx.
 
 	NOTE: For frames with fewer stars, this method is prone to artifacts, which is exacerbated by 
-	using a lower detection threshold.
+	using a lower detection threshold. (Also important to note that using the parallel option with 
+	PSFEx may require additional attention to ensuring files do not overwrite each other given the
+	default naming scheme for .cat and .psf files and subsequent steps to rename them.)
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.

@@ -98,7 +98,7 @@ Data-independent utilities included in `spike` can be tested via the scripts inc
 
 ```bash
 pip install pytest #necessary if pytest is not installed or in your working environment
-python3 -m pytest tests/tests.py
+python -m pytest tests/tests.py
 ```
 
 All tests should pass by default.

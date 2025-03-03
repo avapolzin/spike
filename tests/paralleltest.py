@@ -5,5 +5,11 @@ def paralleltest(string):
 	"""
 	Function to test async write to file and filename.
 	"""
-	os.system('echo "'+string+'"" > testtext.txt')
-	os.system('mv testtext.txt '+string+'_test.txt')
+
+	with open(string+'.txt', 'w') as file:
+		file.write(string + '\n')
+
+	# with open('testtext.txt', 'w') as file:
+	# 	file.write(string + '\n')
+		
+	# os.system('mv testtext.txt '+string+'_test.txt')
