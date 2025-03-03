@@ -4,8 +4,6 @@
 
 All-in-one tool to generate, and correctly drizzle, _HST_, _JWST_, and Roman PSFs.
 
-**Under construction -- come back in a couple of days!**
-
 ## Installation
 
 To install:
