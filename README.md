@@ -19,7 +19,7 @@ cd spike
 sudo pip install .
 
 ````
-or (which does not work yet because I need to figure out what to do with the c bindings and direct dependencies)
+or 
 ```bash
 pip install spike-psf
 ```
