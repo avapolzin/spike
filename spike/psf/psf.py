@@ -275,8 +275,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
+		if savedir.split('/')[-1] != '':
+			savedir += '/'
+
 		sufs = ['drc', 'drz']
-		dout = np.concatenate((sorted(glob.glob(savedir+'/*_drc.fits')), sorted(glob.glob(savedir+'/*_drz.fits'))))
+		dout = np.concatenate((sorted(glob.glob(savedir+'*_drc.fits')), sorted(glob.glob(savedir+'*_drz.fits'))))
 		for di in dout:
 			tools.to_asdf(di)
 
@@ -288,6 +291,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		for do in drizzlelist.keys():
 			returndict[do] = {}
 			for dk in drizzlelist[do].keys():
+
+				if savedir.split('/')[-1] != '':
+					savedir += '/'
 
 				if returnpsf == 'full':	
 					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
@@ -523,7 +529,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					output_file = '%simg'%fk, output_dir = img_dir, save_results = True)
 
     #####################################################################
-    suff = "resamplestep"
+	suff = "resamplestep"
 
     # clean up step to move all of the PSF files to the relevant directory
 	# should grab all .pngs, .fits etc.
@@ -547,7 +553,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output
-		dout = sorted(glob.glob(savedir+'/*_resamplestep.fits')) 
+		if savedir.split('/')[-1] != '':
+			savedir += '/'
+
+		dout = sorted(glob.glob(savedir+'*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 		if verbose:
@@ -560,12 +569,15 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			for dk in drizzlelist[do].keys():
 
 				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-				if ':' in shortra:
+				if ':' not in shortra:
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
+
+				if savedir.split('/')[-1] != '':
+					savedir += '/'
 
 				if returnpsf == 'full':	
 					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname ,suff))
@@ -806,7 +818,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits
 		# defining suffix from resample output
-		dout = sorted(glob.glob(savedir+'/*_resamplestep.fits')) 
+		if savedir.split('/')[-1] != '':
+			savedir += '/'
+
+		dout = sorted(glob.glob(savedir+'*_resamplestep.fits')) 
 		for di in dout:
 			tools.to_asdf(di)
 
@@ -818,19 +833,22 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			for dk in drizzlelist[do].keys():
 
 				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-				if ':' in shortra:
+				if ':' not in shortra:
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
 
+				if savedir.split('/')[-1] != '':
+					savedir += '/'
+
 				if returnpsf == 'full':	
-					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname ,suff))
+					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname, suff))
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
+					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname, suff), 
 									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 
