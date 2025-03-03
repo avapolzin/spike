@@ -211,7 +211,8 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
@@ -351,7 +352,8 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
@@ -499,7 +501,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
@@ -610,7 +613,8 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
@@ -770,7 +774,8 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
@@ -855,7 +860,8 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if plot:
 		fig= plt.figure(figsize = (5, 5))
-		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys_r')
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
 		plt.colorbar()
 		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
 
