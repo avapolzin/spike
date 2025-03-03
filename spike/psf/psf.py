@@ -238,14 +238,14 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for dk in drizzlelist[do].keys():
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
-	drzs = np.concatenate((sorted(glob.glob('*_drc.fits')), sorted(glob.glob('*_drz.fits'))))
+	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), sorted(glob.glob('%s*_drz.fits'%img_dir))))
 	for dr in drzs: #rename drizzled outputs to something more manageable
 		flist = dr.split('_')
-		suff_ = flist[-1]
+		suff_ = flist[-1].split('.')[0]
 		filt_ = flist[-3]
 		obj_ = flist[-4]
 
-		os.system('mv %s %s_%s_psf_%s.fits'%(dr, obj_, filt_, suff_))
+		os.system('mv %s %s%s_%s_psf_%s.fits'%(dr, img_dir, obj_, filt_, suff_))
 
 	suff = suff_ # store suffix, as there should be no variation within one run
 
@@ -288,7 +288,21 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	if returnpsf:
 		returndict = {}
-		for do in drizzlelist.keys():
+		for o, do in enumerate(drizzlelist.keys()):
+			if type(obj) == str:
+				coordstring = str(skycoords.ra)
+				if skycoords.dec.deg > 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg >= 0:
+					coordstring += str(skycoords.dec)
+
+			if type(obj) != str:
+				coordstring = str(skycoords[o].ra)
+				if skycoords[o].dec.deg > 0:
+					coordstring += '+'+str(skycoords[o].dec)
+				if skycoords[o].dec.deg >= 0:
+					coordstring += str(skycoords[o].dec)
+
 			returndict[do] = {}
 			for dk in drizzlelist[do].keys():
 
@@ -296,11 +310,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					savedir += '/'
 
 				if returnpsf == 'full':	
-					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff))
+					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff))
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(do, dk ,suff), 
+					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff), 
 									coords = objloc(do), fov_pixel = cutout_fov, save = savecutout)
 					returndict[do][dk] = crop
 

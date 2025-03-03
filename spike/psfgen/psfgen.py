@@ -713,7 +713,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		find = DAOStarFinder(threshold = thresh*std, **starselectargs)
 
 	if starselect.upper() == 'IRAF':
-		find = IRAFStarFinder(threshold = thresh*std  **starselectargs)
+		find = IRAFStarFinder(threshold = thresh*std,  **starselectargs)
 
 	if mask:
 		maskarr = fits.open(img)[('DQ', extv)].data
