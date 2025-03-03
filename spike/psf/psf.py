@@ -362,7 +362,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
-		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_copy')
+		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_orig')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -603,7 +603,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
-		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_copy')
+		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_orig')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -717,6 +717,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	#####################################################################
 	for do in drizzlelist.keys():
+		print(do)
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():

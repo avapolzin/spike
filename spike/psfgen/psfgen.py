@@ -551,7 +551,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		WebbPSF model PSF
 
 	"""
-	x, y, chip, filt = post
+	x, y, chip, filt = pos
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
@@ -592,12 +592,12 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	#read aperture name from FITS header
 	imfits = fits.open(img)
-	aperturename = img[0].header['APERNAME']
+	aperturename = imfits[0].header['APERNAME']
 	psf.aperturename = aperturename
 
 	if verbose:
 		print('Producing PSF model')
-	psfmod = psf.calc_psf(fov_arcsec = fov_arcsec, ovesample = sample, **calckwargs)
+	psfmod = psf.calc_psf(fov_arcsec = fov, oversample = sample, **calckwargs)
 
 	psfmodel = psfmod[3].data
 
