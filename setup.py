@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
 	name = "spike-psf",
-	version = "0.5",
+	version = "1.0",
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle/resample HST, JWST, and Roman PSFs for improved analyses.",
@@ -12,7 +12,7 @@ setuptools.setup(
 	url = "https://github.com/avapolzin/spike",
 	license = 'MIT',
 	classifiers = [
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Intended Audience :: Science/Research",
 		"License :: OSI Approved :: MIT License",
 		"Operating System :: OS Independent",
