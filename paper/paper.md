@@ -1,5 +1,5 @@
 ---
-title: '`spike`: A tool to drizzle _HST_, _JWST_, and Roman PSFs for improved analyses'
+title: '`spike`: A tool to drizzle _HST_, _JWST_, and Roman point spread functions for improved analyses'
 tags:
   - Python
   - astronomy
