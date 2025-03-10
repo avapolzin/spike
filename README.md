@@ -14,7 +14,7 @@ git clone https://github.com/avapolzin/spike.git
 
 cd spike
 
-sudo pip install .
+pip install .
 
 ````
 or 
