@@ -312,7 +312,7 @@ def regridarr (im, sample):
 
 	Parameters:
 		im (arr): PSF image array.
-		sample (float): If sample > 1, oversampled; if sample < 1, undersampled.
+		sample (float): Npix,im/Npix,orig. If sample > 1, oversampled; if sample < 1, undersampled.
 
 	Returns:
 		Interpolated and regridded PSF model.

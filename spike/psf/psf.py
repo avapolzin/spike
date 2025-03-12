@@ -551,7 +551,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
 	os.system('mv %s*_psf %s'%(img_dir, savedir))
 	os.system('mv %s*.psf %s'%(img_dir, savedir))
 	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
@@ -573,7 +573,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		if savedir.split('/')[-1] != '':
 			savedir += '/'
 
-		dout = sorted(glob.glob(savedir+'*_resamplestep.fits')) 
+		dout = sorted(glob.glob(savedir+'*_%s.fits'%suff)) 
 		for di in dout:
 			tools.to_asdf(di)
 		if verbose:
@@ -822,7 +822,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	# should grab all .pngs, .fits etc.
 	if not os.path.exists(savedir):
 		os.makedirs(savedir)
-	os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) # generated PSF models
+	os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
 	os.system('mv %s*_psf %s'%(img_dir, savedir))
 	os.system('mv %s*.psf %s'%(img_dir, savedir))
 	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
@@ -839,7 +839,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		if savedir.split('/')[-1] != '':
 			savedir += '/'
 
-		dout = sorted(glob.glob(savedir+'*_resamplestep.fits')) 
+		dout = sorted(glob.glob(savedir+'*_%s.fits'%s)) 
 		for di in dout:
 			tools.to_asdf(di)
 

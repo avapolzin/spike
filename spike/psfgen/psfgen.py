@@ -442,7 +442,6 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 				# and expects a particular structure -- once fixed in photutils, will remove
 				# this hacky solution
 				newname = 'STDPSF_%s_%s.fits'%(pos[2], pos[3])
-				os.system('curl "%s" --output "%s"'%(url, newname))
 
 	det = None #set detector for photutils
 	if imcam in ['WFPC2', 'ACS/WFC']:
@@ -489,7 +488,11 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 	if (imcam == 'NIRCAM') and (pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 
 		'F182M', 'F200W', 'F210M', 'F212N']):
 		# part of hacky solution for photutils NIRCam bug
-		model = GriddedPSFModel.read(filename = newname, detector_id = det, format= 'stdpsf')
+		try: # in case photutils accepts my bug fix PR + for version robustness
+			model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
+		except:
+			os.system('curl "%s" --output "%s"'%(url, newname))
+			model = GriddedPSFModel.read(filename = newname, detector_id = det, format= 'stdpsf')
 
 	else:
 		model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
@@ -518,7 +521,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 	if (imcam == 'NIRCAM') and (pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 
 		'F182M', 'F200W', 'F210M', 'F212N']):
 		# clean up from hacky solution
-		os.system('rm %s'%newname)
+		if os.path.is_file(newname):
+			os.system('rm %s'%newname)
 
 	return psfmodel
 
