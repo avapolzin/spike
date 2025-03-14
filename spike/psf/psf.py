@@ -649,7 +649,6 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	Returns:
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
-
 	"""
 	os.environ['CRDS_SERVER_URL']="https://roman-crds.stsci.edu"
 
