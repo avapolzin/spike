@@ -15,6 +15,6 @@ pyyaml
 roman-datamodels
 scipy
 spherical-geometry
-stdatamodels
+stdatamodels==2.2.0 
 tweakwcs
 webbpsf
