@@ -23,7 +23,7 @@ There are a lot of different groups dedicated to simulating data for the Roman S
 
 3. **Tweakreg keeps failing, noting that I'm out of memory. How should I proceed?**
 
-This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well-aligned for you purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resources. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run ``spike``.
+This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well-aligned for your purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resources. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run ``spike``.
 
 
 spike
