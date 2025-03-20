@@ -323,8 +323,8 @@ def regridarr (im, sample):
 		return im
 
 	x,y = im.shape
-	xnew = np.arange(0, x, 1/sample)
-	ynew = np.arange(0, y, 1/sample)
+	xnew = np.arange(0, x, sample)
+	ynew = np.arange(0, y, sample)
 
 	spline = RectBivariateSpline(np.arange(x), np.arange(y), im)
 	out = spline(xnew[xnew <= x-1], ynew[ynew <= y-1])
