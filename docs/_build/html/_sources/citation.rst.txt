@@ -3,9 +3,9 @@
 Citation
 ========
 
-If you use this package or the scripts in this repository in a publication, please add a footnote linking to `https://github.com/avapolzin/spike <https://github.com/avapolzin/spike>`_ and/or consider adding this software to your acknowledgments. To cite ``spike``, please reference `Polzin (in prep) <https://github.com/avapolzin/spike/blob/master/paper/paper.md>`_.
+If you use this package or the scripts in this repository in a publication, please add a footnote linking to `https://github.com/avapolzin/spike <https://github.com/avapolzin/spike>`_ and/or consider adding this software to your acknowledgments. To cite ``spike``, please reference `Polzin (2025) <https://arxiv.org/abs/2503.02288>`_.
 
-``spike`` relies on many other pieces of software. Please also credit the following codes/papers (if stated the condition is met):
+``spike`` relies on many other pieces of software. Please also credit the following codes/papers (if the stated condition is met):
 
 * if you use ``spike`` with HST data: ``drizzlepac`` (`Hoffmann et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021AAS...23821602H/abstract>`_)
 * if you use ``spike`` with JWST data: ``jwst`` (`Bushouse et al. 2024 <https://zenodo.org/records/7038885>`_)
