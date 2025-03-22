@@ -90,6 +90,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	"""
 	from drizzlepac import tweakreg, tweakback, astrodrizzle
 
+	if img_type.lower() in ['drc', 'drz']:
+		raise Exception('%s files are already drizzled. spike works with calibrated, but not-yet-combined images -- e.g., flc, crf, cal.'%img_type)
+
 
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
@@ -111,7 +114,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	genpsf = True
 	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'STDPSF', 'EPSF', 'PSFEX', 'USER']:
-		raise Exception('tool must be one of TINYTIM, TINYTIM_GILLIS, STDPSF, EPSF, PSFEX, USER')
+		raise Exception('method must be one of TINYTIM, TINYTIM_GILLIS, STDPSF, EPSF, PSFEX, USER')
 	if method.upper() == 'TINYTIM':
 		if inst.upper() == 'WFC3':
 			warnings.warn('TinyTim is not recommended for modeling WFC3 PSFs. See https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling.',
