@@ -210,7 +210,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -486,7 +486,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -759,7 +759,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					pool.join()
 				if not parallel:
 					for coord in coords:
-						psffunc(coords, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
