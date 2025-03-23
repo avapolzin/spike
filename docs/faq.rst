@@ -25,6 +25,14 @@ There are a lot of different groups dedicated to simulating data for the Roman S
 
 This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well-aligned for your purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resources. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run ``spike``.
 
+4. **Why am I seeing "ValueError: WCSNAME 'TWEAK' already present...", and how do I resolve it?**
+
+Tweaking an image is a "destructive" process insofar as it irrevocably changes the FITS file. ``Drizzlepac`` specifically avoids overwriting this header key when it's present. You can either rerun the tweak step in ``spike`` using a different key (fed in via the tweakparams argument) or you can simply set pretweaked = True to skip the tweak step altogether.
+
+5. **What file types are accepted by spike and why?**
+
+``spike`` works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the *HST*, *JWST*, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because ``spike`` relies on doing this image combination step, the input files should be calibrated, but not yet combined -- i.e., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because ``astrodrizzle`` does not work with waivered FITS files, ``spike`` only takes as input multi-extension FITS files. 
+
 
 spike
 -----
