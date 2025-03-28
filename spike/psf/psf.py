@@ -212,8 +212,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					pool.close()
 					pool.join()
 				if not parallel:
-					for coord in coords:
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+					for j, coord in enumerate(skycoords):
+						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -243,6 +243,10 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
 		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir))))
+
+	if len(drzs) == 0:
+		raise Exception('No co-added/resampled output files created. Check your coordinates and the output of the PSF generation steps.')
+
 	for dr in drzs: #rename drizzled outputs to something more manageable
 		flist = dr.split('_')
 		suff_ = flist[-1].split('.')[0]
@@ -488,8 +492,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					pool.close()
 					pool.join()
 				if not parallel:
-					for coord in coords:
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+					for j, coord in enumerate(skycoords):
+						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -761,8 +765,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					pool.close()
 					pool.join()
 				if not parallel:
-					for coord in coords:
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+					for j, coord in enumerate(skycoords):
+						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))

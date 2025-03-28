@@ -12,7 +12,7 @@ Probably not. If the data appear corrupted prior to any of the processing steps 
 
 2. **Roman hasn't launched yet; how do I access data to play with `spike.psf.roman`?**
 
-There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. [Troxel et al. (2023)](https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract) has some nice examples of single detector data and you can generate your own Roman imaging with [STIPS](https://github.com/spacetelescope/STScI-STIPS) [(STIPS Development Team 2024)](https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract) The pipeline is very similar to _JWST_'s, with the image from each of the detectors is stored in its own file, so `spike.psf.roman` is, at its core, a modified version of `spike.psf.jwst`.
+There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. [Troxel et al. (2023)](https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract) has some nice examples of single detector data and you can generate your own Roman imaging with [STIPS](https://github.com/spacetelescope/STScI-STIPS) [(STIPS Development Team 2024)](https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract). The pipeline is very similar to _JWST_'s, with the image from each of the detectors is stored in its own file, so `spike.psf.roman` is, at its core, a modified version of `spike.psf.jwst`.
 
 3. **Tweakreg keeps failing, noting that I'm out of memory. How should I proceed?**
 

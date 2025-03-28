@@ -436,12 +436,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 			if pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 'F182M', 'F200W'
 							'F210M', 'F212N']:
-				url = baseurl+imcamurl+'/SWC/%s/STDPSF_%s_%s.fits'%(pos[3], pos[3], pos[2])
-
-				# fix since photutils GriddedPSFModel reads the detector from the filename
-				# and expects a particular structure -- once fixed in photutils, will remove
-				# this hacky solution
-				newname = 'STDPSF_%s_%s.fits'%(pos[2], pos[3])
+				url = baseurl+imcamurl+'/SWC/%s/STDPSF_%s_%s.fits'%(pos[3], pos[2], pos[3])
 
 	det = None #set detector for photutils
 	if imcam in ['WFPC2', 'ACS/WFC']:
@@ -485,19 +480,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 	#preferred equivalent to using photutils.psf.stdpsf_reader directly
 
-	if (imcam == 'NIRCAM') and (pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 
-		'F182M', 'F200W', 'F210M', 'F212N']):
-		# part of hacky solution for photutils NIRCam bug
-		try: # in case photutils accepts my bug fix PR + for version robustness
-			model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
-		except:
-			os.system('curl "%s" --output "%s"'%(url, newname))
-			model = GriddedPSFModel.read(filename = newname, detector_id = det, format= 'stdpsf')
-
-	else:
-		model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
+	model = GriddedPSFModel.read(filename = url, detector_id = det, format= 'stdpsf')
 	
-
 	if verbose:
 		print('Finished reading STDPSF grid, generating PSF model')
 	psfmodel = model.evaluate(x = x, y = y, flux = norm, x_0 = int(pos[0]), y_0 = int(pos[1]))
@@ -517,12 +501,6 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
 		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
 
-
-	if (imcam == 'NIRCAM') and (pos[3] in ['F070W', 'F090W', 'F115W', 'F140M', 'F150W', 
-		'F182M', 'F200W', 'F210M', 'F212N']):
-		# clean up from hacky solution
-		if os.path.is_file(newname):
-			os.system('rm %s'%newname)
 
 	return psfmodel
 
