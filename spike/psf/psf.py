@@ -77,9 +77,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
 			documentation for a full list.
-		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.hst does not return anything.
-		cutout_fov (int): Side length of square cutout region centered on PSF. Used if returnpsf = 'crop'.
-		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
+		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.hst does not return anything. If 'full' (default),
+			returns the PSF in the full spatial context of the processed image. If 'crop', returns the region immediately
+			around the PSF (size of cutout set by cutout_fov).
+		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
+		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -364,9 +366,11 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
-		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.hst does not return anything.
-		cutout_fov (int): Side length of square cutout region centered on PSF. Used if returnpsf = 'crop'.
-		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
+		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.jwst does not return anything. If 'full' (default),
+			returns the PSF in the full spatial context of the processed image. If 'crop', returns the region immediately
+			around the PSF (size of cutout set by cutout_fov).
+		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
+		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -618,7 +622,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, 
-		out = 'fits', tweakparams = {}, drizzleparams = {}, **kwargs):
+		out = 'fits', returnpsf = 'full', cutout_fov = 151, savecutout = True,
+		tweakparams = {}, drizzleparams = {}, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -648,6 +653,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
+		returnpsf (str): 'full', 'crop', or None. If None, spike.psf.roman does not return anything. If 'full' (default),
+			returns the PSF in the full spatial context of the processed image. If 'crop', returns the region immediately
+			around the PSF (size of cutout set by cutout_fov).
+		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
+		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
