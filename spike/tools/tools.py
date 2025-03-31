@@ -499,13 +499,13 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		hdr['COMMENT'] = "PSF generated using %s via spike."%method
 	if not method:
 		hdr['COMMENT'] = "PSF generated via spike."
-	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI')
+	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI', ver = 1)
 
 	if img.split('_')[-1] != '_c0m.fits':
 		ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
 		dqhdrdat = np.zeros_like(imgdat[('DQ', extv)].data)
-		cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR')
-		cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ')
+		cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR', ver = 1)
+		cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ', ver = 1)
 
 	coordstring = str(coords.ra)
 	if coords.dec.deg > 0:
