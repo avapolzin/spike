@@ -73,33 +73,33 @@ register_all()
 
 fig, ax = plt.subplots(1, 5, figsize = (20, 4), gridspec_kw = {'wspace':0.1})
 
-tt = fits.open('psfs_tiny/j8pu42evq_flc_150d08m15.267s+2d09m52.304s2d09m52.304s_F475W_topsf_drz.fits')
+tt = fits.open('psfs_tiny/j8pu42evq_flc_150d08m15.267s+2d09m52.304s_F475W_topsf_drz.fits')
 ttim = tt[1].data[325:465, 940:1080]
 ax[0].imshow(ttim, vmin = np.percentile(ttim, 20), vmax = np.percentile(ttim, 97), origin = 'lower', cmap = 'LondonCalling_r')
 ax[0].text(10, 125, s = 'TinyTim', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[0].axis('off')
 
-ttg = fits.open('psfs_tinygillis/j8pu42evq_flc_150d08m15.267s+2d09m52.304s2d09m52.304s_F475W_topsf_drz.fits')
+ttg = fits.open('psfs_tinygillis/j8pu42evq_flc_150d08m15.267s+2d09m52.304s_F475W_topsf_drz.fits')
 ttgim = ttg[1].data[325:465, 940:1080]
 ax[1].imshow(ttgim, vmin = np.percentile(ttgim, 20), vmax = np.percentile(ttgim, 97), origin = 'lower', cmap = 'LondonCalling_r')
 ax[1].text(10, 125, s = 'TinyTim (Gillis+20)', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[1].axis('off')
 
-std = fits.open('psfs_stdpsf/j8pu42evq_flc_150d08m15.267s+2d09m52.304s2d09m52.304s_F475W_topsf_drz.fits')
+std = fits.open('psfs_stdpsf/j8pu42evq_flc_150d08m15.267s+2d09m52.304s_F475W_topsf_drz.fits')
 stdim = std[1].data[325:465, 940:1080]
 # ax[2].imshow(stdim, vmin = np.percentile(stdim[stdim != 0], 5), vmax = np.percentile(stdim[stdim != 0], 60), origin = 'lower', cmap = 'LondonCalling_r')
 ax[2].imshow(stdim, vmin = np.percentile(stdim, 20), vmax = np.percentile(stdim, 99), origin = 'lower', cmap = 'LondonCalling_r')
 ax[2].text(10, 125, s = 'STDPSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[2].axis('off')
 
-epsf = fits.open('psfs_epsf/j8pu42evq_flc_150d08m15.267s+2d09m52.304s2d09m52.304s_F475W_topsf_drz.fits')
+epsf = fits.open('psfs_epsf/j8pu42evq_flc_150d08m15.267s+2d09m52.304s_F475W_topsf_drz.fits')
 epsfim = epsf[1].data[325:465, 940:1080]
 ax[3].imshow(epsfim, vmin = np.percentile(epsfim, 20), vmax = np.percentile(epsfim, 95), origin = 'lower', cmap = 'LondonCalling_r')
 ax[3].text(10, 125, s = 'ePSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[3].axis('off')
 
 
-psfex = fits.open('psfs_psfex/j8pu42evq_flc_150d08m15.267s+2d09m52.304s2d09m52.304s_F475W_topsf_drz.fits')
+psfex = fits.open('psfs_psfex/j8pu42evq_flc_150d08m15.267s+2d09m52.304s_F475W_topsf_drz.fits')
 psfexim_ = psfex[1].data[325:465, 940:1080]
 ax[4].imshow(psfexim_, vmin = np.percentile(psfexim_[psfexim_ >0], 20), vmax = np.percentile(psfexim_[psfexim_ >0], 95), origin = 'lower', cmap = 'LondonCalling_r')
 ax[4].text(10, 125, s = 'PSFEx', fontsize = 15, fontfamily = 'monospace', color = '#343530')

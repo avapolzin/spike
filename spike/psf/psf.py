@@ -199,9 +199,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
 						coordstring = str(skycoords[j].ra)
-						if skycoords[j].dec.deg > 0:
-							coordstring += '+'+str(skycoords[j].dec)
 						if skycoords[j].dec.deg >= 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg < 0:
 							coordstring += str(skycoords[j].dec)
 
 						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
@@ -481,9 +481,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
 						coordstring = str(skycoords[j].ra)
-						if skycoords[j].dec.deg > 0:
-							coordstring += '+'+str(skycoords[j].dec)
 						if skycoords[j].dec.deg >= 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg < 0:
 							coordstring += str(skycoords[j].dec)
 
 						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
@@ -760,9 +760,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					pool = Pool(processes=(cpu_count() - 1))
 					for j, p in enumerate(pos):
 						coordstring = str(skycoords[j].ra)
-						if skycoords[j].dec.deg > 0:
-							coordstring += '+'+str(skycoords[j].dec)
 						if skycoords[j].dec.deg >= 0:
+							coordstring += '+'+str(skycoords[j].dec)
+						if skycoords[j].dec.deg < 0:
 							coordstring += str(skycoords[j].dec)
 							
 						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
