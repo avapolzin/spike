@@ -66,8 +66,8 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 'WFPC2').
-			For 'WFPC' and 'WFPC2', the camera is selecte by-chip and should not be specified here.
-		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+			For 'WFPC' and 'WFPC2', the camera is selected by-chip and should not be specified here.
+		pos (list): Location of object of interest (spatial and spectral). [X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
@@ -91,7 +91,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		temp (float): Temperature of blackbody spectrum in K.
 		specalpha (float): Spectral index alpha for F(nu)~nu^alpha.
 		specbeta (float): Spectral index alpha for F(lambda)~lambda^beta.
-		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		despace (float): Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 			the 4th Zernike polynomial.
 
@@ -260,7 +260,7 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 		temp (float): Temperature of blackbody spectrum in K.
 		specalpha (float): Spectral index alpha for F(nu)~nu^alpha.
 		specbeta (float): Spectral index alpha for F(lambda)~lambda^beta.
-		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		despace (float): Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 			the 4th Zernike polynomial.
 		sample (float): Factor by which to undersample the PSF. Default is not to undersample.
@@ -387,7 +387,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
-		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		norm (float): Flux normalization for output PSF model.
 
 	Returns:
@@ -523,14 +523,14 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).
-		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		sample (float): Factor by which to oversample the PSF.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 		image_mask (str): Image mask argument for WebbPSF.
 		pupil_mask (str): Pupil mask argument for WebbPSF.
 		**calckwargs: Additional arguments for calc_psf() -- see 
-			https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf
-			Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
+			https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf.
+			Should be fed to spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
 
 	Returns:
 		WebbPSF model PSF
@@ -626,15 +626,15 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
-			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selecte by-chip and 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here.
-		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
+		pos (list): Location of object of interest (spatial and spectral). [X, Y, chip, filter]
 		plot (bool): If True, saves .pngs of the model PSFs.
 		verbose (bool): If True, prints progress messages.
 		mask (bool): If True, uses data quality array to mask some pixels.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
-		fov_arcsec (float): Diameter of model PSF image in arcsec.
+		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		norm (float): Flux normalization for output PSF model.
 		starselect (str): 'DAO', 'IRAF', or 'peak', which use DAOStarFinder, IRAFStarFinder, and 
 			find_peaks from photutils respectively.

@@ -665,7 +665,7 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 		coords (astropy skycoords object): Coordinates of object of interest or list of skycoord objects.
 			Easiest is to feed in the output of spike.tools.objloc.
 		ext (int): Integer index of extension to crop.
-		fov_pixel (int): Diameter of square cutout region in pixels.
+		fov_pixel (int): "Diameter" of square cutout region in pixels.
 		save (bool): If True, will save a FITS file containing cropped region.
 
 	Returns: 

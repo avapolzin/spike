@@ -88,7 +88,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
 
 		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
-		if returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
+		If returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
 	from drizzlepac import tweakreg, tweakback, astrodrizzle
 
@@ -381,7 +381,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
 
 		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
-		if returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
+		If returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
 
 	os.environ['CRDS_SERVER_URL']="https://jwst-crds.stsci.edu"
@@ -666,6 +666,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	Returns:
 		Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)
+
+		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
+		If returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
 	os.environ['CRDS_SERVER_URL']="https://roman-crds.stsci.edu"
 
