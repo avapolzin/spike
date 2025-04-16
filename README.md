@@ -48,7 +48,7 @@ export CRDS_PATH="/path/to/crds_cache/"
 # export CRDS_SERVER_URL="https://roman-crds.stsci.edu"
 ```
 
-Since both JWST and Roman CRDS servers may be defined, these variables are added directly within `spike.jwstcal` and `spike.romancal` and do not need to be added to your startup file. 
+Since both JWST and Roman CRDS servers may be defined, these variables are added directly within `spike.psf.jwst` and `spike.psf.roman` and do not need to be added to your startup file. 
 
 
 ## Getting Started

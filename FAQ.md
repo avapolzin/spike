@@ -24,7 +24,7 @@ Tweaking an image is a "destructive" process insofar as it irrevocably changes t
 
 5. **What file types are accepted by spike and why?**
 
-`spike` works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the *HST*, *JWST*, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because `spike` relies on doing this image combination step, the input files should be calibrated, but not yet combined -- i.e., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because `astrodrizzle` does not work with waivered FITS files, `spike` only takes as input multi-extension FITS files. 
+`spike` works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the *HST*, *JWST*, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because `spike` relies on doing this image combination step, the input files should be calibrated, but not yet combined -- e.g., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because `astrodrizzle` does not work with waivered FITS files, `spike` only takes as input multi-extension FITS files. 
 
 
 ### spike
@@ -68,14 +68,14 @@ If you don't already have the [Gillis et al. (2020)](https://bitbucket.org/brgil
 
 1. **Why am I getting an HTTPS error when my PSF generation method is 'STDPSF'?**
 
-The STDPSFs are read into `photutils` as URLs as needed, so there could also be an issue connecting to the Space Telescope website for [HST](https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/) or [JWST](https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/) STDPSFs.
+The STDPSFs are read into `photutils` as URLs as needed, so there could be an issue connecting to the Space Telescope website for [HST](https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/) or [JWST](https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/) STDPSFs.
 
 
 ### PSFEx
 
 *If you plan to use PSFEx to generate empirical PSFs, both SExtractor and PSFEx must be downloaded and installed separately following the instructions [here](https://github.com/astromatic/sextractor) and [here](https://github.com/astromatic/psfex) respectively.* 
 
-Some notes on PSFEx installation for Macs: You can use `brew install automake, libtool` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these [instructions](http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69)). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, I found that PSFEx could not find the correct directories, so in your PSFEx directory, you will run some variation of `./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib
+Some notes on PSFEx installation for Macs: You can use `brew install automake, libtool` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these [instructions](http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69)). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, I found that PSFEx could not find the correct directories for OpenBLAS, so in your PSFEx directory, you will run some variation of `./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib
 `.
 
 There is also a bug in the PSFEx installation code -- discussed nicely [here](https://trac.macports.org/ticket/71003) -- within PSFEx/src/levmar/compiler.h, you will need to change "finite" to "isfinite" before attempting to run `make`.
