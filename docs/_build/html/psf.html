@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Top-level Functions &mdash; spike 0.5 documentation</title>
+  <title>Top-level Functions &mdash; spike 1.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=db78e746"></script>
+      <script src="_static/documentation_options.js?v=e2a723ec"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -42,8 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Top-level Functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#spike.psf.hst"><code class="docutils literal notranslate"><span class="pre">hst()</span></code></a></li>
@@ -121,16 +122,18 @@ headers are from the original images (see spike.tools.rewrite_fits, which can be
 for a full list.</p></li>
 <li><p><strong>drizzleparams</strong> (<em>dict</em>) – Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac
 documentation for a full list.</p></li>
-<li><p><strong>returnpsf</strong> (<em>str</em>) – ‘full’, ‘crop’, or None. If None, spike.psf.hst does not return anything.</p></li>
-<li><p><strong>cutout_fov</strong> (<em>int</em>) – Side length of square cutout region centered on PSF. Used if returnpsf = ‘crop’.</p></li>
-<li><p><strong>savecutout</strong> (<em>bool</em>) – If True, save a .fits file with the cutout region, including WCS.</p></li>
+<li><p><strong>returnpsf</strong> (<em>str</em>) – ‘full’, ‘crop’, or None. If None, spike.psf.hst does not return anything. If ‘full’ (default),
+returns the PSF in the full spatial context of the processed image. If ‘crop’, returns the region immediately
+around the PSF (size of cutout set by cutout_fov).</p></li>
+<li><p><strong>cutout_fov</strong> (<em>int</em>) – Side length in pixels of square cutout region centered on PSF. Used if returnpsf = ‘crop’.</p></li>
+<li><p><strong>savecutout</strong> (<em>bool</em>) – If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = ‘crop’.</p></li>
 <li><p><strong>**kwargs</strong> – Keyword arguments for PSF generation function.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)</p>
 <p>If returnpsf = ‘full’, will return each of the full drizzled PSF images in an object, filter indexed dict.
-if returnpsf = ‘crop’, will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.</p>
+If returnpsf = ‘crop’, will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.</p>
 </p>
 </dd>
 </dl>
@@ -167,9 +170,11 @@ headers are from the original images (see spike.tools.rewrite_fits, which can be
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
 <li><p><strong>parallel</strong> (<em>bool</em>) – If True, runs PSF generation in parallel.</p></li>
 <li><p><strong>out</strong> (<em>str</em>) – ‘fits’ or ‘asdf’. Output for the drizzled PSF. If ‘asdf’, .asdf AND .fits are saved.</p></li>
-<li><p><strong>returnpsf</strong> (<em>str</em>) – ‘full’, ‘crop’, or None. If None, spike.psf.hst does not return anything.</p></li>
-<li><p><strong>cutout_fov</strong> (<em>int</em>) – Side length of square cutout region centered on PSF. Used if returnpsf = ‘crop’.</p></li>
-<li><p><strong>savecutout</strong> (<em>bool</em>) – If True, save a .fits file with the cutout region, including WCS.</p></li>
+<li><p><strong>returnpsf</strong> (<em>str</em>) – ‘full’, ‘crop’, or None. If None, spike.psf.jwst does not return anything. If ‘full’ (default),
+returns the PSF in the full spatial context of the processed image. If ‘crop’, returns the region immediately
+around the PSF (size of cutout set by cutout_fov).</p></li>
+<li><p><strong>cutout_fov</strong> (<em>int</em>) – Side length in pixels of square cutout region centered on PSF. Used if returnpsf = ‘crop’.</p></li>
+<li><p><strong>savecutout</strong> (<em>bool</em>) – If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = ‘crop’.</p></li>
 <li><p><strong>tweakparams</strong> (<em>dict</em>) – Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 for a full list. See here: <a class="reference external" href="https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments">https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments</a></p></li>
 <li><p><strong>drizzleparams</strong> (<em>dict</em>) – Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac
@@ -180,7 +185,7 @@ documentation for a full list.</p></li>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)</p>
 <p>If returnpsf = ‘full’, will return each of the full drizzled PSF images in an object, filter indexed dict.
-if returnpsf = ‘crop’, will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.</p>
+If returnpsf = ‘crop’, will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.</p>
 </p>
 </dd>
 </dl>
@@ -188,7 +193,7 @@ if returnpsf = ‘crop’, will return a cutout region of the drizzled PSF image
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psf.roman">
-<span class="sig-prename descclassname"><span class="pre">spike.psf.</span></span><span class="sig-name descname"><span class="pre">roman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camera</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WebbPSF'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usermethod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savedir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psfs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drizzleimgs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretweaked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecrds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keeporig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tweakparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drizzleparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psf.roman" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psf.</span></span><span class="sig-name descname"><span class="pre">roman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camera</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'WebbPSF'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usermethod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savedir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psfs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drizzleimgs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretweaked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecrds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keeporig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fits'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returnpsf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">151</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savecutout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tweakparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drizzleparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psf.roman" title="Link to this definition"></a></dt>
 <dd><p>Generate drizzled Roman Space Telescope PSFs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -218,6 +223,11 @@ headers are from the original images (see spike.tools.rewrite_fits, which can be
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
 <li><p><strong>parallel</strong> (<em>bool</em>) – If True, runs PSF generation in parallel.</p></li>
 <li><p><strong>out</strong> (<em>str</em>) – ‘fits’ or ‘asdf’. Output for the drizzled PSF. If ‘asdf’, .asdf AND .fits are saved.</p></li>
+<li><p><strong>returnpsf</strong> (<em>str</em>) – ‘full’, ‘crop’, or None. If None, spike.psf.roman does not return anything. If ‘full’ (default),
+returns the PSF in the full spatial context of the processed image. If ‘crop’, returns the region immediately
+around the PSF (size of cutout set by cutout_fov).</p></li>
+<li><p><strong>cutout_fov</strong> (<em>int</em>) – Side length in pixels of square cutout region centered on PSF. Used if returnpsf = ‘crop’.</p></li>
+<li><p><strong>savecutout</strong> (<em>bool</em>) – If True, save a .fits file with the cutout region, including WCS.</p></li>
 <li><p><strong>tweakparams</strong> (<em>dict</em>) – Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 for a full list.</p></li>
 <li><p><strong>drizzleparams</strong> (<em>dict</em>) – Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac
@@ -226,7 +236,10 @@ documentation for a full list.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)</p>
+<dd class="field-even"><p><p>Generates model PSFs and drizzled PSF. (If drizzledimgs = True, also produces drizzled image from input files.)</p>
+<p>If returnpsf = ‘full’, will return each of the full drizzled PSF images in an object, filter indexed dict.
+If returnpsf = ‘crop’, will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.</p>
+</p>
 </dd>
 </dl>
 </dd></dl>

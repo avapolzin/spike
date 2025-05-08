@@ -3,7 +3,7 @@
 FAQs
 ====
 
-This file is also available on the `GitHub <https://github.com/avapolzin/spike/blob/master/FAQ.md>`_, where it will be updated along with the development version of the code (and may be more responsive to common issues).
+This file is also available on `GitHub <https://github.com/avapolzin/spike/blob/master/FAQ.md>`_, where it will be updated along with the development version of the code (and may be more responsive to common issues).
 
 Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I've tried to project for more common questions here.
 
@@ -19,11 +19,19 @@ Probably not. If the data appear corrupted prior to any of the processing steps 
 
 2. **Roman hasn't launched yet; how do I access data to play with spike.psf.roman?**
 
-There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. `Troxel et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract>`_ has some nice examples of single detector data and you can generate your own Roman imaging with `STIPS <https://github.com/spacetelescope/STScI-STIPS>`_ (`STIPS Development Team 2024 <https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract>`_) The pipeline is very similar to JWST's, with the image from each of the detectors is stored in its own file, so ``spike.psf.roman`` is, at its core, a modified version of ``spike.psf.jwst``.
+There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. `Troxel et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract>`_ has some nice examples of single detector data and you can generate your own Roman imaging with `STIPS <https://github.com/spacetelescope/STScI-STIPS>`_ (`STIPS Development Team 2024 <https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract>`_). The pipeline is very similar to JWST's, with the image from each of the detectors is stored in its own file, so ``spike.psf.roman`` is, at its core, a modified version of ``spike.psf.jwst``.
 
 3. **Tweakreg keeps failing, noting that I'm out of memory. How should I proceed?**
 
 This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well-aligned for your purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resources. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run ``spike``.
+
+4. **Why am I seeing "ValueError: WCSNAME 'TWEAK' already present...", and how do I resolve it?**
+
+Tweaking an image is a "destructive" process insofar as it irrevocably changes the FITS file. ``Drizzlepac`` specifically avoids overwriting this header key when it's present. You can either rerun the tweak step in ``spike`` using a different key (fed in via the tweakparams argument) or you can simply set pretweaked = True to skip the tweak step altogether.
+
+5. **What file types are accepted by spike and why?**
+
+``spike`` works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the *HST*, *JWST*, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because ``spike`` relies on doing this image combination step, the input files should be calibrated, but not yet combined -- e.g., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because ``astrodrizzle`` does not work with waivered FITS files, ``spike`` only takes as input multi-extension FITS files. 
 
 
 spike
@@ -49,7 +57,7 @@ As it turns out, ``multiprocessing`` specifically requires that functions be *im
 
 4. **I'm working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH/$CRDS_PATH. How do I access them from Jupyter?**
 
-There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_.
+There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_. I recommend following the example laid out in the ``spike`` `example_notebooks README <https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md>`_, which amends your kernel.json to consistently read your environment variables directly from your startup file.
 
 
 TinyTim
@@ -71,7 +79,7 @@ STDPSF
 
 1. **Why am I getting an HTTPS error when my PSF generation method is 'STDPSF'?**
 
-The STDPSFs are read into ``photutils`` as URLs as needed, so there could also be an issue connecting to the Space Telescope website for `HST <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>`_ or `JWST <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>`_ STDPSFs.
+The STDPSFs are read into ``photutils`` as URLs as needed, so there could be an issue connecting to the Space Telescope website for `HST <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>`_ or `JWST <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>`_ STDPSFs.
 
 
 PSFEx
@@ -79,7 +87,7 @@ PSFEx
 
 If you plan to use PSFEx to generate empirical PSFs, both SExtractor and PSFEx must be downloaded and installed separately following the instructions `here <https://github.com/astromatic/sextractor>`_ and `here <https://github.com/astromatic/psfex>`_ respectively.
 
-Some notes on PSFEx/SExtractor installation for Macs: You can use ``brew install automake, libtool`` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these `instructions <http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69>`_). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories, so in your PSFEx directory, you will want to run some variation of ``./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib`` when configuring the Makefile for PSFEx.
+Some notes on PSFEx/SExtractor installation for Macs: You can use ``brew install automake, libtool`` to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these `instructions <http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69>`_). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories for OpenBLAS, so in your PSFEx directory, you will want to run some variation of ``./configure --enable-openblas --with-openblas-incdir=/opt/OpenBLAS/include --with-openblas-libdir=/opt/OpenBLAS/lib`` when configuring the Makefile for PSFEx.
 
 There is also a bug in the PSFEx installation code -- discussed nicely `here <https://trac.macports.org/ticket/71003>`_ -- within PSFEx/src/levmar/compiler.h, you will need to change "finite" to "isfinite" before attempting to run ``make``.
 

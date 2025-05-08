@@ -9,7 +9,7 @@ If your `spike` environment does not include `jupyter`, you will need to install
 
 The syntax will be similar with other environment managers. The kernel only needs to be generated _once_. Subsequent usage of notebooks will just require selecting the `spike` kernel.
 
-One common issue with Jupyter kernels is that they do not inherit the environment variables from your global startup file. You can list all of your available kernels with `jupyter kernelspec list` run from the command line. Your kernel.json file can be accessed at the path listed for the `spike` kernel + '/share/jupyter/kernels/kernel.json'. To update your environment variables, simply add an "env" stanza to the .json file, specifying which variables to include:
+One common issue with ipython kernels is that they do not inherit the environment variables from your global startup file. You can list all of your available kernels with `jupyter kernelspec list` run from the command line. Your kernel.json file can be accessed at the path listed for the `spike` kernel + '/share/jupyter/kernels/kernel.json'. To update your environment variables, simply add an "env" stanza to the .json file, specifying which variables to include:
 
 ```json
 {

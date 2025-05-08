@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FAQs &mdash; spike 0.5 documentation</title>
+  <title>FAQs &mdash; spike 1.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=db78e746"></script>
+      <script src="_static/documentation_options.js?v=e2a723ec"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -42,8 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="psf.html">Top-level Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="psfgen.html">PSF Generation</a></li>
@@ -86,7 +87,7 @@
              
   <section id="faqs">
 <span id="spike-faq"></span><h1>FAQs<a class="headerlink" href="#faqs" title="Link to this heading"></a></h1>
-<p>This file is also available on the <a class="reference external" href="https://github.com/avapolzin/spike/blob/master/FAQ.md">GitHub</a>, where it will be updated along with the development version of the code (and may be more responsive to common issues).</p>
+<p>This file is also available on <a class="reference external" href="https://github.com/avapolzin/spike/blob/master/FAQ.md">GitHub</a>, where it will be updated along with the development version of the code (and may be more responsive to common issues).</p>
 <p>Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I’ve tried to project for more common questions here.</p>
 <p>For more detailed questions/concerns about any of <code class="docutils literal notranslate"><span class="pre">spike</span></code>’s dependencies, please refer to the original documentation for that code specifically.</p>
 <section id="space-based-imaging">
@@ -98,11 +99,19 @@
 <ol class="arabic simple" start="2">
 <li><p><strong>Roman hasn’t launched yet; how do I access data to play with spike.psf.roman?</strong></p></li>
 </ol>
-<p>There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract">Troxel et al. (2023)</a> has some nice examples of single detector data and you can generate your own Roman imaging with <a class="reference external" href="https://github.com/spacetelescope/STScI-STIPS">STIPS</a> (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract">STIPS Development Team 2024</a>) The pipeline is very similar to JWST’s, with the image from each of the detectors is stored in its own file, so <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> is, at its core, a modified version of <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code>.</p>
+<p>There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract">Troxel et al. (2023)</a> has some nice examples of single detector data and you can generate your own Roman imaging with <a class="reference external" href="https://github.com/spacetelescope/STScI-STIPS">STIPS</a> (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract">STIPS Development Team 2024</a>). The pipeline is very similar to JWST’s, with the image from each of the detectors is stored in its own file, so <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> is, at its core, a modified version of <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code>.</p>
 <ol class="arabic simple" start="3">
 <li><p><strong>Tweakreg keeps failing, noting that I’m out of memory. How should I proceed?</strong></p></li>
 </ol>
 <p>This is a common issue with the WCS alignment steps, which are memory intensive, particularly for a large number of input files. The first (and easiest) solution is to simply specify pretweaked = True and skip that step altogether if the images are already sufficiently well-aligned for your purposes. Alternatively, you can alter the tweakparams input to change settings that may mitigate the load on your computational resources. You can also tweak the images yourself (which gives you more control over which files are included at any given point) and then, again, specify pretweaked = True when you run <code class="docutils literal notranslate"><span class="pre">spike</span></code>.</p>
+<ol class="arabic simple" start="4">
+<li><p><strong>Why am I seeing “ValueError: WCSNAME ‘TWEAK’ already present…”, and how do I resolve it?</strong></p></li>
+</ol>
+<p>Tweaking an image is a “destructive” process insofar as it irrevocably changes the FITS file. <code class="docutils literal notranslate"><span class="pre">Drizzlepac</span></code> specifically avoids overwriting this header key when it’s present. You can either rerun the tweak step in <code class="docutils literal notranslate"><span class="pre">spike</span></code> using a different key (fed in via the tweakparams argument) or you can simply set pretweaked = True to skip the tweak step altogether.</p>
+<ol class="arabic simple" start="5">
+<li><p><strong>What file types are accepted by spike and why?</strong></p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">spike</span></code> works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the <em>HST</em>, <em>JWST</em>, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because <code class="docutils literal notranslate"><span class="pre">spike</span></code> relies on doing this image combination step, the input files should be calibrated, but not yet combined – e.g., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because <code class="docutils literal notranslate"><span class="pre">astrodrizzle</span></code> does not work with waivered FITS files, <code class="docutils literal notranslate"><span class="pre">spike</span></code> only takes as input multi-extension FITS files.</p>
 </section>
 <section id="spike">
 <h2>spike<a class="headerlink" href="#spike" title="Link to this heading"></a></h2>
@@ -124,7 +133,7 @@
 <ol class="arabic simple" start="4">
 <li><p><strong>I’m working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH/$CRDS_PATH. How do I access them from Jupyter?</strong></p></li>
 </ol>
-<p>There are several ways to make sure that your environment variables are accessible. The various options are discussed in this <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">StackOverflow thread</a>.</p>
+<p>There are several ways to make sure that your environment variables are accessible. The various options are discussed in this <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">StackOverflow thread</a>. I recommend following the example laid out in the <code class="docutils literal notranslate"><span class="pre">spike</span></code> <a class="reference external" href="https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md">example_notebooks README</a>, which amends your kernel.json to consistently read your environment variables directly from your startup file.</p>
 </section>
 <section id="tinytim">
 <h2>TinyTim<a class="headerlink" href="#tinytim" title="Link to this heading"></a></h2>
@@ -143,12 +152,12 @@
 <ol class="arabic simple">
 <li><p><strong>Why am I getting an HTTPS error when my PSF generation method is ‘STDPSF’?</strong></p></li>
 </ol>
-<p>The STDPSFs are read into <code class="docutils literal notranslate"><span class="pre">photutils</span></code> as URLs as needed, so there could also be an issue connecting to the Space Telescope website for <a class="reference external" href="https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/">HST</a> or <a class="reference external" href="https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/">JWST</a> STDPSFs.</p>
+<p>The STDPSFs are read into <code class="docutils literal notranslate"><span class="pre">photutils</span></code> as URLs as needed, so there could be an issue connecting to the Space Telescope website for <a class="reference external" href="https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/">HST</a> or <a class="reference external" href="https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/">JWST</a> STDPSFs.</p>
 </section>
 <section id="psfex">
 <h2>PSFEx<a class="headerlink" href="#psfex" title="Link to this heading"></a></h2>
 <p>If you plan to use PSFEx to generate empirical PSFs, both SExtractor and PSFEx must be downloaded and installed separately following the instructions <a class="reference external" href="https://github.com/astromatic/sextractor">here</a> and <a class="reference external" href="https://github.com/astromatic/psfex">here</a> respectively.</p>
-<p>Some notes on PSFEx/SExtractor installation for Macs: You can use <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">automake,</span> <span class="pre">libtool</span></code> to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these <a class="reference external" href="http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69">instructions</a>). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories, so in your PSFEx directory, you will want to run some variation of <code class="docutils literal notranslate"><span class="pre">./configure</span> <span class="pre">--enable-openblas</span> <span class="pre">--with-openblas-incdir=/opt/OpenBLAS/include</span> <span class="pre">--with-openblas-libdir=/opt/OpenBLAS/lib</span></code> when configuring the Makefile for PSFEx.</p>
+<p>Some notes on PSFEx/SExtractor installation for Macs: You can use <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">automake,</span> <span class="pre">libtool</span></code> to add the GNU functions that PSFEx requires for installation. If FFTW is not already installed on your machine, you will need to follow the instructions for both single- and double-point versions (see these <a class="reference external" href="http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69">instructions</a>). If ATLAS is not already installed, you can bypass that installation altogether by downloading and installing OpenBLAS. Even with a successful install, my experience was that PSFEx could not find the correct directories for OpenBLAS, so in your PSFEx directory, you will want to run some variation of <code class="docutils literal notranslate"><span class="pre">./configure</span> <span class="pre">--enable-openblas</span> <span class="pre">--with-openblas-incdir=/opt/OpenBLAS/include</span> <span class="pre">--with-openblas-libdir=/opt/OpenBLAS/lib</span></code> when configuring the Makefile for PSFEx.</p>
 <p>There is also a bug in the PSFEx installation code – discussed nicely <a class="reference external" href="https://trac.macports.org/ticket/71003">here</a> – within PSFEx/src/levmar/compiler.h, you will need to change “finite” to “isfinite” before attempting to run <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
 <ol class="arabic simple">
 <li><p><strong>My output single-image PSFs look funny/there’s an issue with my SExtractor catalog. How do I fix this?</strong></p></li>

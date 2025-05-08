@@ -1,0 +1,189 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &amp; Setup &mdash; spike 1.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=e2a723ec"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quickstart Guide" href="quickstart.html" />
+    <link rel="prev" title="Easily generated and resampled space-based PSFs." href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            spike
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation &amp; Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environments">Environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-jupyter">Working with Jupyter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="psf.html">Top-level Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="psfgen.html">PSF Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">spike</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation &amp; Setup</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-setup">
+<span id="spike-install"></span><h1>Installation &amp; Setup<a class="headerlink" href="#installation-setup" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To install <code class="docutils literal notranslate"><span class="pre">spike</span></code>, either <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">spike-psf</span></code> or install the development version from the distribution on <a class="reference external" href="https://github.com/avapolzin/spike">GitHub</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avapolzin/spike.git
+<span class="nb">cd</span><span class="w"> </span>spike
+pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+<p>If you install <code class="docutils literal notranslate"><span class="pre">spike</span></code> via PyPI, you will need to separately install <code class="docutils literal notranslate"><span class="pre">DrizzlePac</span></code> from the distribution on <a class="reference external" href="https://github.com/spacetelescope/drizzlepac">GitHub</a>, as PyPI does not handle direct dependencies.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">spike.psfgen.tinypsf</span></code> and <code class="docutils literal notranslate"><span class="pre">spike.psfgen.tinygillispsf</span></code> require <code class="docutils literal notranslate"><span class="pre">TinyTim</span></code> for simulated PSFs. To use that module, please download <a class="reference external" href="https://github.com/spacetelescope/tinytim/releases">TinyTim version 7.5</a> and follow the install instructions. Since that software is now unmaintained, refer to the <a class="reference external" href="https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling">STScI site</a> for details and caveats.</p>
+<p>If you plan to use the <code class="docutils literal notranslate"><span class="pre">PSFEx</span></code> empirical PSF modeling, that will similarly need to be downloaded from the <a class="reference external" href="https://github.com/astromatic/psfex">GitHub repository</a> and installed, as will <a class="reference external" href="https://github.com/astromatic/sextractor">SExtractor</a>.</p>
+<p>If you are using <code class="docutils literal notranslate"><span class="pre">WebbPSF</span></code>, you will need to install the relevant data and include it in your path. Instructions to do this are available <a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/installation.html#data-install">here</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">jwst</span></code> and <code class="docutils literal notranslate"><span class="pre">romancal</span></code> pipelines – which house the tweak/resample steps for JWST and Roman – require the setup of the CRDS_PATH environment variable. The amended version of the code also relies on <code class="docutils literal notranslate"><span class="pre">crds</span></code>, so it is necessary to set these environment variables according to the instructions <a class="reference external" href="https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html">here</a> if you plan to use <code class="docutils literal notranslate"><span class="pre">spike</span></code> with JWST or Roman data.</p>
+<p>If you install all of the optional dependencies described above, your shell’s startup file will look something like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">TINYTIM</span><span class="o">=</span><span class="s2">&quot;/path/to/tinytim-7.5&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny1</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny1&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny2</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny2&quot;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">tiny3</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TINYTIM</span><span class="s2">/tiny3&quot;</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">WEBBPSF_PATH</span><span class="o">=</span><span class="s2">&quot;/path/to/webbpsf-data&quot;</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">CRDS_PATH</span><span class="o">=</span><span class="s2">&quot;/path/to/crds_cache/&quot;</span>
+<span class="c1"># export CRDS_SERVER_URL=&quot;https://jwst-crds.stsci.edu&quot;</span>
+<span class="c1"># export CRDS_SERVER_URL=&quot;https://roman-crds.stsci.edu&quot;</span>
+</pre></div>
+</div>
+<p>Since both JWST and Roman CRDS servers may be defined, these variables are added directly within <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code> and <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> and do not need to be added to your startup file. Similarly, <code class="docutils literal notranslate"><span class="pre">spike</span></code> doe not require that the <code class="docutils literal notranslate"><span class="pre">tiny1</span></code>, <code class="docutils literal notranslate"><span class="pre">tiny2</span></code>, and <code class="docutils literal notranslate"><span class="pre">tiny3</span></code> aliases are set up, but most <code class="docutils literal notranslate"><span class="pre">TinyTim</span></code> users will want to add these to their startup file regardless.</p>
+</section>
+<section id="environments">
+<h2>Environments<a class="headerlink" href="#environments" title="Link to this heading"></a></h2>
+<p>As with any installation, it is recommended that you install <code class="docutils literal notranslate"><span class="pre">spike</span></code> to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed.</p>
+<p>To do this in conda, for example, simply run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">spike</span></code>. Then, to access this new environment, you will use <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">spike</span></code>. Once the environment is activated, you can follow your preferred installation method detailed above.</p>
+<p>Note that you will need to activate the environment on accessing a new terminal window in order to run <code class="docutils literal notranslate"><span class="pre">spike</span></code> or other packages that exist only in that environment. To return to your root environment, run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">deactivate</span> <span class="pre">spike</span></code>.</p>
+</section>
+<section id="working-with-jupyter">
+<h2>Working with Jupyter<a class="headerlink" href="#working-with-jupyter" title="Link to this heading"></a></h2>
+<p>If you have created a new environment for <code class="docutils literal notranslate"><span class="pre">spike</span></code>, you will need to generate a corresponding kernel to run .ipynb files with that environment. If you are using conda, this will look like the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>spike
+python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--name<span class="w"> </span>spike<span class="w"> </span>--display-name<span class="w"> </span><span class="s2">&quot;spike&quot;</span>
+</pre></div>
+</div>
+<p>If your <code class="docutils literal notranslate"><span class="pre">spike</span></code> environment does not include <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, you will need to install it before running the aobve command. Otherwise you will get a “No module named ipykernel” error.</p>
+<p>The syntax will be similar with other environment managers. The kernel only needs to be generated <em>once</em>. Subsequent usage of notebooks will just require selecting the <code class="docutils literal notranslate"><span class="pre">spike</span></code> kernel.</p>
+<p>One common issue with ipython kernels is that they do not inherit the environment variables from your global startup file. You can list all of your available kernels with <code class="docutils literal notranslate"><span class="pre">jupyter</span> <span class="pre">kernelspec</span> <span class="pre">list</span></code> run from the command line. Your kernel.json file can be accessed at the path listed for the <code class="docutils literal notranslate"><span class="pre">spike</span></code> kernel + ‘/share/jupyter/kernels/kernel.json’. To update your environment variables, simply add an “env” stanza to the .json file, specifying which variables to include:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w"> </span><span class="nt">&quot;argv&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;ipykernel_launcher&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;{connection_file}&quot;</span>
+<span class="w"> </span><span class="p">],</span>
+<span class="w"> </span><span class="nt">&quot;display_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Python 3 (ipykernel)&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;debugger&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w"> </span><span class="p">},</span>
+<span class="w"> </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;TINYTIM&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${TINYTIM}&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;WEBBPSF_PATH&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${WEBBPSF_PATH}&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;CRDS_PATH&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${CRDS_PATH}&quot;</span>
+<span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In my experience, this works for notebooks instantiated from the command line or an IDE, but does not consistently work with, e.g., the JupyterLab application. See also <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">this discussion</a> for other ways to set up environment variables with Jupyter kernels.</p>
+<p>If, instead, you have installed <code class="docutils literal notranslate"><span class="pre">spike</span></code> to your root environment, you can simply use your standard python kernel.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Easily generated and resampled space-based PSFs." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quickstart Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Ava Polzin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

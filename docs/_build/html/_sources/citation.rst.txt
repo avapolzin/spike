@@ -3,7 +3,7 @@
 Citation
 ========
 
-If you use this package or the scripts in this repository in a publication, please add a footnote linking to `https://github.com/avapolzin/spike <https://github.com/avapolzin/spike>`_ and/or consider adding this software to your acknowledgments. To cite ``spike``, please reference `Polzin (2025) <https://arxiv.org/abs/2503.02288>`_.
+If you use this package or the scripts in this repository in a publication, please reference `Polzin (2025) <https://arxiv.org/abs/2503.02288>`_. Users may also wish to add a footnote linking to `https://github.com/avapolzin/spike <https://github.com/avapolzin/spike>`_ and/or consider adding this software to your acknowledgments. 
 
 ``spike`` relies on many other pieces of software. Please also credit the following codes/papers (if the stated condition is met):
 

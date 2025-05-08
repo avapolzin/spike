@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSF Generation &mdash; spike 0.5 documentation</title>
+  <title>PSF Generation &mdash; spike 1.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=db78e746"></script>
+      <script src="_static/documentation_options.js?v=e2a723ec"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -42,8 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="psf.html">Top-level Functions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">PSF Generation</a><ul>
@@ -100,15 +101,15 @@ PSF may be lower.</p>
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
 <li><p><strong>imcam</strong> (<em>str</em>) – Specification of instrument/camera used to capture the images (e.g., ‘ACS/WFC’, ‘WFC3/IR’, ‘WFPC’,
-‘WFPC2’, ‘MIRI’, ‘NIRCAM’, ‘NIRISS/Imaging’). For ‘WFPC’ and ‘WFPC2’, the camera is selecte by-chip and
+‘WFPC2’, ‘MIRI’, ‘NIRCAM’, ‘NIRISS/Imaging’). For ‘WFPC’ and ‘WFPC2’, the camera is selected by-chip and
 should not be specified here.</p></li>
-<li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
+<li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral). [X, Y, chip, filter]</p></li>
 <li><p><strong>plot</strong> (<em>bool</em>) – If True, saves .pngs of the model PSFs.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
 <li><p><strong>mask</strong> (<em>bool</em>) – If True, uses data quality array to mask some pixels.</p></li>
 <li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
 suffix) and will amend relevant image WCS information/remove extraneous extensions.</p></li>
-<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – “Diameter” of model PSF image in arcsec.</p></li>
 <li><p><strong>norm</strong> (<em>float</em>) – Flux normalization for output PSF model.</p></li>
 <li><p><strong>starselect</strong> (<em>str</em>) – ‘DAO’, ‘IRAF’, or ‘peak’, which use DAOStarFinder, IRAFStarFinder, and
 find_peaks from photutils respectively.</p></li>
@@ -146,14 +147,14 @@ should not be specified here. If ‘NIRISS’ specified alone, assumes the imagi
 <li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
 suffix) and will amend relevant image WCS information/remove extraneous extensions.
 This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).</p></li>
-<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – “Diameter” of model PSF image in arcsec.</p></li>
 <li><p><strong>sample</strong> (<em>float</em>) – Factor by which to oversample the PSF.</p></li>
 <li><p><strong>regrid</strong> (<em>bool</em>) – If True, will (interpolate and) regrid model PSF to image pixel scale.</p></li>
 <li><p><strong>image_mask</strong> (<em>str</em>) – Image mask argument for WebbPSF.</p></li>
 <li><p><strong>pupil_mask</strong> (<em>str</em>) – Pupil mask argument for WebbPSF.</p></li>
 <li><p><strong>**calckwargs</strong> – Additional arguments for calc_psf() – see
-<a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf">https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf</a>
-Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.</p></li>
+<a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf">https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf</a>.
+Should be fed to spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -164,7 +165,7 @@ Should be fed to the spike.psf.jwst/roman in kwargs as a dictionary called calck
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spike.psfgen.psfex">
-<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">psfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsfex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crclean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psfconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maskparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.psfex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">spike.psfgen.</span></span><span class="sig-name descname"><span class="pre">psfex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imcam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writeto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepsfex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psfconf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maskparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spike.psfgen.psfex" title="Link to this definition"></a></dt>
 <dd><p>Generate PSFs using PSFEx.</p>
 <p>NOTE: For frames with fewer stars, this method is prone to artifacts, which is exacerbated by
 using a lower detection threshold. (Also important to note that using the parallel option with
@@ -218,7 +219,7 @@ should not be specified here. If ‘NIRISS’ specified alone, assumes the imagi
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
 <li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
 suffix) and will amend relevant image WCS information/remove extraneous extensions.</p></li>
-<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – “Diameter” of model PSF image in arcsec.</p></li>
 <li><p><strong>norm</strong> (<em>float</em>) – Flux normalization for output PSF model.</p></li>
 </ul>
 </dd>
@@ -257,7 +258,7 @@ and if ‘plaw_lam’, must also specify specbeta.</p></li>
 <li><p><strong>temp</strong> (<em>float</em>) – Temperature of blackbody spectrum in K.</p></li>
 <li><p><strong>specalpha</strong> (<em>float</em>) – Spectral index alpha for F(nu)~nu^alpha.</p></li>
 <li><p><strong>specbeta</strong> (<em>float</em>) – Spectral index alpha for F(lambda)~lambda^beta.</p></li>
-<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – “Diameter” of model PSF image in arcsec.</p></li>
 <li><p><strong>despace</strong> (<em>float</em>) – Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 the 4th Zernike polynomial.</p></li>
 <li><p><strong>sample</strong> (<em>float</em>) – Factor by which to undersample the PSF. Default is not to undersample.</p></li>
@@ -284,8 +285,8 @@ Tiny Tim PSF model, please use spike.psfgen.tinygillispsf() instead.</p>
 <li><p><strong>coords</strong> (<em>astropy skycoord object</em>) – Coordinates of object of interest or list of skycoord objects.</p></li>
 <li><p><strong>img</strong> (<em>str</em>) – Path to image for which PSF is generated.</p></li>
 <li><p><strong>imcam</strong> (<em>str</em>) – Specification of instrument/camera used to capture the images (e.g., ‘ACS/WFC’, ‘WFC3/IR’, ‘WFPC’, ‘WFPC2’).
-For ‘WFPC’ and ‘WFPC2’, the camera is selecte by-chip and should not be specified here.</p></li>
-<li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral).[X, Y, chip, filter]</p></li>
+For ‘WFPC’ and ‘WFPC2’, the camera is selected by-chip and should not be specified here.</p></li>
+<li><p><strong>pos</strong> (<em>list</em>) – Location of object of interest (spatial and spectral). [X, Y, chip, filter]</p></li>
 <li><p><strong>plot</strong> (<em>bool</em>) – If True, saves .pngs of the model PSFs.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, prints progress messages.</p></li>
 <li><p><strong>writeto</strong> (<em>bool</em>) – If True, will write 2D model PSF (differentiated with ‘_topsf’
@@ -309,7 +310,7 @@ and if ‘plaw_lam’, must also specify specbeta.</p></li>
 <li><p><strong>temp</strong> (<em>float</em>) – Temperature of blackbody spectrum in K.</p></li>
 <li><p><strong>specalpha</strong> (<em>float</em>) – Spectral index alpha for F(nu)~nu^alpha.</p></li>
 <li><p><strong>specbeta</strong> (<em>float</em>) – Spectral index alpha for F(lambda)~lambda^beta.</p></li>
-<li><p><strong>fov_arcsec</strong> (<em>float</em>) – Diameter of model PSF image in arcsec.</p></li>
+<li><p><strong>fov_arcsec</strong> (<em>float</em>) – “Diameter” of model PSF image in arcsec.</p></li>
 <li><p><strong>despace</strong> (<em>float</em>) – Focus, secondary mirror despace in micron. Scaled by 0.011 and added to
 the 4th Zernike polynomial.</p></li>
 </ul>
