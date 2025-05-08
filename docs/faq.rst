@@ -3,7 +3,7 @@
 FAQs
 ====
 
-This file is also available on the `GitHub <https://github.com/avapolzin/spike/blob/master/FAQ.md>`_, where it will be updated along with the development version of the code (and may be more responsive to common issues).
+This file is also available on `GitHub <https://github.com/avapolzin/spike/blob/master/FAQ.md>`_, where it will be updated along with the development version of the code (and may be more responsive to common issues).
 
 Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I've tried to project for more common questions here.
 
@@ -57,7 +57,7 @@ As it turns out, ``multiprocessing`` specifically requires that functions be *im
 
 4. **I'm working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH/$CRDS_PATH. How do I access them from Jupyter?**
 
-There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_.
+There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_. I recommend following the example laid out in the ``spike`` `example_notebooks README <https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md>`_, which amends your kernel.json to consistently read your environment variables directly from your startup file.
 
 
 TinyTim

@@ -9,7 +9,14 @@ Easily generated and resampled space-based PSFs.
 .. image:: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c/status.svg
     :target: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c
 
-To install ``spike``, either ``pip install spike-psf`` or install the development version from the distribution on `GitHub <https://github.com/avapolzin/spike>`_.
+To install ``spike``, either ``pip install spike-psf`` or install the development version from the distribution on `GitHub <https://github.com/avapolzin/spike>`_:
+
+.. code-block:: bash
+
+	cd ~
+	git clone https://github.com/avapolzin/spike.git
+	cd spike
+	pip install .
 
 If you install ``spike`` via PyPI, you will need to separately install ``DrizzlePac`` from the distribution on `GitHub <https://github.com/spacetelescope/drizzlepac>`_, as PyPI does not handle direct dependencies.
 
@@ -40,7 +47,7 @@ Since both JWST and Roman CRDS servers may be defined, these variables are added
 
 .. toctree::
 	:maxdepth: 1
-	:caption: Contents:
+	:caption: Documentation:
 
 	quickstart.rst
 	psf.rst
@@ -48,6 +55,15 @@ Since both JWST and Roman CRDS servers may be defined, these variables are added
 	tools.rst
 	faq.rst
 	citation.rst
+
+.. .. toctree::
+.. 	:maxdepth: 1
+.. 	:caption: Examples:
+
+.. 	acs_example.nblink
+.. 	nircam_example.nblink
+.. 	psf_generation.nblink
+
 
 For detailed questions related to the HST, JWST, or Roman calibration pipelines, or any of the individual PSF models, please refer to the original documentation for each software as it will be more comprehensive than what is offered here.
 

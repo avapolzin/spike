@@ -2,7 +2,7 @@
 *.egg-info/*
 build/*
 dist/*
-.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*
 */__pycache__/*
 spike/*/__pycache__/*
 test_outputs/*

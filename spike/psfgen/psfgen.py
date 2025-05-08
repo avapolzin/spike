@@ -145,9 +145,9 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		specparam = specbeta
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', coordstring+'_%s'%pos[3]+'_psf')
@@ -305,9 +305,9 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 	from make_psf import make_subsampled_model_psf
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 		
 	modname = img.replace('.fits', coordstring+'_%s'%pos[3]+'_psf')
@@ -445,9 +445,9 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		det = stdpsf_jwdet[pos[2]]
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
@@ -539,9 +539,9 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	x, y, chip, filt = pos
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
@@ -666,9 +666,9 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
@@ -773,7 +773,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 
 
 def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
-	savepsfex = False, crclean = True, seconf = None, psfconf = None, regrid = True, 
+	savepsfex = False, seconf = None, psfconf = None, regrid = True, 
 	mask = True, maskparams = {}):
 	"""
 	Generate PSFs using PSFEx.
@@ -835,9 +835,9 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		print('Finished PSFEx, generating image')
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')

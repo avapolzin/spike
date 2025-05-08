@@ -49,7 +49,7 @@ As it turns out, `multiprocessing` specifically requires that functions be *impo
 
 4. **I'm working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found. How do I access them from Jupyter?**
 
-There are several ways to make sure that your environment variables are accessible. The various options are discussed in this [StackOverflow thread](https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook).
+There are several ways to make sure that your environment variables are accessible. The various options are discussed in this [StackOverflow thread](https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook). I recommend following the example laid out in the `spike` [example_notebooks README](https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md), which amends your kernel.json to consistently read your environment variables directly from your startup file.
 
 ### TinyTim
 

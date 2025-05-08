@@ -508,9 +508,9 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ', ver = 1)
 
 	coordstring = str(coords.ra)
-	if coords.dec.deg > 0:
-		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')

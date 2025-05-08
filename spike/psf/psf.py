@@ -95,6 +95,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if img_type.lower() in ['drc', 'drz']:
 		raise Exception('%s files are already drizzled. spike works with calibrated, but not-yet-combined images -- e.g., flc, crf, cal.'%img_type)
 
+	if img_dir[:-1] != '/':
+		img_dir += '/' #force paths to work out
 
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
@@ -104,7 +106,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			print('Made copy of '+img_dir)
 
 
-	imgs = sorted(glob.glob(img_dir+'/*'+img_type+'.fits'))
+	imgs = sorted(glob.glob(img_dir+'*'+img_type+'.fits'))
 
 	if inst.upper() in ['ACS', 'WFC3']:
 		imcam = inst.upper()+'/'+camera.upper()
@@ -169,14 +171,14 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
 				coordstring = str(skycoords.ra)
-				if skycoords.dec.deg > 0:
-					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg >= 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
 				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
-					if pos[3] not in drizzlelist.keys():
+					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
@@ -191,31 +193,47 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			
 			for i in imgs:
 
-				pos = tools.checkpixloc(skycoords, i, inst, camera)
-
 				if parallel:
 					if method.upper() == 'PSFEX':
 						warnings.warn('Warning: Check your config and param files to ensure output files have unique names.', Warning, stacklevel = 2)
 					pool = Pool(processes=(cpu_count() - 1))
-					for j, p in enumerate(pos):
-						coordstring = str(skycoords[j].ra)
-						if skycoords[j].dec.deg >= 0:
-							coordstring += '+'+str(skycoords[j].dec)
-						if skycoords[j].dec.deg < 0:
-							coordstring += str(skycoords[j].dec)
+					for j, coord in enumerate(skycoords):
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
-						if np.isfinite(p[0]): #confirm that object falls onto detector
-							if p[3] not in drizzlelist[obj[j]].keys():
-								drizzlelist[obj[j]][p[3]] = []
-							drizzlelist[obj[j]][p[3]].append(modname)
+						pos = tools.checkpixloc(coord, i, inst, camera)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
+						coordstring = str(coord.ra)
+						if coord.dec.deg >= 0:
+							coordstring += '+'+str(coord.dec)
+						if coord.dec.deg < 0:
+							coordstring += str(coord.dec)
+
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						if np.isfinite(pos[0]): #confirm that object falls onto detector
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+							drizzlelist[obj[j]][pos[3]].append(modname)
+
+							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
+
 				if not parallel:
 					for j, coord in enumerate(skycoords):
-						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
+						pos = tools.checkpixloc(coord, i, inst, camera)
+
+						coordstring = str(coord.ra)
+						if coord.dec.deg >= 0:
+							coordstring += '+'+str(coord.dec)
+						if coord.dec.deg < 0:
+							coordstring += str(coord.dec)
+
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						if np.isfinite(pos[0]): #confirm that object falls onto detector
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+							drizzlelist[obj[j]][pos[3]].append(modname)
+
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -247,7 +265,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir))))
 
 	if len(drzs) == 0:
-		raise Exception('No co-added/resampled output files created. Check your coordinates and the output of the PSF generation steps.')
+		raise Exception('No co-added/resampled output files created. Check your input path, coordinates and the output of the PSF generation steps.')
 
 	for dr in drzs: #rename drizzled outputs to something more manageable
 		flist = dr.split('_')
@@ -302,16 +320,16 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		for o, do in enumerate(drizzlelist.keys()):
 			if type(obj) == str:
 				coordstring = str(skycoords.ra)
-				if skycoords.dec.deg > 0:
-					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg >= 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
 			if type(obj) != str:
 				coordstring = str(skycoords[o].ra)
-				if skycoords[o].dec.deg > 0:
-					coordstring += '+'+str(skycoords[o].dec)
 				if skycoords[o].dec.deg >= 0:
+					coordstring += '+'+str(skycoords[o].dec)
+				if skycoords[o].dec.deg < 0:
 					coordstring += str(skycoords[o].dec)
 
 			returndict[do] = {}
@@ -392,6 +410,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	from spike.jwstcal import resample_step
 	from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
 
+	if img_dir[:-1] != '/':
+		img_dir += '/' #force paths to work out
+
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
@@ -400,7 +421,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			print('Made copy of '+img_dir)
 
 
-	imgs = sorted(glob.glob(img_dir+'/*'+img_type+'.fits'))
+	imgs = sorted(glob.glob(img_dir+'*'+img_type+'.fits'))
 
 	imcam = inst.upper()
 
@@ -451,14 +472,14 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
 				coordstring = str(skycoords.ra)
-				if skycoords.dec.deg > 0:
-					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg >= 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
 				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
-					if pos[3] not in drizzlelist.keys():
+					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
@@ -473,31 +494,46 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			
 			for i in imgs:
 
-				pos = tools.checkpixloc(skycoords, i, inst, camera)
-
 				if parallel:
 					if method.upper() == 'PSFEX':
 						warnings.warn('Warning: Check your config and param files to ensure output files have unique names.', Warning, stacklevel = 2)
 					pool = Pool(processes=(cpu_count() - 1))
-					for j, p in enumerate(pos):
-						coordstring = str(skycoords[j].ra)
-						if skycoords[j].dec.deg >= 0:
-							coordstring += '+'+str(skycoords[j].dec)
-						if skycoords[j].dec.deg < 0:
-							coordstring += str(skycoords[j].dec)
+					for j, coord in enumerate(skycoords):
+						coordstring = str(sc.ra)
+						if coord.dec.deg >= 0:
+							coordstring += '+'+str(coord.dec)
+						if coord.dec.deg < 0:
+							coordstring += str(coord.dec)
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
+						pos = tools.checkpixloc(coord, i, inst, camera)
+
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 						if np.isfinite(p[0]): #confirm that object falls onto detector
-							if p[3] not in drizzlelist[obj[j]].keys():
-								drizzlelist[obj[j]][p[3]] = []
-							drizzlelist[obj[j]][p[3]].append(modname)
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+							drizzlelist[obj[j]][pos[3]].append(modname)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
+							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
+
 				if not parallel:
 					for j, coord in enumerate(skycoords):
-						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
+						pos = tools.checkpixloc(coord, i, inst, camera)
+
+						coordstring = str(coord.ra)
+						if coord.dec.deg >= 0:
+							coordstring += '+'+str(coord.dec)
+						if coord.dec.deg < 0:
+							coordstring += str(coord.dec)
+
+						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						if np.isfinite(pos[0]): #confirm that object falls onto detector
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+							drizzlelist[obj[j]][pos[3]].append(modname)
+
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -677,6 +713,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	from spike.romancal import tweakreg_step, resample_step
 
+	if img_dir[:-1] != '/':
+		img_dir += '/' #force paths to work out
+
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
@@ -685,7 +724,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			print('Made copy of '+img_dir)
 
 
-	imgs = sorted(glob.glob(img_dir+'/*'+img_type+'.fits'))
+	imgs = sorted(glob.glob(img_dir+'*'+img_type+'.fits'))
 
 	imcam = inst.upper()
 
@@ -733,14 +772,14 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 				coordstring = str(skycoords.ra)
-				if skycoords.dec.deg > 0:
-					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg >= 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
 				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
 				if np.isfinite(pos[0]): #confirm object falls onto image
-					if pos[3] not in drizzlelist.keys():
+					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
 
