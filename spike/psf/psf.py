@@ -43,6 +43,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		returnpsf = 'full',
 		cutout_fov = 151,
 		savecutout = True,
+		finalonly = False,
+		removedir = 'toremove',
 		**kwargs):
 	"""
 	Generate drizzled HST PSFs.
@@ -82,6 +84,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			around the PSF (size of cutout set by cutout_fov).
 		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
+		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
+		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -251,16 +255,25 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
 
 	for do in drizzlelist.keys():
+		cstring = tools.objloc(do)
+		coordstring = str(cstring.ra)
+		if cstring.dec.deg >= 0:
+			coordstring += '+'+str(cstring.dec)
+		if cstring.dec.deg < 0:
+			coordstring += str(cstring.dec)
+
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
-				drizzleparams['output'] = img_dir + '%s_%s'%(do, dk) #set output based on coord, filter
+				outname = coordstring+'_'+dk+'_psf'
+				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				pool.apply_async(astrodrizzle.AstroDrizzle, args = (drizzlelist[do][dk]), kwds = drizzleparams)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				drizzleparams['output'] = img_dir + '%s_%s'%(do, dk) #set output based on coord, filter
+				outname = coordstring+'_'+dk+'_psf'
+				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
 	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
@@ -287,21 +300,57 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			drizzleparams['output'] = img_dir + '%s_img'%fk #set output name with filter
 			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
 
+	if not finalonly:
+		# clean up step to move all of the PSF files to the relevant directory
+		# should grab all .pngs, .fits etc.
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
 
-	# clean up step to move all of the PSF files to the relevant directory
-	# should grab all .pngs, .fits etc.
-	if not os.path.exists(savedir):
-		os.makedirs(savedir)
-	os.system('mv %s*_psf* %s'%(img_dir, savedir)) # generated PSF models
-	os.system('mv %s*.psf %s'%(img_dir, savedir))
-	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
+		os.system('mv %s*_psf* %s'%(img_dir, savedir)) # generated PSF models
+		os.system('mv %s*.psf %s'%(img_dir, savedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
-	## clean up other files generated in the process
-	os.system('mv %s*.cat %s'%(img_dir, savedir))
-	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, savedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+		os.system('mv *_sci1.fits %s'%(savedir))
 
-	if verbose:
-		print('Moved PSF files to %s'%savedir)
+
+		if verbose:
+			print('Moved PSF files to %s'%savedir)
+
+
+	if finalonly:
+		# clean up step to move all of the PSF files to the relevant directory
+		# should grab all .pngs, .fits etc.
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
+
+		os.system('mv %s*_drz* %s'%(img_dir, savedir)) #move files to preserve
+		os.system('mv %s*_drc* %s'%(img_dir, savedir))
+		os.system('mv %s*_mos* %s'%(img_dir, savedir))
+
+		if verbose:
+			print('Moved PSF files to %s'%savedir)
+
+		if not os.path.exists(removedir): #directory to remove excess files
+			os.makedirs(removedir)
+
+		os.system('mv %s*_psf* %s'%(img_dir, removedir)) # generated PSF models
+		os.system('mv %s*.psf %s'%(img_dir, removedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, removedir))
+
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, removedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
+		os.system('mv *_sci1.fits %s'%(removedir))
+
+		os.system('rm -r %s'%s(removedir))
+
+		if verbose:
+			print('Deleted intermediate products and removedir.')
+
+
 
 
 	if out == 'asdf':

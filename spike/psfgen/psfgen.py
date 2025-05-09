@@ -150,7 +150,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
-	modname = img.replace('.fits', coordstring+'_%s'%pos[3]+'_psf')
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
 		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 

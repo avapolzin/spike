@@ -8,6 +8,8 @@ Easily generated and resampled space-based PSFs.
     :target: https://arxiv.org/abs/2503.02288
 .. image:: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c/status.svg
     :target: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c
+.. image:: https://img.shields.io/badge/GitHub-avapolzin/spike-08872b
+    :target: https://github.com/avapolzin/spike
 
 To install ``spike``, either ``pip install spike-psf`` or install the development version from the distribution on `GitHub <https://github.com/avapolzin/spike>`_. More detailed instructions are available on `this page <https://spike-psf.readthedocs.io/en/latest/install.html>`_.
 
