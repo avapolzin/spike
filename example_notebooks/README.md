@@ -5,7 +5,7 @@ conda activate spike
 python -m ipykernel install --user --name spike --display-name "spike"
 ````
 
-If your `spike` environment does not include `jupyter`, you will need to install it before running the aobve command. Otherwise you will get a "No module named ipykernel" error.
+If your `spike` environment does not include `jupyter`, you will need to install it before running the above command. Otherwise you will get a "No module named ipykernel" error.
 
 The syntax will be similar with other environment managers. The kernel only needs to be generated _once_. Subsequent usage of notebooks will just require selecting the `spike` kernel.
 

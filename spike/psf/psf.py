@@ -254,11 +254,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
+				drizzleparams['output'] = img_dir + '%s_%s'%(do, dk) #set output based on coord, filter
 				pool.apply_async(astrodrizzle.AstroDrizzle, args = (drizzlelist[do][dk]), kwds = drizzleparams)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
+				drizzleparams['output'] = img_dir + '%s_%s'%(do, dk) #set output based on coord, filter
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
 	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
@@ -270,8 +272,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	for dr in drzs: #rename drizzled outputs to something more manageable
 		flist = dr.split('_')
 		suff_ = flist[-1].split('.')[0]
-		filt_ = flist[-3]
-		obj_ = flist[-4]
+		filt_ = flist[1]
+		obj_ = flist[0]
 
 		os.system('mv %s %s%s_%s_psf_%s.fits'%(dr, img_dir, obj_, filt_, suff_))
 
@@ -282,6 +284,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		drizzleparams['driz_cr_corr'] = True #reset parameters turned off for PSF
 		drizzleparams['static'] = True
 		for fk in filelist.keys():
+			drizzleparams['output'] = img_dir + '%s_img'%fk #set output name with filter
 			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
 
 
@@ -589,7 +592,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		for fk in filelist.keys():
 			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-					output_file = '%simg'%fk, output_dir = img_dir, save_results = True)
+					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
 
     #####################################################################
 	suff = "resamplestep"

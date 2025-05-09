@@ -46,7 +46,7 @@ Since both JWST and Roman CRDS servers may be defined, these variables are added
 Environments
 ------------
 
-As with any installation, it is recommended that you install ``spike`` to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed. 
+As with any specialized package, it is recommended that you install ``spike`` to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed. 
 
 To do this in conda, for example, simply run ``conda create -n spike``. Then, to access this new environment, you will use ``conda activate spike``. Once the environment is activated, you can follow your preferred installation method detailed above. 
 
@@ -64,7 +64,7 @@ If you have created a new environment for ``spike``, you will need to generate a
 	python -m ipykernel install --user --name spike --display-name "spike"
 
 
-If your ``spike`` environment does not include ``jupyter``, you will need to install it before running the aobve command. Otherwise you will get a "No module named ipykernel" error.
+If your ``spike`` environment does not include ``jupyter``, you will need to install it before running the above command. Otherwise you will get a "No module named ipykernel" error.
 
 The syntax will be similar with other environment managers. The kernel only needs to be generated *once*. Subsequent usage of notebooks will just require selecting the ``spike`` kernel.
 

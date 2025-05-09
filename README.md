@@ -92,6 +92,8 @@ An example file structure:
 
 test_outputs.py includes the information for the datasets used and can also serve as a guide for testing other data. Note that different user inputs may be required based on data used (as for PSF generation and drizzling). Each run generates quite a few files, so I recommend moving test_outputs.py into its own directory rather than running it in the cloned `spike` one.
 
+Similarly, one can test `spike` by running the code from the [example notebooks](https://github.com/avapolzin/spike/tree/master/example_notebooks).
+
 Data-independent utilities included in `spike` can be tested via the scripts included in the "tests" directory here. To run these tests follow the below steps from your locally installed `spike` directory.
 
 ```bash
