@@ -1,5 +1,7 @@
 sphinx
 sphinx-rtd-theme
+nbsphinx
+nbsphinx-link
 asdf
 astropy
 crds

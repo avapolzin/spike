@@ -60,8 +60,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
-				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
-				imgprefix_195.78-46.52_F555W_psf.fits
+				named [imgprefix]_[coords]_[band]_topsf.fits, e.g., imgprefix_23.31+30.12_F814W_topsf.fits or 
+				imgprefix_195.78-46.52_F555W_topsf.fits
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
 				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
@@ -321,8 +321,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 
 	if finalonly:
-		# clean up step to move all of the PSF files to the relevant directory
-		# should grab all .pngs, .fits etc.
+		# clean up step to move all of the resampled files to the relevant directory
 		if not os.path.exists(savedir):
 			os.makedirs(savedir)
 
@@ -331,7 +330,12 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		os.system('mv %s*_mos* %s'%(img_dir, savedir))
 
 		if verbose:
-			print('Moved PSF files to %s'%savedir)
+			print('Moved drizzled files to %s'%savedir)
+
+		if os.path.exists(removedir):
+			# raise warning if removedir exists; not an error, though since some people might create it for this purpose
+			warnings.warn('%s already exists. This directory and its contents will be deleted.'%(removedir),
+				Warning, stacklevel = 2)
 
 		if not os.path.exists(removedir): #directory to remove excess files
 			os.makedirs(removedir)
@@ -406,8 +410,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF', usermethod = None, 
 		savedir = 'psfs', drizzleimgs = False, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
-		returnpsf = 'full', cutout_fov = 151, savecutout = True,
-		tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
+		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
+		removedir = 'toremove', tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
 
@@ -441,6 +445,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			around the PSF (size of cutout set by cutout_fov).
 		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
+		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
+		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -646,23 +652,57 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
     #####################################################################
 	suff = "resamplestep"
 
-    # clean up step to move all of the PSF files to the relevant directory
-	# should grab all .pngs, .fits etc.
-	if not os.path.exists(savedir):
-		os.makedirs(savedir)
-	os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
-	os.system('mv %s*_psf %s'%(img_dir, savedir))
-	os.system('mv %s*.psf %s'%(img_dir, savedir))
-	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
+	if not finalonly:
+	    # clean up step to move all of the PSF files to the relevant directory
+		# should grab all .pngs, .fits etc.
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
+		os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
+		os.system('mv %s*_psf %s'%(img_dir, savedir))
+		os.system('mv %s*.psf %s'%(img_dir, savedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
-	## clean up other files generated in the process
-	os.system('mv %s*.cat %s'%(img_dir, savedir))
-	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
-	# retain tweaked version in working directory for re-runs etc.
-	# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, savedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+		# retain tweaked version in working directory for re-runs etc.
+		# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
 
-	if verbose:
-		print('Moved PSF files to %s'%savedir)
+		if verbose:
+			print('Moved PSF files to %s'%savedir)
+
+	if finalonly:
+		# clean up step to move all of the resampled files to the relevant directory
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
+
+		os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) #move files to preserve
+		os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generic name for flexibility
+
+		if verbose:
+			print('Moved resampled files to %s'%savedir)
+
+
+		if os.path.exists(removedir):
+			# raise warning if removedir exists; not an error, though since some people might create it for this purpose
+			warnings.warn('%s already exists. This directory and its contents will be deleted.'%(removedir),
+				Warning, stacklevel = 2)
+
+		if not os.path.exists(removedir): #directory to remove excess files
+			os.makedirs(removedir)
+
+		os.system('mv %s*_psf %s'%(img_dir, removedir))
+		os.system('mv %s*.psf %s'%(img_dir, removedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, removedir))
+
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, removedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
+
+		os.system('rm -r %s'%s(removedir))
+
+		if verbose:
+			print('Deleted intermediate products and removedir.')
 
 
 
@@ -710,8 +750,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, 
-		out = 'fits', returnpsf = 'full', cutout_fov = 151, savecutout = True,
-		tweakparams = {}, drizzleparams = {}, **kwargs):
+		out = 'fits', returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
+		removedir = 'toremove', tweakparams = {}, drizzleparams = {}, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -746,6 +786,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			around the PSF (size of cutout set by cutout_fov).
 		cutout_fov (int): Side length in pixels of square cutout region centered on PSF. Used if returnpsf = 'crop'.
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
+		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
+		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -928,20 +970,58 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
     #####################################################################
 	suff = "resamplestep"
 
-    # clean up step to move all of the PSF files to the relevant directory
-	# should grab all .pngs, .fits etc.
-	if not os.path.exists(savedir):
-		os.makedirs(savedir)
-	os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
-	os.system('mv %s*_psf %s'%(img_dir, savedir))
-	os.system('mv %s*.psf %s'%(img_dir, savedir))
-	os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
+    	if not finalonly:
+	    # clean up step to move all of the PSF files to the relevant directory
+		# should grab all .pngs, .fits etc.
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
+		os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generated PSF models
+		os.system('mv %s*_psf %s'%(img_dir, savedir))
+		os.system('mv %s*.psf %s'%(img_dir, savedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, savedir)) # tweaked and drizzled PSF models
 
-	## clean up other files generated in the process
-	os.system('mv %s*.cat %s'%(img_dir, savedir))
-	os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
-	# retain tweaked version in working directory for re-runs etc.
-	# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, savedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
+		# retain tweaked version in working directory for re-runs etc.
+		# os.system('mv %s*_tweakregstep.fits %s'%(img_dir, savedir))
+
+		if verbose:
+			print('Moved PSF files to %s'%savedir)
+
+	if finalonly:
+		# clean up step to move all of the resampled files to the relevant directory
+		if not os.path.exists(savedir):
+			os.makedirs(savedir)
+
+		os.system('mv %s*_resamplestep* %s'%(img_dir, savedir)) #move files to preserve
+		os.system('mv %s*_%s* %s'%(img_dir, suff, savedir)) # generic name for flexibility
+
+		if verbose:
+			print('Moved resampled files to %s'%savedir)
+
+
+		if os.path.exists(removedir):
+			# raise warning if removedir exists; not an error, though since some people might create it for this purpose
+			warnings.warn('%s already exists. This directory and its contents will be deleted.'%(removedir),
+				Warning, stacklevel = 2)
+
+		if not os.path.exists(removedir): #directory to remove excess files
+			os.makedirs(removedir)
+
+		os.system('mv %s*_psf %s'%(img_dir, removedir))
+		os.system('mv %s*.psf %s'%(img_dir, removedir))
+		os.system('mv %s*_topsf* %s'%(img_dir, removedir))
+
+		## clean up other files generated in the process
+		os.system('mv %s*.cat %s'%(img_dir, removedir))
+		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
+
+		os.system('rm -r %s'%s(removedir))
+
+		if verbose:
+			print('Deleted intermediate products and removedir.')
+
 
 	if out == 'asdf':
 		# .asdf file read out in addition to .fits

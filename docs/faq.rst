@@ -59,6 +59,10 @@ As it turns out, ``multiprocessing`` specifically requires that functions be *im
 
 There are several ways to make sure that your environment variables are accessible. The various options are discussed in this `StackOverflow thread <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_. I recommend following the example laid out in the ``spike`` `example_notebooks README <https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md>`_, which amends your kernel.json to consistently read your environment variables directly from your startup file.
 
+5. **Why am I getting some version of 'OSError: 8388608 requested and 0 written'?**
+
+This error pops up when your computer is out of storage. The imaging files that ``spike`` uses are already quite large, and the various PSF generation and drizzling steps create additional files that can take up quite a bit of space. There is little to do for this while `spike` is running, but you can toggle ``finalonly = True`` from ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` to only retain the drizzled/resampled PSFs after the last step. By default, though, ``spike`` saves all intermediate products.
+
 
 TinyTim
 -------
