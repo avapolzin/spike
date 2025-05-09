@@ -614,7 +614,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, writeto = True, 
 	fov_arcsec = 6, norm = 1., starselect = 'DAO', starselectargs = {'fwhm':10}, thresh = 125,
-	usermask = None, epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':10}):
+	usermask = None, maskval = None, epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':10}, ):
 	"""
 	Generate PSFs using the empirical photutils.epsf routine. 
 
@@ -644,6 +644,8 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 			which stars are used to build the model.
 		usermask (arr): If mask = True, used in addition to the DQ array to mask bad pixels. Must be
 			the same dimensions as the data array.
+		maskval (float): Value to assign to masked pixels. If None, default set by star seletion method. 
+			Otherwise, can be np.nan or number. Default for 'IRAF' is np.nan, default for 'DAO' is 0.
 		epsfargs (dict): Keyword arguments for the EPSFBuilder. Default in spike is to not oversample
 			the PSF, but the regridding is all handled during the creation of the coord-specific model.
 
@@ -692,29 +694,36 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 
 	dat = fits.open(img)[ext].data
 
-	if mask:
-		maskarr = fits.open(img)[('DQ', extv)].data
-		dat[maskarr > 0] = np.nan # only retain good pixels
-		maskarr[maskarr > 0] = True
-
-		if usermask:
-			dat[usermask] = np.nan
-			maskarr[usermask] = True
-
 	mean, median, std = sigma_clipped_stats(dat, sigma=3.0)
 
 	if starselect.upper() == 'DAO':
 		# take default FWHM to be 4x the detector plate scale, can overwrite with starselectargs
+
 		find = DAOStarFinder(threshold = thresh*std, **starselectargs)
+		if not maskval:
+			maskval = 0
 
 	if starselect.upper() == 'IRAF':
+		## from tests, nan masks work best with IRAF
+		# suggested thresh = 3 here, as function of masking
+
+		mean, median, std = sigma_clipped_stats(dat, sigma=3.0)
+
 		find = IRAFStarFinder(threshold = thresh*std,  **starselectargs)
+		if not maskval:
+			maskval = np.nan	
 
 	if verbose:
-			print('Identifying stars to use in ePSF')
-			
+		print('Identifying stars to use in ePSF')
+	
 	if mask:
-		sources = find(dat, mask = maskarr)
+		maskarr = fits.open(img)[('DQ', extv)].data
+		dat[maskarr > 0] = maskval # only retain good pixels
+		maskarr[maskarr > 0] = True
+		if usermask:
+			dat[usermask] = maskval
+			maskarr[usermask] = True
+		sources = find(dat, maskarr)
 
 	if not mask:
 		sources = find(dat)
@@ -727,7 +736,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 	tab = Table()
 	tab['x'] = xs[exmask]
 	tab['y'] = ys[exmask]
-	nddata = NDData(data = dat - median) 
+	nddata = NDData(data = dat - np.nanmedian(dat)) 
 	if verbose:
 		print('Beginning stellar extraction.')
 	stars = extract_stars(nddata, tab, size = exsize)
