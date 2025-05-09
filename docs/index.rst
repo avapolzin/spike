@@ -10,7 +10,6 @@ Easily generated and resampled space-based PSFs.
     :target: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c
 .. image:: https://img.shields.io/badge/GitHub-avapolzin/spike-74349c
     :target: https://github.com/avapolzin/spike
-    ..08872b as alternative color
 
 To install ``spike``, either ``pip install spike-psf`` or install the development version from the distribution on `GitHub <https://github.com/avapolzin/spike>`_. More detailed instructions are available on `this page <https://spike-psf.readthedocs.io/en/latest/install.html>`_.
 
@@ -27,7 +26,7 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 	faq.rst
 	citation.rst
 
-.. .. toctree::
+.. toctree::
 	:maxdepth: 1
 	:caption: Examples:
 
