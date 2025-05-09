@@ -33,13 +33,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					   'updatehdr':True,
 					   'wcsname': 'TWEAK'}, 
 		drizzleparams = {'preserve':False,
-	    				 'driz_cr_corr':False,
+						 'driz_cr_corr':False,
 						 'clean':False,
-					     'configobj':None,
-					     'final_pixfrac':0.8,
-					     'build':True,
-					     'combine_type':'imedian',
-					     'static':False},
+						 'configobj':None,
+						 'final_pixfrac':0.8,
+						 'build':True,
+						 'combine_type':'imedian',
+						 'static':False},
 		returnpsf = 'full',
 		cutout_fov = 151,
 		savecutout = True,
@@ -649,11 +649,11 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
 					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
 
-    #####################################################################
+	#####################################################################
 	suff = "resamplestep"
 
 	if not finalonly:
-	    # clean up step to move all of the PSF files to the relevant directory
+		# clean up step to move all of the PSF files to the relevant directory
 		# should grab all .pngs, .fits etc.
 		if not os.path.exists(savedir):
 			os.makedirs(savedir)
@@ -967,11 +967,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		for fk in filelist.keys():
 			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
 					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
-    #####################################################################
+	#####################################################################
 	suff = "resamplestep"
 
-    	if not finalonly:
-	    # clean up step to move all of the PSF files to the relevant directory
+	if not finalonly:
+		# clean up step to move all of the PSF files to the relevant directory
 		# should grab all .pngs, .fits etc.
 		if not os.path.exists(savedir):
 			os.makedirs(savedir)

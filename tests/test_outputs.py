@@ -27,7 +27,7 @@ psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc
 # ### test ePSF output ###
 psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
 	inst = 'ACS', camera = 'WFC', method='epsf', savedir = 'psfs_epsf', verbose = True,
-	pretweaked = True)
+	pretweaked = True, thresh = 200)
 
 # ### test PSFEx output ###
 psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
@@ -67,8 +67,8 @@ psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 't
 ################################# code to generate figures #####################################
 import matplotlib.pyplot as plt
 import numpy as np
-from albumpl.cmap import register_all
-register_all()
+import albumpl.cmap
+from astropy.io import fits
 
 
 fig, ax = plt.subplots(1, 5, figsize = (20, 4), gridspec_kw = {'wspace':0.1})

@@ -692,6 +692,13 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 
 	dat = fits.open(img)[ext].data
 
+	if mask:
+		maskarr = fits.open(img)[('DQ', extv)].data
+		dat[maskarr > 0] = 0 # only retain good pixels
+		maskarr[maskarr > 0] = True
+		if usermask:
+			dat[usermask] = 0
+
 	mean, median, std = sigma_clipped_stats(dat, sigma=3.0)
 
 	if starselect.upper() == 'DAO':
@@ -702,11 +709,6 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		find = IRAFStarFinder(threshold = thresh*std,  **starselectargs)
 
 	if mask:
-		maskarr = fits.open(img)[('DQ', extv)].data
-		dat[maskarr > 0] = 0 # only retain good pixels
-		maskarr[maskarr > 0] = True
-		if usermask:
-			dat[usermask] = 0
 		if verbose:
 			print('Identifying stars to use in ePSF')
 		sources = find(dat, mask = maskarr)
