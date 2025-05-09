@@ -15,7 +15,9 @@ release = '1.0.6'
 extensions = [
 	'sphinx_rtd_theme',
 	'sphinx.ext.autodoc',
-	'sphinx.ext.napoleon'
+	'sphinx.ext.napoleon',
+	'nbsphinx',
+	'nbsphinx_link'
 ]
 
 templates_path = ['_templates']
