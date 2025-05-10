@@ -56,7 +56,7 @@ psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 't
 ### test ePSF output ###
 psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
 	inst = 'NIRCam', method='epsf', savedir = 'psfs_jwst_epsf', verbose = True,
-	pretweaked = True, starselect = 'IRAF', thresh = 50)
+	pretweaked = True, starselect = 'IRAF', thresh = 3)
 
 ### test PSFEx output ###
 psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
@@ -94,7 +94,7 @@ ax[2].axis('off')
 
 epsf = fits.open('psfs_epsf/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 epsfim = epsf[1].data[325:465, 940:1080]
-ax[3].imshow(epsfim, vmin = np.percentile(epsfim, 20), vmax = np.percentile(epsfim, 95), origin = 'lower', cmap = 'LondonCalling_r')
+ax[3].imshow(epsfim, vmin = np.percentile(epsfim, 20), vmax = np.percentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
 ax[3].text(10, 125, s = 'ePSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[3].axis('off')
 
@@ -125,7 +125,7 @@ ax[1].axis('off')
 ## this one has to be generated with different values than the defaults -- ePSF is very sensitive to threshold value
 epsf = fits.open('psfs_jwst_epsf/100031+021026_F115W_resamplestep.fits')
 epsfim = epsf[1].data[1114-70: 1114+70, 553-70:553+70]
-ax[2].imshow(epsfim, vmin = np.nanpercentile(epsfim, 20), vmax = np.nanpercentile(epsfim, 95), origin = 'lower', cmap = 'LondonCalling_r')
+ax[2].imshow(epsfim, vmin = np.nanpercentile(epsfim, 20), vmax = np.nanpercentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
 ax[2].text(10, 125, s = 'ePSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[2].axis('off')
 
