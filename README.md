@@ -24,6 +24,8 @@ pip install spike-psf
 
 If you install from PyPI, you will also need to install `DrizzlePac` from the [GitHub distribution](https://github.com/spacetelescope/drizzlepac.git).
 
+To receive updates about the code, including notice of improvements and bug fixes, please fill out [this form](https://forms.gle/q7oCeD7gdVeVTPuTA) with your email.
+
 *Note that `spike.psfgen.tinypsf` and `spike.psfgen.tinygillispsf` require `TinyTim` for simulated PSFs. To use that module, please download [`TinyTim` version 7.5](https://github.com/spacetelescope/tinytim/releases) and follow the install instructions. Since that software is now unmaintained, refer to the [STScI site](https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling) for details and caveats.*
 
 *If you plan to use the `PSFEx` empirical PSF modeling, that will similarly need to be downloaded from the [GitHub repository](https://github.com/astromatic/psfex) and installed, as will [`SExtractor`](https://github.com/astromatic/sextractor).*
