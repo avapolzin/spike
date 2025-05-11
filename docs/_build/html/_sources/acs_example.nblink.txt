@@ -1,0 +1,3 @@
+{
+    "path": "../example_notebooks/acs_example.ipynb"
+}

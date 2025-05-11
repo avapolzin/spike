@@ -16,6 +16,7 @@
       <script src="_static/documentation_options.js?v=e2a723ec"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,6 +60,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="citation.html">Citation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acs_example.html">Drizzled PSFs from <em>HST</em>/ACS Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nircam_example.html">Resampled PSFs from <em>JWST</em>/NIRCam Imaging</a></li>
 </ul>
 
         </div>
@@ -134,6 +140,10 @@
 <li><p><strong>I’m working in Jupyter Lab/Notebook, and my environment variables are not loaded/not found, impacting $TINYTIM/$WEBBPSF_PATH/$CRDS_PATH. How do I access them from Jupyter?</strong></p></li>
 </ol>
 <p>There are several ways to make sure that your environment variables are accessible. The various options are discussed in this <a class="reference external" href="https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook">StackOverflow thread</a>. I recommend following the example laid out in the <code class="docutils literal notranslate"><span class="pre">spike</span></code> <a class="reference external" href="https://github.com/avapolzin/spike/blob/master/example_notebooks/README.md">example_notebooks README</a>, which amends your kernel.json to consistently read your environment variables directly from your startup file.</p>
+<ol class="arabic simple" start="5">
+<li><p><strong>Why am I getting some version of ‘OSError: 8388608 requested and 0 written’?</strong></p></li>
+</ol>
+<p>This error pops up when your computer is out of storage. The imaging files that <code class="docutils literal notranslate"><span class="pre">spike</span></code> uses are already quite large, and the various PSF generation and drizzling steps create additional files that can take up quite a bit of space. There is little to do for this while <cite>spike</cite> is running, but you can toggle <code class="docutils literal notranslate"><span class="pre">finalonly</span> <span class="pre">=</span> <span class="pre">True</span></code> from <code class="docutils literal notranslate"><span class="pre">spike.psf.hst</span></code>, <code class="docutils literal notranslate"><span class="pre">spike.psf.jwst</span></code>, and <code class="docutils literal notranslate"><span class="pre">spike.psf.roman</span></code> to only retain the drizzled/resampled PSFs after the last step. By default, though, <code class="docutils literal notranslate"><span class="pre">spike</span></code> saves all intermediate products.</p>
 </section>
 <section id="tinytim">
 <h2>TinyTim<a class="headerlink" href="#tinytim" title="Link to this heading"></a></h2>

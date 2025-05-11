@@ -17,6 +17,8 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 
 If you install ``spike`` via PyPI, you will need to separately install ``DrizzlePac`` from the distribution on `GitHub <https://github.com/spacetelescope/drizzlepac>`_, as PyPI does not handle direct dependencies.
 
+To receive updates about ``spike``, including notice of improvements and bug fixes, please fill out `this form <https://forms.gle/q7oCeD7gdVeVTPuTA>`_ with your email.
+
 Note that ``spike.psfgen.tinypsf`` and ``spike.psfgen.tinygillispsf`` require ``TinyTim`` for simulated PSFs. To use that module, please download `TinyTim version 7.5 <https://github.com/spacetelescope/tinytim/releases>`_ and follow the install instructions. Since that software is now unmaintained, refer to the `STScI site <https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling>`_ for details and caveats.
 
 If you plan to use the ``PSFEx`` empirical PSF modeling, that will similarly need to be downloaded from the `GitHub repository <https://github.com/astromatic/psfex>`_ and installed, as will `SExtractor <https://github.com/astromatic/sextractor>`_.
@@ -46,7 +48,7 @@ Since both JWST and Roman CRDS servers may be defined, these variables are added
 Environments
 ------------
 
-As with any installation, it is recommended that you install ``spike`` to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed. 
+As with any specialized package, it is recommended that you install ``spike`` to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed. 
 
 To do this in conda, for example, simply run ``conda create -n spike``. Then, to access this new environment, you will use ``conda activate spike``. Once the environment is activated, you can follow your preferred installation method detailed above. 
 
@@ -64,7 +66,7 @@ If you have created a new environment for ``spike``, you will need to generate a
 	python -m ipykernel install --user --name spike --display-name "spike"
 
 
-If your ``spike`` environment does not include ``jupyter``, you will need to install it before running the aobve command. Otherwise you will get a "No module named ipykernel" error.
+If your ``spike`` environment does not include ``jupyter``, you will need to install it before running the above command. Otherwise you will get a "No module named ipykernel" error.
 
 The syntax will be similar with other environment managers. The kernel only needs to be generated *once*. Subsequent usage of notebooks will just require selecting the ``spike`` kernel.
 

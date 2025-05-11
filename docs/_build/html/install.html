@@ -16,6 +16,7 @@
       <script src="_static/documentation_options.js?v=e2a723ec"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -57,6 +58,11 @@
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="citation.html">Citation</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acs_example.html">Drizzled PSFs from <em>HST</em>/ACS Imaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nircam_example.html">Resampled PSFs from <em>JWST</em>/NIRCam Imaging</a></li>
+</ul>
 
         </div>
       </div>
@@ -94,6 +100,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 <p>If you install <code class="docutils literal notranslate"><span class="pre">spike</span></code> via PyPI, you will need to separately install <code class="docutils literal notranslate"><span class="pre">DrizzlePac</span></code> from the distribution on <a class="reference external" href="https://github.com/spacetelescope/drizzlepac">GitHub</a>, as PyPI does not handle direct dependencies.</p>
+<p>To receive updates about <code class="docutils literal notranslate"><span class="pre">spike</span></code>, including notice of improvements and bug fixes, please fill out <a class="reference external" href="https://forms.gle/q7oCeD7gdVeVTPuTA">this form</a> with your email.</p>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">spike.psfgen.tinypsf</span></code> and <code class="docutils literal notranslate"><span class="pre">spike.psfgen.tinygillispsf</span></code> require <code class="docutils literal notranslate"><span class="pre">TinyTim</span></code> for simulated PSFs. To use that module, please download <a class="reference external" href="https://github.com/spacetelescope/tinytim/releases">TinyTim version 7.5</a> and follow the install instructions. Since that software is now unmaintained, refer to the <a class="reference external" href="https://www.stsci.edu/hst/instrumentation/focus-and-pointing/focus/tiny-tim-hst-psf-modeling">STScI site</a> for details and caveats.</p>
 <p>If you plan to use the <code class="docutils literal notranslate"><span class="pre">PSFEx</span></code> empirical PSF modeling, that will similarly need to be downloaded from the <a class="reference external" href="https://github.com/astromatic/psfex">GitHub repository</a> and installed, as will <a class="reference external" href="https://github.com/astromatic/sextractor">SExtractor</a>.</p>
 <p>If you are using <code class="docutils literal notranslate"><span class="pre">WebbPSF</span></code>, you will need to install the relevant data and include it in your path. Instructions to do this are available <a class="reference external" href="https://webbpsf.readthedocs.io/en/latest/installation.html#data-install">here</a>.</p>
@@ -115,7 +122,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </section>
 <section id="environments">
 <h2>Environments<a class="headerlink" href="#environments" title="Link to this heading"></a></h2>
-<p>As with any installation, it is recommended that you install <code class="docutils literal notranslate"><span class="pre">spike</span></code> to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed.</p>
+<p>As with any specialized package, it is recommended that you install <code class="docutils literal notranslate"><span class="pre">spike</span></code> to a new environment, which will help avoid any conflict between its dependencies and any other packages that are already installed.</p>
 <p>To do this in conda, for example, simply run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">spike</span></code>. Then, to access this new environment, you will use <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">spike</span></code>. Once the environment is activated, you can follow your preferred installation method detailed above.</p>
 <p>Note that you will need to activate the environment on accessing a new terminal window in order to run <code class="docutils literal notranslate"><span class="pre">spike</span></code> or other packages that exist only in that environment. To return to your root environment, run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">deactivate</span> <span class="pre">spike</span></code>.</p>
 </section>
@@ -126,7 +133,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--name<span class="w"> </span>spike<span class="w"> </span>--display-name<span class="w"> </span><span class="s2">&quot;spike&quot;</span>
 </pre></div>
 </div>
-<p>If your <code class="docutils literal notranslate"><span class="pre">spike</span></code> environment does not include <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, you will need to install it before running the aobve command. Otherwise you will get a “No module named ipykernel” error.</p>
+<p>If your <code class="docutils literal notranslate"><span class="pre">spike</span></code> environment does not include <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, you will need to install it before running the above command. Otherwise you will get a “No module named ipykernel” error.</p>
 <p>The syntax will be similar with other environment managers. The kernel only needs to be generated <em>once</em>. Subsequent usage of notebooks will just require selecting the <code class="docutils literal notranslate"><span class="pre">spike</span></code> kernel.</p>
 <p>One common issue with ipython kernels is that they do not inherit the environment variables from your global startup file. You can list all of your available kernels with <code class="docutils literal notranslate"><span class="pre">jupyter</span> <span class="pre">kernelspec</span> <span class="pre">list</span></code> run from the command line. Your kernel.json file can be accessed at the path listed for the <code class="docutils literal notranslate"><span class="pre">spike</span></code> kernel + ‘/share/jupyter/kernels/kernel.json’. To update your environment variables, simply add an “env” stanza to the .json file, specifying which variables to include:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
