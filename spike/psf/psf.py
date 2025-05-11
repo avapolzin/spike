@@ -474,7 +474,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
-		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_orig')
+		os.system('cp -r '+img_dir+'*_'+img_type+'.fits '+'img_dir'+'_orig')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -519,7 +519,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 
-		imgs = sorted(glob.glob(img_dir+'/*_tweakregstep.fits'))
+		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
@@ -813,7 +813,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	if keeporig and not pretweaked:
 		if not os.path.exists(img_dir+'_orig'):
 			os.makedirs(img_dir+'_orig')
-		os.system('cp -r '+img_dir+'/*_'+img_type+'.fits '+'img_dir'+'_orig')
+		os.system('cp -r '+img_dir+'*_'+img_type+'.fits '+'img_dir'+'_orig')
 		if verbose:
 			print('Made copy of '+img_dir)
 
@@ -856,7 +856,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
 					output_dir = img_dir, save_results = True)
 
-		imgs = sorted(glob.glob(img_dir+'/*_tweakregstep.fits'))
+		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object

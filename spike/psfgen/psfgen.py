@@ -506,7 +506,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	fov = 6, sample = 1., regrid = True, image_mask = None, pupil_mask = None,
+	fov_arcsec = 6, sample = 1., regrid = True, image_mask = None, pupil_mask = None,
 	**calckwargs):
 	"""
 	Generate JWST and Roman PSFs using WebbPSF.
@@ -582,7 +582,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	if verbose:
 		print('Producing PSF model')
-	psfmod = psf.calc_psf(fov_arcsec = fov, oversample = sample, **calckwargs)
+	psfmod = psf.calc_psf(fov_arcsec = fov_arcsec, oversample = sample, **calckwargs)
 
 	psfmodel = psfmod[3].data
 
