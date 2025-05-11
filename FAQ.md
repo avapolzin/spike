@@ -92,7 +92,7 @@ Within spike/configs, there are example configuration and parameter files for PS
 
 2. **Why am I getting an `ZeroDivisionError: float division by zero` error?**
 
-PSFEx relies on being able to detect stars in you images. In my experience, in fields (and/or filters) with few stars, it is possible that `PSFEx` will still run, but return PSF_FWHM = 0 and PSF_SAMP = 0 in the header of the resultant .psf file, as it did not actually have what to fit. You should first check those keys to ascertain whether this is the issue. If it is, I recommend either changing the fit parameters in the `SExtractor` and `PSFEx` configuration files or adopting a different PSF generation method.
+PSFEx relies on being able to detect stars in your images. In my experience, in fields (and/or filters) with few stars, it is possible that `PSFEx` will still run, but return PSF_FWHM = 0 and PSF_SAMP = 0 in the header of the resultant .psf file, as it did not actually have what to fit. You should first check those keys to ascertain whether this is the issue. If it is, I recommend either changing the fit parameters in the `SExtractor` and `PSFEx` configuration files or adopting a different PSF generation method.
 
 
 ### WebbPSF
