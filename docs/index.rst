@@ -31,6 +31,7 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 	:caption: Examples:
 
 	acs_example.nblink
+	wfc3_example.nblink
 	nircam_example.nblink
 .. 	psf_generation.nblink
 

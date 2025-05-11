@@ -542,23 +542,23 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		d2im2 = None
 
 
-	if (d2im1 == 'EXTVER: 1') & (d2im2 == 'EXTVER: 2'):
+	if (d2im1 in ['EXTVER: 1', 'EXTVER: 1.0']) & (d2im2 in ['EXTVER: 2', 'EXTVER: 2.0']):
 		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 1)].data, header = imgdat[('D2IMARR', 1)].header, 
 			name = 'D2IMARR', ver = 1))
 		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 2)].data, header = imgdat[('D2IMARR', 2)].header, 
 			name = 'D2IMARR', ver = 2))
-	if (d2im1 == 'EXTVER: 3') & (d2im2 == 'EXTVER: 4'):
+	if (d2im1 in ['EXTVER: 3', 'EXTVER: 3.0']) & (d2im2 in ['EXTVER: 4', 'EXTVER: 4.0']):
 		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 3)].data, header = imgdat[('D2IMARR', 3)].header, 
 			name = 'D2IMARR', ver = 3))
 		hdlist.append(fits.ImageHDU(data = imgdat[('D2IMARR', 4)].data, header = imgdat[('D2IMARR', 4)].header, 
 			name = 'D2IMARR', ver = 4))
 
-	if (dp1 == 'EXTVER: 1') & (dp2 == 'EXTVER: 2'):
+	if (dp1 in ['EXTVER: 1', 'EXTVER: 1.0']) & (dp2 in ['EXTVER: 2', 'EXTVER: 2.0']):
 		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 1)].data, header = imgdat[('WCSDVARR', 1)].header, 
 			name = 'WCSDVARR', ver = 1))
 		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 2)].data, header = imgdat[('WCSDVARR', 2)].header, 
 			name = 'WCSDVARR', ver = 2))
-	if (dp1 == 'EXTVER: 3') & (dp2 == 'EXTVER: 4'):
+	if (dp1 in ['EXTVER: 3', 'EXTVER: 3.0']) & (dp2 in ['EXTVER: 4', 'EXTVER: 4.0']):
 		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 3)].data, header = imgdat[('WCSDVARR', 3)].header, 
 			name = 'WCSDVARR', ver = 3))
 		hdlist.append(fits.ImageHDU(data = imgdat[('WCSDVARR', 4)].data, header = imgdat[('WCSDVARR', 4)].header, 

@@ -439,7 +439,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 				url = baseurl+imcamurl+'/SWC/%s/STDPSF_%s_%s.fits'%(pos[3], pos[2], pos[3])
 
 	det = None #set detector for photutils
-	if imcam in ['WFPC2', 'ACS/WFC']:
+	if imcam in ['WFPC2', 'ACS/WFC', 'WFC3/UVIS']:
 		det = pos[2]
 	if (imcam == 'NIRCAM') and (pos[2] not in ['NGCA5', 'NRCB5']):
 		det = stdpsf_jwdet[pos[2]]
