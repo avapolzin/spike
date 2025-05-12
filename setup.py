@@ -5,7 +5,7 @@ pypi_descrip = (spike_home / "README.md").read_text()
 
 setuptools.setup(
 	name = "spike-psf",
-	version = "1.0.6",
+	version = "1.0.7",
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle/resample HST, JWST, and Roman PSFs for improved analyses.",
@@ -26,7 +26,8 @@ setuptools.setup(
 	"drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git", 
 	"gwcs", 
 	"jsonschema", "matplotlib", "numpy", "photutils", "psutil", "pyyaml", "roman-datamodels", 
-	"scipy", "spherical-geometry", "stdatamodels==2.2.0", "tweakwcs", "webbpsf"],
+	"scipy", "spherical-geometry", "stdatamodels==2.2.0", "tweakwcs", 
+	"stpsf"],
 	package_data={'spike': ['configs/*/*']},
 	long_description=pypi_descrip,
     long_description_content_type='text/markdown'

@@ -12,7 +12,11 @@ from spike import tools
 import subprocess
 import urllib
 import warnings
-import webbpsf
+
+try: #for version control reasons
+	import stpsf as webbpsf
+except:
+	import webbpsf
 
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
 	return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
@@ -509,7 +513,8 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	fov_arcsec = 6, sample = 1., regrid = True, image_mask = None, pupil_mask = None,
 	**calckwargs):
 	"""
-	Generate JWST and Roman PSFs using WebbPSF.
+	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: the WebbPSF name is maintained 
+	here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
@@ -529,7 +534,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		image_mask (str): Image mask argument for WebbPSF.
 		pupil_mask (str): Pupil mask argument for WebbPSF.
 		**calckwargs: Additional arguments for calc_psf() -- see 
-			https://webbpsf.readthedocs.io/en/latest/api/webbpsf.JWInstrument.html#webbpsf.JWInstrument.calc_psf.
+			https://stpsf.readthedocs.io/en/latest/usage.html#.
 			Should be fed to spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
 
 	Returns:

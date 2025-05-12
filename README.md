@@ -30,7 +30,7 @@ To receive updates about the code, including notice of improvements and bug fixe
 
 *If you plan to use the `PSFEx` empirical PSF modeling, that will similarly need to be downloaded from the [GitHub repository](https://github.com/astromatic/psfex) and installed, as will [`SExtractor`](https://github.com/astromatic/sextractor).*
 
-*If you are using `WebbPSF`, you will need to install the relevant data and include it in your path. Instructions to do this are available [here](https://webbpsf.readthedocs.io/en/latest/installation.html#data-install).*
+*If you are using `STPSF` (formerly `WebbPSF`), you will need to install the relevant data and include it in your path. Instructions to do this are available [here](https://stpsf.readthedocs.io/en/latest/installation.html).*
 
 *The `jwst` and `romancal` pipelines -- which house the tweak/resample steps for JWST and Roman -- require the setup of CRDS_PATH and CRDS_SERVER_URL environment variables. The amended version of the code also relies on `crds`, so it is necessary to set these environment variables according to the instructions [here](https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html) if you plan to use `spike` with JWST or Roman data.*
 
@@ -43,7 +43,8 @@ alias tiny1="$TINYTIM/tiny1"
 alias tiny2="$TINYTIM/tiny2"
 alias tiny3="$TINYTIM/tiny3"
 
-export WEBBPSF_PATH="/path/to/webbpsf-data"
+# export WEBBPSF_PATH="/path/to/webbpsf-data"
+export STPSF_PATH="/path/to/STPSF-data"
 
 export CRDS_PATH="/path/to/crds_cache/"
 # export CRDS_SERVER_URL="https://jwst-crds.stsci.edu"
@@ -51,6 +52,8 @@ export CRDS_PATH="/path/to/crds_cache/"
 ```
 
 Since both JWST and Roman CRDS servers may be defined, these variables are added directly within `spike.psf.jwst` and `spike.psf.roman` and do not need to be added to your startup file. 
+
+Additionally, `spike` is written to be backwards compatible with `WebbPSF` installations.
 
 
 ## Getting Started

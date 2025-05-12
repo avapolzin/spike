@@ -425,7 +425,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		method (str): 'WebbPSF', 'STDPSF' (empirical), 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
-				imgprefix_195.78-46.52_F555W_psf.fits
+				imgprefix_195.78-46.52_F555W_psf.fits. Note: the WebbPSF name is maintained here in lieu of STPSF to avoid
+				confusion with the generation of empirical STDPSFs.
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
 				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
@@ -766,7 +767,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		method (str): 'WebbPSF', 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
-				imgprefix_195.78-46.52_F555W_psf.fits
+				imgprefix_195.78-46.52_F555W_psf.fits. Note: the WebbPSF name is maintained here in lieu of STPSF to avoid
+				confusion with the generation of empirical STDPSFs.
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
 				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 

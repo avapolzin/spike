@@ -37,7 +37,7 @@ Given a directory containing reduced and calibrated, but not yet co-added, .fits
 
 ![Comparison of drizzled PSFs generated for _HST_ images using the default parameters for different methods included in `spike`. All panels use the same ACS/WFC imaging of the COSMOS field in F475W. Note that the ePSF panel (second from right) shows some artifacts; the robustness of the effective PSF method is heavily dependent on the number of stars in the chosen field and may be changed by altering the star detection threshold. \label{fig:hstcomparison}](spike_psf_hstcompare.png)
 
-`spike` works with both model and empirical PSFs. The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gillis.etal.2020 modification [@Gillis.2019], `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], `photutils` effective PSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], `PSFEx` [@Bertin.2011; @Bertin.2013], and Space Telescope Science Institute's library of empirical STDPSFs [^3] [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are included for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for _HST_ and \autoref{fig:jwstcomparison} compares output drizzled PSFs for _JWST_. 
+`spike` works with both model and empirical PSFs. The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gillis.etal.2020 modification [@Gillis.2019], `STPSF`[@Perrin_STPSF] -- formerly `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], `photutils` effective PSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], `PSFEx` [@Bertin.2011; @Bertin.2013], and Space Telescope Science Institute's library of empirical STDPSFs [^3] [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are included for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for _HST_ and \autoref{fig:jwstcomparison} compares output drizzled PSFs for _JWST_. 
 
 [^3]: <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>; <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>
 
@@ -80,7 +80,7 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
  - `stpipe` [@stpipe]
  - `TinyTim` [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters [@Gillis.2019]
  - `tweakwcs` [@cara.etal]
- - `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
+ - `STPSF` [@Perrin_STPSF], formerly `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
 
 # Acknowledgments
 

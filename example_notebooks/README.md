@@ -29,11 +29,13 @@ One common issue with ipython kernels is that they do not inherit the environmen
  },
  "env": {
     "TINYTIM": "${TINYTIM}",
-    "WEBBPSF_PATH": "${WEBBPSF_PATH}",
+    "STPSF_PATH": "${STPSF_PATH}",
     "CRDS_PATH": "${CRDS_PATH}"
  }
 }
 ```
+
+If you are still using `WebbPSF` instead of `STPSF`, your key/value pair will be `"WEBBPSF_PATH": "${WEBBPSF_PATH}"` instead of `"STPSF_PATH": "${STPSF_PATH}"`.
 
 In my experience, this works for notebooks instantiated from the command line or an IDE, but does not consistently work with, e.g., the JupyterLab application. See also [this discussion](https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook) for other ways to set up environment variables with Jupyter kernels.
 

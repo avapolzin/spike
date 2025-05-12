@@ -23,7 +23,7 @@ Note that ``spike.psfgen.tinypsf`` and ``spike.psfgen.tinygillispsf`` require ``
 
 If you plan to use the ``PSFEx`` empirical PSF modeling, that will similarly need to be downloaded from the `GitHub repository <https://github.com/astromatic/psfex>`_ and installed, as will `SExtractor <https://github.com/astromatic/sextractor>`_.
 
-If you are using ``WebbPSF``, you will need to install the relevant data and include it in your path. Instructions to do this are available `here <https://webbpsf.readthedocs.io/en/latest/installation.html#data-install>`_.
+If you are using ``STPSF`` (formerly ``WebbPSF``), you will need to install the relevant data and include it in your path. Instructions to do this are available `here <https://stpsf.readthedocs.io/en/latest/installation.html>`_.
 
 The ``jwst`` and ``romancal`` pipelines -- which house the tweak/resample steps for JWST and Roman -- require the setup of the CRDS_PATH environment variable. The amended version of the code also relies on ``crds``, so it is necessary to set these environment variables according to the instructions `here <https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html>`_ if you plan to use ``spike`` with JWST or Roman data. 
 
@@ -36,13 +36,16 @@ If you install all of the optional dependencies described above, your shell's st
 	alias tiny2="$TINYTIM/tiny2"
 	alias tiny3="$TINYTIM/tiny3"
 
-	export WEBBPSF_PATH="/path/to/webbpsf-data"
+	# export WEBBPSF_PATH="/path/to/webbpsf-data"
+	export STPSF_PATH="/path/to/STPSF-data"
 
 	export CRDS_PATH="/path/to/crds_cache/"
 	# export CRDS_SERVER_URL="https://jwst-crds.stsci.edu"
 	# export CRDS_SERVER_URL="https://roman-crds.stsci.edu"
 
 Since both JWST and Roman CRDS servers may be defined, these variables are added directly within ``spike.psf.jwst`` and ``spike.psf.roman`` and do not need to be added to your startup file. Similarly, ``spike`` doe not require that the ``tiny1``, ``tiny2``, and ``tiny3`` aliases are set up, but most ``TinyTim`` users will want to add these to their startup file regardless.
+
+Additionally, ``spike`` is written to be backwards compatible with `WebbPSF` installations.
 
 
 Environments
@@ -89,11 +92,12 @@ One common issue with ipython kernels is that they do not inherit the environmen
 	 },
 	 "env": {
 	    "TINYTIM": "${TINYTIM}",
-	    "WEBBPSF_PATH": "${WEBBPSF_PATH}",
+	    "STPSF_PATH": "${STPSF_PATH}",
 	    "CRDS_PATH": "${CRDS_PATH}"
 	 }
 	}
 
+If you are still using ``WebbPSF`` instead of ``STPSF``, your key/value pair will be ``"WEBBPSF_PATH": "${WEBBPSF_PATH}"`` instead of ``"STPSF_PATH": "${STPSF_PATH}"``.
 
 In my experience, this works for notebooks instantiated from the command line or an IDE, but does not consistently work with, e.g., the JupyterLab application. See also `this discussion <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_ for other ways to set up environment variables with Jupyter kernels.
 

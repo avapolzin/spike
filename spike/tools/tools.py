@@ -666,7 +666,8 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 			Easiest is to feed in the output of spike.tools.objloc.
 		ext (int): Integer index of extension to crop.
 		fov_pixel (int): "Diameter" of square cutout region in pixels.
-		save (bool): If True, will save a FITS file containing cropped region.
+		save (bool): If True, will save a FITS file containing cropped region. Note that the 
+			output FITS file will not have any distortion corrections stored.
 
 	Returns: 
 		cutoutim (arr): Array containing cutout region of the image.
@@ -694,7 +695,7 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	ymax = y0 + fov_pixel//2
 
 	if fov_pixel % 2 == 0:
-		coords0 = utils.pixel_to_skycoords((x0, y0), wcs)
+		coords0 = utils.pixel_to_skycoord(x0, y0, wcs)
 		ra = coords0.ra.deg
 		dec = coords0.dec.deg
 		cutoutim = dat[ymin:ymax, xmin:xmax]
@@ -710,9 +711,29 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	hdr['NAXIS1'] = fov_pixel
 	hdr['NAXIS2'] = fov_pixel
 
+	# remove WCSDVARR and D2IMARR keys, since output isn't really on original
+	# image grid any longer
+	try:
+		del hdr['DP1']
+		del hdr['DP2']
+		del hdr['D2IM1']
+		del hdr['D2IM2']
+		del hdr['D2IMDIS1']
+		del hdr['D2IMDIS2']
+		del hdr['D2IMERR1']
+		del hdr['D2IMERR2']
+		del hdr['CPDIS1']
+		del hdr['CPDIS2']
+		del hdr['CPERR1']
+		del hdr['CPERR2']
+	except:
+		pass
+
 	cihdr = fits.ImageHDU(data = cutoutim, header = hdr, name = 'SCI')
 
 	hdlist = [cphdr, cihdr]
+
+
 	hdulist = fits.HDUList(hdlist)
 	if save:
 		hdulist.writeto(img.replace('.fits', '_crop.fits'))
