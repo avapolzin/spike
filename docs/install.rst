@@ -45,7 +45,7 @@ If you install all of the optional dependencies described above, your shell's st
 
 Since both JWST and Roman CRDS servers may be defined, these variables are added directly within ``spike.psf.jwst`` and ``spike.psf.roman`` and do not need to be added to your startup file. Similarly, ``spike`` doe not require that the ``tiny1``, ``tiny2``, and ``tiny3`` aliases are set up, but most ``TinyTim`` users will want to add these to their startup file regardless.
 
-Additionally, ``spike`` is written to be backwards compatible with `WebbPSF` installations.
+Additionally, ``spike`` is written to be backwards compatible with ``WebbPSF`` installations.
 
 
 Environments
