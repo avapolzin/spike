@@ -55,7 +55,7 @@ As with any specialized package, it is recommended that you install ``spike`` to
 
 To do this in conda, for example, simply run ``conda create -n spike``. Then, to access this new environment, you will use ``conda activate spike``. Once the environment is activated, you can follow your preferred installation method detailed above. 
 
-Note that you will need to activate the environment on accessing a new terminal window in order to run ``spike`` or other packages that exist only in that environment. To return to your root environment, run ``conda deactivate spike``.
+Note that you will need to activate the environment on accessing a new terminal window in order to run ``spike`` or other packages that exist only in that environment. To return to your root environment, run ``conda deactivate``.
 
 
 Working with Jupyter
