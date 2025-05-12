@@ -33,7 +33,7 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 	acs_example.nblink
 	wfc3_example.nblink
 	nircam_example.nblink
-.. 	psf_generation.nblink
+	psf_generation.nblink
 
 
 For detailed questions related to the HST, JWST, or Roman calibration pipelines, or any of the individual PSF models, please refer to the original documentation for each software as it will be more comprehensive than what is offered here.
