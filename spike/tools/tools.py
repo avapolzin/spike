@@ -667,7 +667,8 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 		ext (int): Integer index of extension to crop.
 		fov_pixel (int): "Diameter" of square cutout region in pixels.
 		save (bool): If True, will save a FITS file containing cropped region. Note that the 
-			output FITS file will not have any distortion corrections stored.
+			output FITS file will not have any distortion corrections stored as it is already 
+			decontextualized from the original image.
 
 	Returns: 
 		cutoutim (arr): Array containing cutout region of the image.
