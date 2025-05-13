@@ -513,8 +513,8 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	fov_arcsec = 6, sample = 1., regrid = True, image_mask = None, pupil_mask = None,
 	**calckwargs):
 	"""
-	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: the WebbPSF name is maintained 
-	here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
+	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: reference to the WebbPSF name is 
+	maintained here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
 
 	Parameters:
 		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
