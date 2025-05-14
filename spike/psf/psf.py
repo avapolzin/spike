@@ -349,7 +349,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
 		os.system('mv *_sci1.fits %s'%(removedir))
 
-		os.system('rm -r %s'%s(removedir))
+		os.system('rm -r %s'%(removedir))
 
 		if verbose:
 			print('Deleted intermediate products and removedir.')
@@ -700,7 +700,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		os.system('mv %s*.cat %s'%(img_dir, removedir))
 		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
 
-		os.system('rm -r %s'%s(removedir))
+		os.system('rm -r %s'%(removedir))
 
 		if verbose:
 			print('Deleted intermediate products and removedir.')
@@ -1019,7 +1019,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		os.system('mv %s*.cat %s'%(img_dir, removedir))
 		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
 
-		os.system('rm -r %s'%s(removedir))
+		os.system('rm -r %s'%(removedir))
 
 		if verbose:
 			print('Deleted intermediate products and removedir.')
