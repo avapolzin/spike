@@ -6,3 +6,9 @@ dist/*
 */__pycache__/*
 spike/*/__pycache__/*
 test_outputs/*
+a.txt
+b.txt
+c.txt
+d.txt
+e.txt
+f.txt
