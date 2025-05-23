@@ -30,5 +30,7 @@ setuptools.setup(
 	"stpsf"],
 	package_data={'spike': ['configs/*/*']},
 	long_description=pypi_descrip,
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
+    project_urls={'source':"https://github.com/avapolzin/spike", 
+    'documentation':"https://spike-psf.readthedocs.io"}
 )

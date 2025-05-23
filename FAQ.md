@@ -12,7 +12,7 @@ Probably not. If the data appear corrupted prior to any of the processing steps 
 
 2. **Roman hasn't launched yet; how do I access data to play with `spike.psf.roman`?**
 
-There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. [Troxel et al. (2023)](https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract) has some nice examples of single detector data and you can generate your own Roman imaging with [STIPS](https://github.com/spacetelescope/STScI-STIPS) [(STIPS Development Team 2024)](https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract). The pipeline is very similar to _JWST_'s, with the image from each of the detectors is stored in its own file, so `spike.psf.roman` is, at its core, a modified version of `spike.psf.jwst`.
+There are a lot of different groups dedicated to simulating data for the Roman Space Telescope. [Troxel et al. (2023)](https://ui.adsabs.harvard.edu/abs/2023MNRAS.522.2801T/abstract) has some nice examples of single detector data and you can generate your own Roman imaging with [STIPS](https://github.com/spacetelescope/STScI-STIPS) [(STIPS Development Team 2024)](https://ui.adsabs.harvard.edu/abs/2024arXiv241111978S/abstract). The pipeline is very similar to _JWST_'s, with the image from each of the detectors stored in its own file, so `spike.psf.roman` is, at its core, a modified version of `spike.psf.jwst`.
 
 3. **Tweakreg keeps failing, noting that I'm out of memory. How should I proceed?**
 
@@ -95,9 +95,9 @@ Within spike/configs, there are example configuration and parameter files for PS
 PSFEx relies on being able to detect stars in your images. In my experience, in fields (and/or filters) with few stars, it is possible that `PSFEx` will still run, but return PSF_FWHM = 0 and PSF_SAMP = 0 in the header of the resultant .psf file, as it did not actually have what to fit. You should first check those keys to ascertain whether this is the issue. If it is, I recommend either changing the fit parameters in the `SExtractor` and `PSFEx` configuration files or adopting a different PSF generation method.
 
 
-### WebbPSF
+### STPSF/WebbPSF
 
-*If you plan to use WebbPSF PSFs (for JWST and Roman), the relevant data must be downloaded and included in your path following the instructions [here](https://webbpsf.readthedocs.io/en/latest/installation.html#data-install).* 
+*If you plan to use STPSF -- formerly WebbPSF -- PSFs (for JWST and Roman), the relevant data must be downloaded and included in your path following the instructions [here](https://stpsf.readthedocs.io/en/latest/installation.html).* 
 
 
 

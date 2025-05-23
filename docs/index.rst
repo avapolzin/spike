@@ -2,8 +2,6 @@
 
 Easily generated and resampled space-based PSFs.
 ================================================
-.. image:: https://readthedocs.org/projects/spike-psf/badge/?version=latest
-    :target: https://spike-psf.readthedocs.io/en/latest/?badge=latest
 .. image:: https://img.shields.io/badge/arXiv-2503.02288-b31b1b
     :target: https://arxiv.org/abs/2503.02288
 .. image:: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c/status.svg

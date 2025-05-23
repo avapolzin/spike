@@ -20,7 +20,8 @@ from spike.tools import objloc
 
 def test_objloc(obj, expected):
 	from spike.tools import objloc
-	assert obj == expected
+	sep = obj.separation(expected)
+	assert sep.arcsec <= 0.05 # position within 1 pix
 
 
 def test_multiprocessing():
