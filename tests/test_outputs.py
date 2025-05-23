@@ -1,67 +1,67 @@
 from spike import psf
 
 
-# ############################################## HST #############################################
-# acs_path = '/path/to/acs/data'
-# ## files contained in directory:
-# # j8pu42ecq_flc.fits
-# # j8pu42egq_flc.fits
-# # j8pu42esq_flc.fits
-# # j8pu42evq_flc.fits
+############################################## HST #############################################
+acs_path = '/path/to/acs/data'
+## files contained in directory:
+# j8pu42ecq_flc.fits
+# j8pu42egq_flc.fits
+# j8pu42esq_flc.fits
+# j8pu42evq_flc.fits
 
-# ### test TinyTim output ###
-# psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
-# 	inst = 'ACS', camera = 'WFC', method='TinyTim', savedir = 'psfs_tiny', verbose = True,
-# 	pretweaked = False)
+### test TinyTim output ###
+psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
+	inst = 'ACS', camera = 'WFC', method='TinyTim', savedir = 'psfs_tiny', verbose = True,
+	pretweaked = False)
 
-# # ### test TinyTim (Gillis et al. mod) output ###
-# psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
-# 	inst = 'ACS', camera = 'WFC', method='TinyTim_Gillis', savedir = 'psfs_tinygillis', verbose = True,
-# 	pretweaked = True)
-
-# # ### test STDPSF output ###
-# psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
-# 	inst = 'ACS', camera = 'WFC', method='stdpsf', savedir = 'psfs_stdpsf', verbose = True,
-# 	pretweaked = True)
-
-# # ### test ePSF output ###
-# psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
-# 	inst = 'ACS', camera = 'WFC', method='epsf', savedir = 'psfs_epsf', verbose = True,
-# 	pretweaked = True, thresh = 200)
-
-# # ### test PSFEx output ###
-# psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
-# 	inst = 'ACS', camera = 'WFC', method='PSFEx', savedir = 'psfs_psfex', verbose = True,
-# 	pretweaked = True)
-
-
-
-# ############################################# JWST #############################################
-# nircam_path = '/path/to/nircam/data'
-# ## files contained in directory:
-# # jw02514162001_03201_00001_nrca2_cal.fits
-# # jw02514162001_03201_00002_nrca2_cal.fits
-# # jw02514162001_03201_00003_nrca2_cal.fits
-
-# ## test WebbPSF output ###
-# psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'cal',
-# 	inst = 'NIRCam', method='webbpsf', savedir = 'psfs_webbpsf', verbose = True,
-# 	pretweaked = False)
+# ### test TinyTim (Gillis et al. mod) output ###
+psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
+	inst = 'ACS', camera = 'WFC', method='TinyTim_Gillis', savedir = 'psfs_tinygillis', verbose = True,
+	pretweaked = True)
 
 # ### test STDPSF output ###
-# psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
-# 	inst = 'NIRCam', method='stdpsf', savedir = 'psfs_jwst_stdpsf', verbose = True,
-# 	pretweaked = True)
+psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
+	inst = 'ACS', camera = 'WFC', method='stdpsf', savedir = 'psfs_stdpsf', verbose = True,
+	pretweaked = True)
 
 # ### test ePSF output ###
-# psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
-# 	inst = 'NIRCam', method='epsf', savedir = 'psfs_jwst_epsf', verbose = True,
-# 	pretweaked = True, starselect = 'IRAF', thresh = 3)
+psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
+	inst = 'ACS', camera = 'WFC', method='epsf', savedir = 'psfs_epsf', verbose = True,
+	pretweaked = True, thresh = 200)
 
 # ### test PSFEx output ###
-# psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
-# 	inst = 'NIRCam', method='PSFEx', savedir = 'psfs_jwst_psfex', verbose = True,
-# 	pretweaked = True)
+psf.hst(img_dir = acs_path, obj = '10:00:33.0178 +02:09:52.304', img_type = 'flc', 
+	inst = 'ACS', camera = 'WFC', method='PSFEx', savedir = 'psfs_psfex', verbose = True,
+	pretweaked = True)
+
+
+
+############################################# JWST #############################################
+nircam_path = '/path/to/nircam/data'
+## files contained in directory:
+# jw02514162001_03201_00001_nrca2_cal.fits
+# jw02514162001_03201_00002_nrca2_cal.fits
+# jw02514162001_03201_00003_nrca2_cal.fits
+
+## test WebbPSF output ###
+psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'cal',
+	inst = 'NIRCam', method='webbpsf', savedir = 'psfs_webbpsf', verbose = True,
+	pretweaked = False)
+
+### test STDPSF output ###
+psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
+	inst = 'NIRCam', method='stdpsf', savedir = 'psfs_jwst_stdpsf', verbose = True,
+	pretweaked = True)
+
+### test ePSF output ###
+psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
+	inst = 'NIRCam', method='epsf', savedir = 'psfs_jwst_epsf', verbose = True,
+	pretweaked = True, starselect = 'IRAF', thresh = 3)
+
+### test PSFEx output ###
+psf.jwst(img_dir = nircam_path, obj = '10:00:31.432 +02:10:26.29', img_type = 'tweakregstep', 
+	inst = 'NIRCam', method='PSFEx', savedir = 'psfs_jwst_psfex', verbose = True,
+	pretweaked = True)
 
 
 ################################# code to generate figures #####################################
