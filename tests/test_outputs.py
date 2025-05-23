@@ -71,72 +71,116 @@ import albumpl.cmap
 from astropy.io import fits
 
 
-fig, ax = plt.subplots(1, 5, figsize = (20, 4), gridspec_kw = {'wspace':0.1})
+def tick_formatter(y, pos):
+	if y <= 0:
+		if y == 0:
+			return 0
+		if y < 0:
+			label = str(np.log10(abs(y))).split('.')
+			exp = float(label[0])
+			if exp < 1:
+				pref = 10**float('-0.'+label[1])
+			if exp >= 1:
+				pref = 10**float('0.'+label[1])
+			if pref >= 10:
+				pref /= 10
+				exp += 1
+			if pref < 1:
+				exp -= 1
+			return r'$-%d \times 10^{%d}$'%(pref, exp)
+	else:
+		label = str(np.log10(abs(y))).split('.')
+		exp = float(label[0])
+		if exp < 1:
+			pref = 10**float('-0.'+label[1])
+		if exp >= 1:
+			pref = 10**float('0.'+label[1])
+		if pref >= 10:
+			pref /= 10
+			exp += 1
+		if pref < 1:
+			pref *= 10
+			exp -= 1
+		return r'$%i \times 10^{%i}$'%(pref, exp)
+
+
+fig, ax = plt.subplots(1, 5, figsize = (20, 5), gridspec_kw = {'wspace':0.1})
 
 tt = fits.open('psfs_tiny/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 ttim = tt[1].data[325:465, 940:1080]
-ax[0].imshow(ttim, vmin = np.percentile(ttim, 20), vmax = np.percentile(ttim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+cbar0 = ax[0].imshow(ttim, vmin = np.percentile(ttim, 20), vmax = np.percentile(ttim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar0, ax = ax[0], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[0].text(10, 125, s = 'TinyTim', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[0].axis('off')
 
 ttg = fits.open('psfs_tinygillis/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 ttgim = ttg[1].data[325:465, 940:1080]
-ax[1].imshow(ttgim, vmin = np.percentile(ttgim, 20), vmax = np.percentile(ttgim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+cbar1 = ax[1].imshow(ttgim, vmin = np.percentile(ttgim, 20), vmax = np.percentile(ttgim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar1, ax = ax[1], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[1].text(10, 125, s = 'TinyTim (Gillis+20)', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[1].axis('off')
 
 std = fits.open('psfs_stdpsf/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 stdim = std[1].data[325:465, 940:1080]
 # ax[2].imshow(stdim, vmin = np.percentile(stdim[stdim != 0], 5), vmax = np.percentile(stdim[stdim != 0], 60), origin = 'lower', cmap = 'LondonCalling_r')
-ax[2].imshow(stdim, vmin = np.percentile(stdim, 20), vmax = np.percentile(stdim, 99), origin = 'lower', cmap = 'LondonCalling_r')
+cbar2 = ax[2].imshow(stdim, vmin = np.percentile(stdim, 20), vmax = np.percentile(stdim, 99), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar2, ax = ax[2], location = 'top', orientation = 'horizontal', pad = 0.05, 
+	format = tick_formatter, ticks = [0, 5e-8, 1e-7])
 ax[2].text(10, 125, s = 'STDPSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[2].axis('off')
 
 epsf = fits.open('psfs_epsf/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 epsfim = epsf[1].data[325:465, 940:1080]
-ax[3].imshow(epsfim, vmin = np.percentile(epsfim, 20), vmax = np.percentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+cbar3 = ax[3].imshow(epsfim, vmin = np.percentile(epsfim, 20), vmax = np.percentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar3, ax = ax[3], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[3].text(10, 125, s = 'ePSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[3].axis('off')
 
 
 psfex = fits.open('psfs_psfex/150d08m15.267s+2d09m52.304s_F475W_psf_drz.fits')
 psfexim_ = psfex[1].data[325:465, 940:1080]
-ax[4].imshow(psfexim_, vmin = np.percentile(psfexim_[psfexim_ >0], 20), vmax = np.percentile(psfexim_[psfexim_ >0], 95), origin = 'lower', cmap = 'LondonCalling_r')
+cbar4 = ax[4].imshow(psfexim_, vmin = np.percentile(psfexim_[psfexim_ >0], 20), vmax = np.percentile(psfexim_[psfexim_ >0], 90), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar4, ax = ax[4], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter,
+	ticks = [2e-7, 4e-7, 6e-7])
 ax[4].text(10, 125, s = 'PSFEx', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[4].axis('off')
 
 fig.savefig('spike_psf_hstcompare.png', bbox_inches = 'tight')
 
 
-fig, ax = plt.subplots(1, 4, figsize = (16, 4), gridspec_kw = {'wspace':0.1})
+fig, ax = plt.subplots(1, 4, figsize = (16, 5), gridspec_kw = {'wspace':0.1})
 
 jw = fits.open('psfs_webbpsf/100031+021026_F115W_resamplestep.fits')
 jwim = jw[1].data[1114-70: 1114+70, 553-70:553+70]
-ax[0].imshow(jwim, vmin = np.nanpercentile(jwim, 20), vmax = np.nanpercentile(jwim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+cbar0 = ax[0].imshow(jwim, vmin = np.nanpercentile(jwim, 20), vmax = np.nanpercentile(jwim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar0, ax = ax[0], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[0].text(10, 125, s = 'WebbPSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[0].axis('off')
 
 std = fits.open('psfs_jwst_stdpsf/100031+021026_F115W_resamplestep.fits')
 stdim = std[1].data[1114-70: 1114+70, 553-70:553+70]
-ax[1].imshow(stdim, vmin = np.nanpercentile(stdim, 20), vmax = np.nanpercentile(stdim, 99), origin = 'lower', cmap = 'LondonCalling_r')
+cbar1 = ax[1].imshow(stdim, vmin = np.nanpercentile(stdim, 20), vmax = np.nanpercentile(stdim, 99), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar1, ax = ax[1], location = 'top', orientation = 'horizontal', pad = 0.05, 
+	format = tick_formatter, ticks = [1e-5, 5e-5, 1e-4])
 ax[1].text(10, 125, s = 'STDPSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[1].axis('off')
 
 ## this one has to be generated with different values than the defaults -- ePSF is very sensitive to threshold value
 epsf = fits.open('psfs_jwst_epsf/100031+021026_F115W_resamplestep.fits')
 epsfim = epsf[1].data[1114-70: 1114+70, 553-70:553+70]
-ax[2].imshow(epsfim, vmin = np.nanpercentile(epsfim, 20), vmax = np.nanpercentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+cbar2 = ax[2].imshow(epsfim, vmin = np.nanpercentile(epsfim, 20), vmax = np.nanpercentile(epsfim, 97), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar2, ax = ax[2], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[2].text(10, 125, s = 'ePSF', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[2].axis('off')
 
 
 psfex = fits.open('psfs_jwst_psfex/100031+021026_F115W_resamplestep.fits')
 psfexim_ = psfex[1].data[1114-70: 1114+70, 553-70:553+70]
-ax[3].imshow(psfexim_, vmin = np.nanpercentile(psfexim_[psfexim_ >0], 20), vmax = np.nanpercentile(psfexim_[psfexim_ >0], 95), origin = 'lower', cmap = 'LondonCalling_r')
+cbar3 = ax[3].imshow(psfexim_, vmin = np.nanpercentile(psfexim_[psfexim_ >0], 20), vmax = np.nanpercentile(psfexim_[psfexim_ >0], 90), origin = 'lower', cmap = 'LondonCalling_r')
+plt.colorbar(cbar3, ax = ax[3], location = 'top', orientation = 'horizontal', pad = 0.05, format = tick_formatter)
 ax[3].text(10, 125, s = 'PSFEx', fontsize = 15, fontfamily = 'monospace', color = '#343530')
 ax[3].axis('off')
 
 
 fig.savefig('spike_psf_jwstcompare.png', bbox_inches = 'tight')
-
 
