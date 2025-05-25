@@ -48,7 +48,7 @@ In most cases, users will only ever interact with the top-level functions `spike
 
 # Preparation for Future Observatories
 
-When Roman is launched and data become available, `spike` will be updated to reflect the most current version of the pipeline and the detailed considerations of the real data. `spike.psf.roman` currently takes as input single detector images, which can be used with `spike.psfgen` -- the working directory need not be local; it just needs to have read/write access. Since Roman is not yet collecting data, `spike.psf.roman` is based on the structure of simulated single detector data from [e.g., @Troxel.etal.2023].
+When Roman is launched and data become available, `spike` will be updated to reflect the most current version of the pipeline and the detailed considerations of the real data. `spike.psf.roman` currently takes as input single detector images, which can be used with `spike.psfgen` -- the working directory need not be local; it just needs to have read/write access. Since Roman is not yet collecting data, `spike.psf.roman` is based on the structure of simulated single detector data from e.g., @Troxel.etal.2023.
 
 
 # Managing Restrictive Dependencies
