@@ -1,5 +1,7 @@
 You may notice that the example notebooks in this directory are all fairly similar -- this is a function of `spike` using common syntax across modules for both PSF drizzling and PSF generation, which makes the code very simple to use. 
 
+The data used in these examples is available for download from [MAST](https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html) (via search) or [here](https://uchicago.box.com/s/1a0ip1q4dsdoswpi86630m02275z95j1).
+
 If you have created a new environment for `spike`, you will need to generate a corresponding kernel to run .ipynb files with that environment. If you are using conda, this will look like the following:
 
 ```bash
