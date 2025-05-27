@@ -53,7 +53,7 @@ In lieu of passing coordinates to obj, you can also provide an object name (as l
 	psf.jwst(img_dir = nircam_path, obj = 'M79', img_type = 'cal', inst = 'NIRCam')
 
 
-The last code block shows minimal examples, which includes all of the required inputs (camera is only required for ACS and WFC3). ``spike`` handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.
+The last code block shows minimal examples, which include all of the required inputs (camera is only required for ACS and WFC3). ``spike`` handles filter and detector/chip identification automatically, and the default parameters are sufficient to produce PSFs in most cases. The top-level functions ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` also take a number of keyword arguments that allow for near-complete customization of the generated PSFs.
 
 Note that it will often be preferred to provide a savedir argument, as otherwise files with the same name may be overwritten in the default /psfs directory.
 
