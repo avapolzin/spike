@@ -101,7 +101,7 @@ If you are still using ``WebbPSF`` instead of ``STPSF``, your key/value pair wil
 
 In my experience, this works for notebooks instantiated from the command line or an IDE, but does not consistently work with, e.g., the JupyterLab application. See also `this discussion <https://stackoverflow.com/questions/37890898/how-to-set-env-variable-in-jupyter-notebook>`_ for other ways to set up environment variables with Jupyter kernels.
 
-One alternative that discussion raises, is to use ``os`` to set environment variables before importing ``spike`` as follows:
+One alternative that discussion raises is to use ``os`` to set environment variables before importing ``spike`` as follows:
 
 .. code-block:: python
 
