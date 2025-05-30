@@ -64,76 +64,6 @@ archivePrefix = {arXiv},
 }
 
 
-@ARTICLE{Rogowski.etal.2023,
-  author={Rogowski, Marcin and Aseeri, Samar and Keyes, David and Dalcin, Lisandro},
-  journal={IEEE Transactions on Parallel and Distributed Systems}, 
-  title={mpi4py.futures: MPI-Based Asynchronous Task Execution for Python}, 
-  year={2023},
-  volume={34},
-  number={2},
-  pages={611-622},
-  keywords={Python;Task analysis;Message systems;Libraries;Standards;Codes;Sockets;MPI;Python;parallelism;master-worker;parallel programming models;distributed computing;high performance computing;task execution;multiprocessing},
-  doi={10.1109/TPDS.2022.3225481}
-}
-
-@ARTICLE{Dalcin.Fang.2021,
-  author={Dalcin, Lisandro and Fang, Yao-Lung L.},
-  journal={Computing in Science & Engineering}, 
-  title={mpi4py: Status Update After 12 Years of Development}, 
-  year={2021},
-  volume={23},
-  number={4},
-  pages={47-54},
-  keywords={Python;Graphics processing units;High performance computing;Semantics;Programming;Task analysis},
-  doi={10.1109/MCSE.2021.3083216}
-}
-
-@article{Dalcin.etal.2011,
-title = {Parallel distributed computing using Python},
-journal = {Advances in Water Resources},
-volume = {34},
-number = {9},
-pages = {1124-1139},
-year = {2011},
-note = {New Computational Methods and Software Tools},
-issn = {0309-1708},
-doi = {https://doi.org/10.1016/j.advwatres.2011.04.013},
-url = {https://www.sciencedirect.com/science/article/pii/S0309170811000777},
-author = {Lisandro D. Dalcin and Rodrigo R. Paz and Pablo A. Kler and Alejandro Cosimo},
-keywords = {Python, MPI, PETSc},
-abstract = {This work presents two software components aimed to relieve the costs of accessing high-performance parallel computing resources within a Python programming environment: MPI for Python and PETSc for Python. MPI for Python is a general-purpose Python package that provides bindings for the Message Passing Interface (MPI) standard using any back-end MPI implementation. Its facilities allow parallel Python programs to easily exploit multiple processors using the message passing paradigm. PETSc for Python provides access to the Portable, Extensible Toolkit for Scientific Computation (PETSc) libraries. Its facilities allow sequential and parallel Python applications to exploit state of the art algorithms and data structures readily available in PETSc for the solution of large-scale problems in science and engineering. MPI for Python and PETSc for Python are fully integrated to PETSc-FEM, an MPI and PETSc based parallel, multiphysics, finite elements code developed at CIMEC laboratory. This software infrastructure supports research activities related to simulation of fluid flows with applications ranging from the design of microfluidic devices for biochemical analysis to modeling of large-scale stream/aquifer interactions.}
-}
-
-@article{Dalcin.etal.2008,
-title = {MPI for Python: Performance improvements and MPI-2 extensions},
-journal = {Journal of Parallel and Distributed Computing},
-volume = {68},
-number = {5},
-pages = {655-662},
-year = {2008},
-issn = {0743-7315},
-doi = {https://doi.org/10.1016/j.jpdc.2007.09.005},
-url = {https://www.sciencedirect.com/science/article/pii/S0743731507001712},
-author = {Lisandro Dalcín and Rodrigo Paz and Mario Storti and Jorge D’Elía},
-keywords = {Message passing, MPI, High-level languages, Parallel Python},
-abstract = {MPI for Python provides bindings of the message passing interface (MPI) standard for the Python programming language and allows any Python program to exploit multiple processors. In its first release, MPI for Python was constructed on top of the MPI-1 specification defining an object-oriented interface that closely followed the MPI-2 C++ bindings, and provided support for communications of general Python objects. In the latest release, this package is improved to enable direct blocking/non-blocking communication of numeric arrays, and to support almost all MPI-2 features. Improvements in communication performance have been tested in a Beowulf class cluster. Results showed a negligible overhead in comparison to compiled C code. MPI for Python is open source and available for download on the web (http://mpi4py.scipy.org/).}
-}
-
-@article{Dalcin.etal.2005,
-title = {MPI for Python},
-journal = {Journal of Parallel and Distributed Computing},
-volume = {65},
-number = {9},
-pages = {1108-1115},
-year = {2005},
-issn = {0743-7315},
-doi = {https://doi.org/10.1016/j.jpdc.2005.03.010},
-url = {https://www.sciencedirect.com/science/article/pii/S0743731505000560},
-author = {Lisandro Dalcín and Rodrigo Paz and Mario Storti},
-keywords = {Message passing, MPI, High level languages, Parallel Python},
-abstract = {MPI for Python provides bindings of the Message Passing Interface (MPI) standard for the Python programming language and allows any Python program to exploit multiple processors. This package is constructed on top of the MPI-1 specification and defines an object-oriented interface which closely follows MPI-2 C++bindings. It supports point-to-point (sends, receives) and collective (broadcasts, scatters, gathers) communications of general Python objects. Efficiency has been tested in a Beowulf class cluster and satisfying results were obtained. MPI for Python is open source and available for download on the web (http://www.cimec.org.ar/python).}
-}
-
 @INPROCEEDINGS{Perrin.etal.2012,
        author = {{Perrin}, Marshall D. and {Soummer}, R{\'e}mi and {Elliott}, Erin M. and {Lallo}, Matthew D. and {Sivaramakrishnan}, Anand},
         title = "{Simulating point spread functions for the James Webb Space Telescope with WebbPSF}",
@@ -393,20 +323,6 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@inproceedings{Pontoppidan.etal.2016,
-author = {Klaus M. Pontoppidan and Timothy E. Pickering and Victoria G. Laidler and Karoline Gilbert and Christopher D. Sontag and Christine Slocum and Mark J. Sienkiewicz Jr. and Christopher Hanley and Nicholas M. Earl and Laurent Pueyo and Swara Ravindranath and Diane M. Karakla and Massimo Robberto and Alberto Noriega-Crespo and Elizabeth A. Barker},
-title = {{Pandeia: a multi-mission exposure time calculator for JWST and WFIRST}},
-volume = {9910},
-booktitle = {Observatory Operations: Strategies, Processes, and Systems VI},
-editor = {Alison B. Peck and Robert L. Seaman and Chris R. Benn},
-organization = {International Society for Optics and Photonics},
-publisher = {SPIE},
-pages = {991016},
-keywords = {Exposure time calculator, JWST, WFIRST, ETC},
-year = {2016},
-doi = {10.1117/12.2231768},
-URL = {https://doi.org/10.1117/12.2231768}
-}
 
 @ARTICLE{Troxel.etal.2023,
        author = {{Troxel}, M.~A. and {Lin}, C. and {Park}, A. and {Hirata}, C. and {Mandelbaum}, R. and {Jarvis}, M. and {Choi}, A. and {Givans}, J. and {Higgins}, M. and {Sanchez}, B. and {Yamamoto}, M. and {Awan}, H. and {Chiang}, J. and {Dor{\'e}}, O. and {Walter}, C.~W. and {Zhang}, T. and {Cohen-Tanugi}, J. and {Gawiser}, E. and {Hearin}, A. and {Heitmann}, K. and {Ishak}, M. and {Kovacs}, E. and {Mao}, Y. -Y. and {Wood-Vasey}, M. and {Becker}, Matt and {Meyers}, Josh and {Melchior}, Peter and {LSST Dark Energy Science Collaboration}},
@@ -769,24 +685,6 @@ year = {2024}
   url          = {https://doi.org/10.5281/zenodo.5539941}
 }
 
-@ARTICLE{Euclid.I,
-       author = {{Euclid Collaboration} and {Mellier}, Y. and {Abdurro'uf} and {Acevedo Barroso}, J.~A. and {Ach{\'u}carro}, A. and {Adamek}, J. and {Adam}, R. and {Addison}, G.~E. and {Aghanim}, N. and {Aguena}, M. and {Ajani}, V. and {Akrami}, Y. and {Al-Bahlawan}, A. and {Alavi}, A. and {Albuquerque}, I.~S. and {Alestas}, G. and {Alguero}, G. and {Allaoui}, A. and {Allen}, S.~W. and {Allevato}, V. and {Alonso-Tetilla}, A.~V. and {Altieri}, B. and {Alvarez-Candal}, A. and {Alvi}, S. and {Amara}, A. and {Amendola}, L. and {Amiaux}, J. and {Andika}, I.~T. and {Andreon}, S. and {Andrews}, A. and {Angora}, G. and {Angulo}, R.~E. and {Annibali}, F. and {Anselmi}, A. and {Anselmi}, S. and {Arcari}, S. and {Archidiacono}, M. and {Aric{\`o}}, G. and {Arnaud}, M. and {Arnouts}, S. and {Asgari}, M. and {Asorey}, J. and {Atayde}, L. and {Atek}, H. and {Atrio-Barandela}, F. and {Aubert}, M. and {Aubourg}, E. and {Auphan}, T. and {Auricchio}, N. and {Aussel}, B. and {Aussel}, H. and {Avelino}, P.~P. and {Avgoustidis}, A. and {Avila}, S. and {Awan}, S. and {Azzollini}, R. and {Baccigalupi}, C. and {Bachelet}, E. and {Bacon}, D. and {Baes}, M. and {Bagley}, M.~B. and {Bahr-Kalus}, B. and {Balaguera-Antolinez}, A. and {Balbinot}, E. and {Balcells}, M. and {Baldi}, M. and {Baldry}, I. and {Balestra}, A. and {Ballardini}, M. and {Ballester}, O. and {Balogh}, M. and {Ba{\~n}ados}, E. and {Barbier}, R. and {Bardelli}, S. and {Baron}, M. and {Barreiro}, T. and {Barrena}, R. and {Barriere}, J. -C. and {Barros}, B.~J. and {Barthelemy}, A. and {Bartolo}, N. and {Basset}, A. and {Battaglia}, P. and {Battisti}, A.~J. and {Baugh}, C.~M. and {Baumont}, L. and {Bazzanini}, L. and {Beaulieu}, J. -P. and {Beckmann}, V. and {Belikov}, A.~N. and {Bel}, J. and {Bellagamba}, F. and {Bella}, M. and {Bellini}, E. and {Benabed}, K. and {Bender}, R. and {Benevento}, G. and {Bennett}, C.~L. and {Benson}, K. and {Bergamini}, P. and {Bermejo-Climent}, J.~R. and {Bernardeau}, F. and {Bertacca}, D. and {Berthe}, M. and {Berthier}, J. and {Bethermin}, M. and {Beutler}, F. and {Bevillon}, C. and {Bhargava}, S. and {Bhatawdekar}, R. and {Bianchi}, D. and {Bisigello}, L. and {Biviano}, A. and {Blake}, R.~P. and {Blanchard}, A. and {Blazek}, J. and {Blot}, L. and {Bosco}, A. and {Bodendorf}, C. and {Boenke}, T. and {B{\"o}hringer}, H. and {Boldrini}, P. and {Bolzonella}, M. and {Bonchi}, A. and {Bonici}, M. and {Bonino}, D. and {Bonino}, L. and {Bonvin}, C. and {Bon}, W. and {Booth}, J.~T. and {Borgani}, S. and {Borlaff}, A.~S. and {Borsato}, E. and {Bose}, B. and {Botticella}, M.~T. and {Boucaud}, A. and {Bouche}, F. and {Boucher}, J.~S. and {Boutigny}, D. and {Bouvard}, T. and {Bouwens}, R. and {Bouy}, H. and {Bowler}, R.~A.~A. and {Bozza}, V. and {Bozzo}, E. and {Branchini}, E. and {Brando}, G. and {Brau-Nogue}, S. and {Brekke}, P. and {Bremer}, M.~N. and {Brescia}, M. and {Breton}, M. -A. and {Brinchmann}, J. and {Brinckmann}, T. and {Brockley-Blatt}, C. and {Brodwin}, M. and {Brouard}, L. and {Brown}, M.~L. and {Bruton}, S. and {Bucko}, J. and {Buddelmeijer}, H. and {Buenadicha}, G. and {Buitrago}, F. and {Burger}, P. and {Burigana}, C. and {Busillo}, V. and {Busonero}, D. and {Cabanac}, R. and {Cabayol-Garcia}, L. and {Cagliari}, M.~S. and {Caillat}, A. and {Caillat}, L. and {Calabrese}, M. and {Calabro}, A. and {Calderone}, G. and {Calura}, F. and {Camacho Quevedo}, B. and {Camera}, S. and {Campos}, L. and {Ca{\~n}as-Herrera}, G. and {Candini}, G.~P. and {Cantiello}, M. and {Capobianco}, V. and {Cappellaro}, E. and {Cappelluti}, N. and {Cappi}, A. and {Caputi}, K.~I. and {Cara}, C. and {Carbone}, C. and {Cardone}, V.~F. and {Carella}, E. and {Carlberg}, R.~G. and {Carle}, M. and {Carminati}, L. and {Caro}, F. and {Carrasco}, J.~M. and {Carretero}, J. and {Carrilho}, P. and {Carron Duque}, J. and {Carry}, B.},
-        title = "{Euclid: I. Overview of the Euclid mission}",
-      journal = {Astronomy and Astrophysics},
-     keywords = {instrumentation: detectors, instrumentation: spectrographs, space vehicles: instruments, telescopes, surveys, cosmology: observations, Cosmology and Nongalactic Astrophysics, Astrophysics of Galaxies, Instrumentation and Methods for Astrophysics},
-         year = 2025,
-        month = may,
-       volume = {697},
-          eid = {A1},
-        pages = {A1},
-          doi = {10.1051/0004-6361/202450810},
-archivePrefix = {arXiv},
-       eprint = {2405.13491},
- primaryClass = {astro-ph.CO},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2025A&A...697A...1E},
-      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
-
 
 
 @ARTICLE{2020SciPy-NMeth,
@@ -884,4 +782,19 @@ license = {BSD-3-Clause},
 title = {{STPSF}},
 url = {https://github.com/spacetelescope/stpsf},
 version = {2.0.0}
+}
+
+@article{Liaudat_2023,
+doi = {10.1088/1361-6420/acb664},
+url = {https://dx.doi.org/10.1088/1361-6420/acb664},
+year = {2023},
+month = {feb},
+publisher = {IOP Publishing},
+volume = {39},
+number = {3},
+pages = {035008},
+author = {Liaudat, Tobias and Starck, Jean-Luc and Kilbinger, Martin and Frugier, Pierre-Antoine},
+title = {Rethinking data-driven point spread function modeling with a differentiable optical model},
+journal = {Inverse Problems},
+abstract = {In astronomy, upcoming space telescopes with wide-field optical instruments have a spatially varying point spread function (PSF). Specific scientific goals require a high-fidelity estimation of the PSF at target positions where no direct measurement of the PSF is provided. Even though observations of the PSF are available at some positions of the field of view (FOV), they are undersampled, noisy, and integrated into wavelength in the instrument’s passband. PSF modeling represents a challenging ill-posed problem, as it requires building a model from these observations that can infer a super-resolved PSF at any wavelength and position in the FOV. Current data-driven PSF models can tackle spatial variations and super-resolution. However, they are not capable of capturing PSF chromatic variations. Our model, coined WaveDiff, proposes a paradigm shift in the data-driven modeling of the point spread function field of telescopes. We change the data-driven modeling space from the pixels to the wavefront by adding a differentiable optical forward model into the modeling framework. This change allows the transfer of a great deal of complexity from the instrumental response into the forward model. The proposed model relies on efficient automatic differentiation technology and modern stochastic first-order optimization techniques recently developed by the thriving machine-learning community. Our framework paves the way to building powerful, physically motivated models that do not require special calibration data. This paper demonstrates the WaveDiff model in a simplified setting of a space telescope. The proposed framework represents a performance breakthrough with respect to the existing state-of-the-art data-driven approach. The pixel reconstruction errors decrease six-fold at observation resolution and 44-fold for a 3x super-resolution. The ellipticity errors are reduced at least 20 times, and the size error is reduced more than 250 times. By only using noisy broad-band in-focus observations, we successfully capture the PSF chromatic variations due to diffraction. WaveDiff source code and examples associated with this paper are available at this link .}
 }
