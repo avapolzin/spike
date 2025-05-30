@@ -108,8 +108,8 @@ One alternative that discussion raises, is to use ``os`` to set environment vari
 	import os
 
 	os['TINYTIM'] = '/path/to/tinytim'
-	os['STPSF_PATH'] = 'path/to/stpsf'
-	os['CRDS_PATH'] = 'path/to/crds/cache'
+	os['STPSF_PATH'] = '/path/to/stpsf'
+	os['CRDS_PATH'] = '/path/to/crds/cache'
 
 	import spike
 
