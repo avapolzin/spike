@@ -15,8 +15,10 @@ import warnings
 
 try: #for version control reasons
 	import stpsf as webbpsf
+	is_stpsf = True
 except:
 	import webbpsf
+	is_stpsf = False # for version control
 
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
 	return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
@@ -510,8 +512,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	fov_arcsec = 6, sample = 1., regrid = True, image_mask = None, pupil_mask = None,
-	**calckwargs):
+	fov_arcsec = 6, sample = 4., savebool = True, regrid = True, image_mask = None, 
+	pupil_mask = None, **calckwargs):
 	"""
 	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: reference to the WebbPSF name is 
 	maintained here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
@@ -530,6 +532,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 			This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).
 		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		sample (float): Factor by which to oversample the PSF.
+		savefull (bool): If True, save the full multi-extension WebbPSF/STPSF output.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 		image_mask (str): Image mask argument for WebbPSF.
 		pupil_mask (str): Pupil mask argument for WebbPSF.
@@ -551,51 +554,24 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
-	if imcam.upper() == 'NIRCAM':
-		psf = webbpsf.NIRCam()
-
-	if imcam.upper() == 'MIRI':
-		psf = webbpsf.MIRI()
-
-	if imcam.upper() == 'NIRISS':
-		psf = webbpsf.NIRISS()
-
-	if imcam.upper() == 'WFI':
-		psf = webbpsf.roman.WFI()
-
-	if imcam.upper() == 'CGI':
-		psf = webbpsf.roman.RomanCoronagraph()
-		warnings.warn("WebbPSF Roman CGI development halted in 2017. Use with caution.", Warning, stacklevel = 2) 
-
-	if imcam.upper() in ['NIRCAM', 'WFI']:
-		psf.detector = chip
-
-
-	psf.filter = filt
-	psf.detector_position = (x, y)
-
-	if image_mask:
-		psf.image_mask = image_mask
-
-	if pupil_mask:
-		psf.pupil_mask = pupil_mask
-
-	#read aperture name from FITS header
-	imfits = fits.open(img)
-	aperturename = imfits[0].header['APERNAME']
-	psf.aperturename = aperturename
+	psf = webbpsf.setup_sim_to_match_file(img)
 
 	if verbose:
 		print('Producing PSF model')
 	psfmod = psf.calc_psf(fov_arcsec = fov_arcsec, oversample = sample, **calckwargs)
 
-	psfmodel = psfmod[3].data
+	psfmodel = psfmod['DET_DIST'].data
 
-	if regrid:
-		if sample != 1.:
-			if verbose:
-				print('Regridding PSF to instrument resolution')
-			psfmodel = tools.regridarr(psfmodel, sample)
+	if savefull:
+		if is_stpsf:
+			code_name = 'STPSF'
+		if not is_stpsf:
+			code_name = 'WebbPSF'
+
+		if verbose:
+			print('Saving full %s output'%code_name)
+		
+		psfmod.writeto(modname.replace('_psf', '_%s'%code_name)+'.fits')
 
 
 	if plot:
