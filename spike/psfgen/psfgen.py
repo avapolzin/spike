@@ -512,7 +512,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	fov_arcsec = 6, sample = 4., savebool = True, regrid = True, image_mask = None, 
+	fov_arcsec = 6, sample = 4, savebool = True, regrid = True, image_mask = None, 
 	pupil_mask = None, **calckwargs):
 	"""
 	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: reference to the WebbPSF name is 
