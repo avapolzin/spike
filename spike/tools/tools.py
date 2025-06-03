@@ -714,6 +714,32 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	ymin = y0 - fov_pixel//2
 	ymax = y0 + fov_pixel//2
 
+	xcen = fov_pixel//2
+	ycen = fov_pixel//2
+	xlen = fov_pixel
+	ylen = fov_pixel
+
+	## to deal with PSFs near edge of frame
+	if xmin < 0:
+		xcen += xmin
+		xlen += xmin
+		xmin = 0
+
+	if ymin < 0:
+		ycen += ymin
+		ylen += ymin
+		ymin = 0
+
+	if xmax > dat.shape[0]:
+		over = xmax - dat.shape[0]
+		xlen -= over
+		xmax = dat.shape[0]
+
+	if ymax > dat.shape[1]:
+		over = ymax - dat.shape[1]
+		ylen -= over
+		ymax = dat.shape[1]
+
 	if fov_pixel % 2 == 0:
 		coords0 = utils.pixel_to_skycoord(x0, y0, wcs)
 		ra = coords0.ra.deg
@@ -726,10 +752,10 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 
 	hdr['CRVAL1'] = ra
 	hdr['CRVAL2'] = dec
-	hdr['CRPIX1'] = fov_pixel//2
-	hdr['CRPIX2'] = fov_pixel//2
-	hdr['NAXIS1'] = fov_pixel
-	hdr['NAXIS2'] = fov_pixel
+	hdr['CRPIX1'] = xcen//2
+	hdr['CRPIX2'] = ycen//2
+	hdr['NAXIS1'] = xlen
+	hdr['NAXIS2'] = ylen
 
 	# remove WCSDVARR and D2IMARR keys, since output isn't really on original
 	# image grid any longer
