@@ -555,6 +555,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 	psf = webbpsf.setup_sim_to_match_file(img)
+	psf.detector_position = (x, y) #set detector_position
 
 	if verbose:
 		print('Producing PSF model')

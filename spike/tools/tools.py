@@ -487,6 +487,25 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	ymin = int(pos[1]) - psfarr.shape[1]//2
 	ymax = int(pos[1]) + psfarr.shape[1]//2
 
+	## to deal with PSFs near edge of frame
+	if xmin < 0:
+		psfarr = psfarr[:, abs(int(xmin)):]
+		xmin = 0
+
+	if ymin < 0:
+		psfarr = psfarr[abs(int(ymin)):, :]
+		ymin = 0
+
+	if xmax > psfim.shape[0]:
+		over = xmax - psfim.shape[0]
+		psfarr = psfarr[:, :abs(int(over))]
+		xmax = psfim.shape[0]
+
+	if ymax > psfim.shape[1]:
+		over = ymax - psfim.shape[1]
+		psfarr = psfarr[:abs(int(over)), :]
+		ymax = psfim.shape[1]
+
 	if psfarr.shape[0] % 2 == 0:
 		psfim[ymin:ymax, xmin:xmax] += psfarr
 	if psfarr.shape[0] % 2 != 0:
