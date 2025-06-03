@@ -512,8 +512,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	fov_arcsec = 6, sample = 4, savefull = True, regrid = True, image_mask = None, 
-	pupil_mask = None, **calckwargs):
+	fov_arcsec = 6, sample = 4, regrid = True, image_mask = None, pupil_mask = None, 
+	savefull = False, **calckwargs):
 	"""
 	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: reference to the WebbPSF name is 
 	maintained here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
@@ -532,10 +532,10 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 			This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).
 		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		sample (float): Factor by which to oversample the PSF.
-		savefull (bool): If True, save the full multi-extension WebbPSF/STPSF output.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 		image_mask (str): Image mask argument for WebbPSF.
 		pupil_mask (str): Pupil mask argument for WebbPSF.
+		savefull (bool): If True, save the full multi-extension WebbPSF/STPSF output.
 		**calckwargs: Additional arguments for calc_psf() -- see 
 			https://stpsf.readthedocs.io/en/latest/usage.html#.
 			Should be fed to spike.psf.jwst/roman in kwargs as a dictionary called calckwargs.
