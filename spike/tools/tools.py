@@ -482,34 +482,49 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	imgdat = fits.open(img)
 
 	psfim = np.zeros_like(imgdat[ext].data)
-	xmin = int(pos[0]) - psfarr.shape[0]//2
-	xmax = int(pos[0]) + psfarr.shape[0]//2
-	ymin = int(pos[1]) - psfarr.shape[1]//2
-	ymax = int(pos[1]) + psfarr.shape[1]//2
+	xmin = int(pos[0]) - psfarr.shape[1]//2
+	xmax = int(pos[0]) + psfarr.shape[1]//2
+	ymin = int(pos[1]) - psfarr.shape[0]//2
+	ymax = int(pos[1]) + psfarr.shape[0]//2
 
 	## to deal with PSFs near edge of frame
+	update_xmax = 1 #whether to use to adjust shape
+	update_ymax = 1
+
 	if xmin < 0:
-		psfarr = psfarr[:, abs(int(xmin)):]
+		psfarr = psfarr[:, int(abs(xmin)):]
 		xmin = 0
 
 	if ymin < 0:
-		psfarr = psfarr[abs(int(ymin)):, :]
+		psfarr = psfarr[int(abs(ymin)):, :]
 		ymin = 0
 
-	if xmax > psfim.shape[0]:
-		over = xmax - psfim.shape[0]
-		psfarr = psfarr[:, :abs(int(over))]
-		xmax = psfim.shape[0]
+	if xmax > psfim.shape[1]:
+		over = xmax - psfim.shape[1]
+		psfarr = psfarr[:, :int(over)+1]
+		xmax = psfim.shape[1]
+		update_xmax = 0
 
-	if ymax > psfim.shape[1]:
-		over = ymax - psfim.shape[1]
-		psfarr = psfarr[:abs(int(over)), :]
-		ymax = psfim.shape[1]
+	if ymax > psfim.shape[0]:
+		over = ymax - psfim.shape[0]
+		psfarr = psfarr[:int(over)+1, :]
+		ymax = psfim.shape[0]
+		update_ymax = 0
 
-	if psfarr.shape[0] % 2 == 0:
-		psfim[ymin:ymax, xmin:xmax] += psfarr
-	if psfarr.shape[0] % 2 != 0:
-		psfim[ymin:ymax+1, xmin:xmax+1] += psfarr
+	if psfarr.shape[1] % 2 != psfim[ymin:ymax, xmin:xmax].shape[1] % 2:
+		if update_xmax == 1:
+			xmax += 1
+		if update_xmax == 0:
+			xmin -= 1
+
+	if psfarr.shape[0] % 2 != psfim[ymin:ymax, xmin:xmax].shape[0] % 2:
+		if update_ymax == 1:
+			ymax += 1
+		if update_ymax == 0:
+			ymin -= 1
+
+	psfim[ymin:ymax, xmin:xmax] += psfarr
+
 
 	cphdr = fits.PrimaryHDU(header = imgdat[0].header)
 
@@ -716,29 +731,21 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 
 	xcen = fov_pixel//2
 	ycen = fov_pixel//2
-	xlen = fov_pixel
-	ylen = fov_pixel
 
 	## to deal with PSFs near edge of frame
 	if xmin < 0:
 		xcen += xmin
-		xlen += xmin
 		xmin = 0
 
 	if ymin < 0:
 		ycen += ymin
-		ylen += ymin
 		ymin = 0
 
-	if xmax > dat.shape[0]:
-		over = xmax - dat.shape[0]
-		xlen -= over
-		xmax = dat.shape[0]
+	if xmax > dat.shape[1]:
+		xmax = dat.shape[1]
 
-	if ymax > dat.shape[1]:
-		over = ymax - dat.shape[1]
-		ylen -= over
-		ymax = dat.shape[1]
+	if ymax > dat.shape[0]:
+		ymax = dat.shape[0]
 
 	if fov_pixel % 2 == 0:
 		coords0 = utils.pixel_to_skycoord(x0, y0, wcs)
@@ -754,8 +761,8 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 	hdr['CRVAL2'] = dec
 	hdr['CRPIX1'] = xcen//2
 	hdr['CRPIX2'] = ycen//2
-	hdr['NAXIS1'] = xlen
-	hdr['NAXIS2'] = ylen
+	hdr['NAXIS1'] = cutoutim.shape[1]
+	hdr['NAXIS2'] = cutoutim.shape[0]
 
 	# remove WCSDVARR and D2IMARR keys, since output isn't really on original
 	# image grid any longer
