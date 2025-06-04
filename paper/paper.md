@@ -84,7 +84,7 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
 
 # Acknowledgments
 
-AP is supported by the Quad Fellowship administered by IIE and thanks Hsiao-Wen Chen and Juan Guerra for their comments. This work makes use of observations made with the NASA/ESA Hubble Space Telescope and the NASA/ESA/CSA James Webb Space Telescope obtained from the Mikulski Archive for Space Telescopes at the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contracts NAS 5–26555 for HST and NAS 5-03127 for JWST.
+AP is supported by the Quad Fellowship administered by IIE and thanks Hsiao-Wen Chen and Juan Guerra for their comments. AP also thanks the reviewers for their suggestions, which improved the manuscript and codebase. This work makes use of observations made with the NASA/ESA Hubble Space Telescope and the NASA/ESA/CSA James Webb Space Telescope obtained from the Mikulski Archive for Space Telescopes at the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contracts NAS 5–26555 for HST and NAS 5-03127 for JWST.
 
 
 # References
