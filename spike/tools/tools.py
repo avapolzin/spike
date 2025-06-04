@@ -492,22 +492,22 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	update_ymax = 1
 
 	if xmin < 0:
-		psfarr = psfarr[:, int(abs(xmin)):]
+		psfarr = psfarr[:, int(abs(xmin))+1:]
 		xmin = 0
 
 	if ymin < 0:
-		psfarr = psfarr[int(abs(ymin)):, :]
+		psfarr = psfarr[int(abs(ymin))+1:, :]
 		ymin = 0
 
 	if xmax > psfim.shape[1]:
 		over = xmax - psfim.shape[1]
-		psfarr = psfarr[:, :int(over)+1]
+		psfarr = psfarr[:, :int(over)]
 		xmax = psfim.shape[1]
 		update_xmax = 0
 
 	if ymax > psfim.shape[0]:
 		over = ymax - psfim.shape[0]
-		psfarr = psfarr[:int(over)+1, :]
+		psfarr = psfarr[:int(over), :]
 		ymax = psfim.shape[0]
 		update_ymax = 0
 
