@@ -20,7 +20,7 @@ warnings.formatwarning = warning_on_one_line
 
 
 def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermethod = None, 
-		savedir = 'psfs', drizzleimgs = False, pretweaked = False,
+		savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False,
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		tweakparams = {'threshold':6.0, 
 					   'searchrad':3.0, 
@@ -69,6 +69,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
 		savedir (str): Where the PSF models and drizzled PSF will be saved. Defaults to 'psfs'.
 		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
+		objonly (bool): If True, only drizzles input images that cover the selected obj.
 		pretweaked (bool): If True, skips TweakReg steps to include fine WCS corrections.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
 		plot (bool): If True, saves .pngs of the model PSFs.
@@ -167,9 +168,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			tweakreg.TweakReg(filelist[fk], **tweakparams)
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
+	imglist = {} #images to drizzle per object per filter (used if objonly = True)
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
+			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
@@ -180,11 +183,14 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
-				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
+						imglist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
+					imglist[obj][pos[3]].append(i)
+
 
 					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
@@ -193,6 +199,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 			for o in obj:
 				drizzlelist[o] = {}
+				imglist[o] = {}
 				skycoords.append(tools.objloc(o))
 			
 			for i in imgs:
@@ -211,11 +218,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						if coord.dec.deg < 0:
 							coordstring += str(coord.dec)
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 						if np.isfinite(pos[0]): #confirm that object falls onto detector
 							if pos[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][pos[3]] = []
+								imglist[obj[j]][pos[3]] = []
 							drizzlelist[obj[j]][pos[3]].append(modname)
+							imglist[obj[j]][pos[3]].append(i)
 
 							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
 					pool.close()
@@ -231,11 +240,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						if coord.dec.deg < 0:
 							coordstring += str(coord.dec)
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 						if np.isfinite(pos[0]): #confirm that object falls onto detector
 							if pos[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][pos[3]] = []
+								imglist[obj[j]][pos[3]] = []
 							drizzlelist[obj[j]][pos[3]].append(modname)
+							imglist[obj[j]][pos[3]].append(i)
 
 						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
@@ -243,12 +254,32 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		userpsfs = sorted(glob.glob(usermethod))
 
 		for up in userpsfs:
-			im, obj, filt, _ = up.split('_')
+			im, imtype, obj, filt, _ = up.split('_')
+
+			img = imgdir+'%s_%s.fits'%(im, imtype)
+			coord = tools.objloc(obj)
+			pos = tools.checkpixloc(coords)
+
+			psfmodel = fits.open(up)[1].data
+
+			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+
+			coordstring = str(coord.ra)
+			if coord.dec.deg >= 0:
+				coordstring += '+'+str(coord.dec)
+			if coord.dec.deg < 0:
+				coordstring += str(coord.dec)
+
+			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}
+				imglist[obj] = {}
 			if filt not in drizzlelist[obj].keys():
 				drizzlelist[obj][filt] = []
-			drizzlelist[obj][filt].append(im)
+				imglist[obj][filt] = []
+			drizzlelist[obj][filt].append(modname)
+			imglist[obj][filt].append(img)
 			
 
 	if keeporig:
@@ -296,15 +327,42 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		drizzleparams['driz_cr_corr'] = True #reset parameters turned off for PSF
 		drizzleparams['static'] = True
-		for fk in filelist.keys():
-			drizzleparams['output'] = img_dir + '%s_img'%fk #set output name with filter
-			astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
+		if not objonly:
+			for fk in filelist.keys():
+				drizzleparams['output'] = img_dir + '%s_img'%fk #set output name with filter
+				astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
+		if objonly:
+			for do in imglist.keys():
+				cstring = tools.objloc(do)
+				coordstring = str(cstring.ra)
+				if cstring.dec.deg >= 0:
+					coordstring += '+'+str(cstring.dec)
+				if cstring.dec.deg < 0:
+					coordstring += str(cstring.dec)
+
+				if parallel:
+					pool = Pool(processes=(cpu_count() - 1))
+					for dk in imglist[do].keys():
+						outname = coordstring+'_'+dk+'_img'
+						drizzleparams['output'] = img_dir + outname #set output based on coord, filter
+						pool.apply_async(astrodrizzle.AstroDrizzle, args = (imglist[do][dk]), kwds = drizzleparams)
+					pool.close()
+					pool.join()
+				if not parallel:
+					for dk in drizzlelist[do].keys():
+						outname = coordstring+'_'+dk+'_img'
+						drizzleparams['output'] = img_dir + outname #set output based on coord, filter
+						astrodrizzle.AstroDrizzle(imglist[do][dk], **drizzleparams)
 
 	if not finalonly:
 		# clean up step to move all of the PSF files to the relevant directory
 		# should grab all .pngs, .fits etc.
 		if not os.path.exists(savedir):
 			os.makedirs(savedir)
+
+		os.system('mv %s*_drc* %s'%(img_dir, savedir)) # drizzled files
+		os.system('mv %s*_drz* %s'%(img_dir, savedir)) # drizzled files
+		os.system('mv %s*_mos* %s'%(img_dir, savedir)) # drizzled files
 
 		os.system('mv %s*_psf* %s'%(img_dir, savedir)) # generated PSF models
 		os.system('mv %s*.psf %s'%(img_dir, savedir))
@@ -313,7 +371,19 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		## clean up other files generated in the process
 		os.system('mv %s*.cat %s'%(img_dir, savedir))
 		os.system('mv %s*_mask.fits %s'%(img_dir, savedir))
-		os.system('mv *_sci1.fits %s'%(savedir))
+		os.system('mv ./*_sci1.fits %s'%(savedir))
+
+		## clean up files generated in img drizzle
+		os.system('mv %s*.cat %s'%(img_dir, savedir))
+		os.system('mv %s*_staticMask.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_sci* %s'%(img_dir, savedir))
+		os.system('mv %s*_mask* %s'%(img_dir, savedir))
+		os.system('mv ./*_sci2.fits %s'%(savedir))
+		os.system('mv %s*_wht.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_med.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_blt.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_crclean.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_crmask.fits %s'%(img_dir, savedir))
 
 
 		if verbose:
@@ -347,7 +417,18 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		## clean up other files generated in the process
 		os.system('mv %s*.cat %s'%(img_dir, removedir))
 		os.system('mv %s*_mask.fits %s'%(img_dir, removedir))
-		os.system('mv *_sci1.fits %s'%(removedir))
+		os.system('mv %s*sci1.fits %s'%(img_dir, removedir))
+
+		## clean up files generated in img drizzle
+		os.system('mv %s*.cat %s'%(img_dir, removedir))
+		os.system('mv %s*_staticMask.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_sci* %s'%(img_dir, removedir))
+		os.system('mv %s*sci2.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_wht.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_med.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_blt.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_crclean.fits %s'%(img_dir, removedir))
+		os.system('mv %s*_crmask.fits %s'%(img_dir, removedir))
 
 		os.system('rm -r %s'%(removedir))
 
@@ -408,7 +489,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 
 def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF', usermethod = None, 
-		savedir = 'psfs', drizzleimgs = False, pretweaked = False, usecrds = False, 
+		savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
 		removedir = 'toremove', tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
@@ -434,6 +515,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
 		savedir (str): Where the PSF models and drizzled PSF will be saved. Defaults to 'psfs'.
 		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
+		objonly (bool): If True, only drizzles input images that cover the selected obj.
 		pretweaked (bool): If True, skips tweak step to include fine WCS corrections.
 		usecrds (bool): If True, use CRDS config settings as defaults. 
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before tweak.
@@ -523,9 +605,11 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
+	imglist = {} #write file names to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
+			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
@@ -536,11 +620,13 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
-				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
+						imglist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
+					imglist[obj][pos[3]].append(i)
 
 					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
@@ -549,6 +635,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 			for o in obj:
 				drizzlelist[o] = {}
+				imglist[o] = {}
 				skycoords.append(tools.objloc(o))
 			
 			for i in imgs:
@@ -566,11 +653,13 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 						pos = tools.checkpixloc(coord, i, inst, camera)
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 						if np.isfinite(p[0]): #confirm that object falls onto detector
 							if pos[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][pos[3]] = []
+								imglist[obj[j]][pos[3]] = []
 							drizzlelist[obj[j]][pos[3]].append(modname)
+							imglist[obj[j]][pos[3]].append(i)
 
 							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
 					pool.close()
@@ -586,11 +675,13 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 						if coord.dec.deg < 0:
 							coordstring += str(coord.dec)
 
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 						if np.isfinite(pos[0]): #confirm that object falls onto detector
 							if pos[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][pos[3]] = []
+								imglist[obj[j]][pos[3]] = []
 							drizzlelist[obj[j]][pos[3]].append(modname)
+							imglist[obj[j]][pos[3]].append(i)
 
 						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
@@ -598,12 +689,34 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		userpsfs = sorted(glob.glob(usermethod))
 
 		for up in userpsfs:
-			im, obj, filt, _ = up.split('_')
+			## JWST names in program_program2_exp_cal.fits form
+
+			im, im2, im3, imtype, obj, filt, _ = up.split('_')
+
+			img = imgdir+'%s_%s_%s_%s.fits'%(im, im2, im3, imtype)
+			coord = tools.objloc(obj)
+			pos = tools.checkpixloc(coords)
+
+			psfmodel = fits.open(up)[1].data
+
+			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+
+			coordstring = str(coord.ra)
+			if coord.dec.deg >= 0:
+				coordstring += '+'+str(coord.dec)
+			if coord.dec.deg < 0:
+				coordstring += str(coord.dec)
+
+			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}
+				imglist[obj] = {}
 			if filt not in drizzlelist[obj].keys():
 				drizzlelist[obj][filt] = []
-			drizzlelist[obj][filt].append(im)
+				imglist[obj][filt] = []
+			drizzlelist[obj][filt].append(modname)
+			imglist[obj][filt].append(img)
 
 	#####################################################################
 	for do in drizzlelist.keys():
@@ -646,9 +759,47 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
-		for fk in filelist.keys():
-			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+		if not objonly:
+			for fk in filelist.keys():
+				resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
+						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+		if objonly:
+			if parallel:
+				pool = Pool(processes=(cpu_count() - 1))
+				for dk in imglist[do].keys():
+
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+					if ':' not in shortra:
+						if int(shortra) > 0:
+							shortra = "+"+shortra
+
+					resampname = shortdec+shortra+'_'+dk+'_img'
+					resampname = resampname.replace(':', '').replace(' ', '')
+
+					resamp = resample_step.ResampleStep(**drizzleparams)
+					resampkwds = {'input_models': imglist[do][dk], 
+								  'output_file': resampname,
+								  'output_dir':img_dir, 
+								  'save_results':True}
+					pool.apply_async(resamp.call, kwds = resampkwds)
+				pool.close()
+				pool.join()
+			if not parallel:
+				for dk in imglist[do].keys():
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+					if ':' not in shortra:
+						if int(shortra) > 0:
+							shortra = "+"+shortra
+
+					resampname = shortdec+shortra+'_'+dk+'_img'
+					resampname = resampname.replace(':', '').replace(' ', '')
+
+					resamp = resample_step.ResampleStep(**drizzleparams).call(imglist[do][dk],
+						output_file = resampname, 
+						output_dir = img_dir, save_results = True)
+
 
 	#####################################################################
 	suff = "resamplestep"
@@ -749,7 +900,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 
 def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
-		usermethod = None, savedir = 'psfs', drizzleimgs = False, pretweaked = False, 
+		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, 
 		out = 'fits', returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
 		removedir = 'toremove', tweakparams = {}, drizzleparams = {}, **kwargs):
@@ -776,6 +927,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
 		savedir (str): Where the PSF models and drizzled PSF will be saved. Defaults to 'psfs'.
 		drizzleimgs (bool): If True, will drizzle the input images at the same time as creating a drizzled psf.
+		objonly (bool): If True, only drizzles input images that cover the selected obj.
 		pretweaked (bool): If True, skips tweak step to include fine WCS corrections.
 		usecrds (bool): If True, use CRDS config settings as defaults. 
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before tweak.
@@ -861,9 +1013,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
+	imglist = {}
 	if genpsf: #generate model PSFs for each image + object
 		if type(obj) == str: #check number of objects
 			drizzlelist[obj] = {}
+			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
@@ -873,11 +1027,13 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
-				modname = i.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 				if np.isfinite(pos[0]): #confirm object falls onto image
 					if pos[3] not in drizzlelist[obj].keys():
 						drizzlelist[obj][pos[3]] = []
+						imglist[obj][pos[3]] = []
 					drizzlelist[obj][pos[3]].append(modname)
+					imglist[obj][pos[3]].append(i)
 
 					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
@@ -886,6 +1042,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 			for o in obj:
 				drizzlelist[o] = {}
+				imglist[o] = {}
 				skycoords.append(tools.objloc(o))
 			
 			for i in imgs:
@@ -903,29 +1060,70 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 						if skycoords[j].dec.deg < 0:
 							coordstring += str(skycoords[j].dec)
 							
-						modname = i.replace('.fits', '_'+coordstring+'_%s'%p[3]+'_topsf.fits')
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 						if np.isfinite(p[0]): #confirm that object falls onto detector
 							if p[3] not in drizzlelist[obj[j]].keys():
 								drizzlelist[obj[j]][p[3]] = []
-							drizzlelist[obj[j]][p[3]].append(i)
+								imglist[obj[j]][p[3]] = []
+							drizzlelist[obj[j]][p[3]].append(modname)
+							imglist[obj[j]][p[3]].append(i)
 
 							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for j, coord in enumerate(skycoords):
-						psffunc(coord, i, imcam, pos[j], plot, verbose, **kwargs) 
+						pos = tools.checkpixloc(coord, i, inst, camera)
+
+						coordstring = str(coord.ra)
+						if coord.dec.deg >= 0:
+							coordstring += '+'+str(coord.dec)
+						if coord.dec.deg < 0:
+							coordstring += str(coord.dec)
+
+						modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+						if np.isfinite(pos[0]): #confirm that object falls onto detector
+							if pos[3] not in drizzlelist[obj[j]].keys():
+								drizzlelist[obj[j]][pos[3]] = []
+								imglist[obj[j]][pos[3]] = []
+							drizzlelist[obj[j]][pos[3]].append(modname)
+							imglist[obj[j]][pos[3]].append(i)
+
+						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
 
 		for up in userpsfs:
-			im, obj, filt, _ = up.split('_')
+			## Roman names in dc2_filt_NNNNN_det.fits form
+			# based on simulations
+
+			im, imf, imn, imd, imtype, obj, filt, _ = up.split('_')
+
+			img = imgdir+'%s_%s_%s_%s_%s.fits'%(im, imf, imn, imd, imtype)
+			coord = tools.objloc(obj)
+			pos = tools.checkpixloc(coords)
+
+			psfmodel = fits.open(up)[1].data
+
+			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+
+			coordstring = str(coord.ra)
+			if coord.dec.deg >= 0:
+				coordstring += '+'+str(coord.dec)
+			if coord.dec.deg < 0:
+				coordstring += str(coord.dec)
+
+			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}
+				imglist[obj] = {}
 			if filt not in drizzlelist[obj].keys():
 				drizzlelist[obj][filt] = []
-			drizzlelist[obj][filt].append(im)
+				imglist[obj][filt] = []
+			drizzlelist[obj][filt].append(modname)
+			imglist[obj][filt].append(img)
 
 	#####################################################################
 	for do in drizzlelist.keys():
@@ -966,9 +1164,44 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
-		for fk in filelist.keys():
-			resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-					output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+		if not objonly:
+			for fk in filelist.keys():
+				resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
+						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+		if objonly:
+			if parallel:
+				pool = Pool(processes=(cpu_count() - 1))
+				for dk in imglist[do].keys():
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+					if ':' not in shortra:
+						if int(shortra) > 0:
+							shortra = "+"+shortra
+
+					resampname = shortdec+shortra+'_'+dk+'_img'
+					resampname = resampname.replace(':', '').replace(' ', '')
+
+					resamp = resample_step.ResampleStep(**drizzleparams)
+					resampkwds = {'input_models': imglist[do][dk], 
+								  'output_file': resampname,
+								  'output_dir':img_dir, 
+								  'save_results':True}
+					pool.apply_async(resamp.call, kwds = resampkwds)
+				pool.close()
+				pool.join()
+			if not parallel:
+				for dk in imglist[do].keys():
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+					if ':' not in shortra:
+						if int(shortra) > 0:
+							shortra = "+"+shortra
+
+					resampname = shortdec+shortra+'_'+dk+'_img'
+					resampname = resampname.replace(':', '').replace(' ', '')
+
+					resamp = resample_step.ResampleStep(**drizzleparams).call(imglist[do][dk],
+						output_file = resampname, output_dir = img_dir, save_results = True)
 	#####################################################################
 	suff = "resamplestep"
 

@@ -451,7 +451,7 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	"""
 	Write relevant image headers to the model PSFs and modify the coordinates and WCS.
-	Creates a full _topsf.fits file with only one SCI extension for use with drizzle/resample.
+	Creates a full _topsf_*.fits file with only one SCI extension for use with drizzle/resample.
 
 	Parameters:
 		psfarr (arr): The 2D PSF model.
@@ -547,7 +547,8 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
-	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_topsf.fits')
+	img_type = img.split('_')[-1].replace('.fits', '')
+	modname = img.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 
 	if img.split('_')[-1] != '_c0m.fits':
 		hdlist = [cphdr, cihdr, cehdr, cdqhdr]
