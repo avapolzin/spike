@@ -23,6 +23,7 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 	tools.rst
 	faq.rst
 	citation.rst
+	changelog.rst
 
 .. toctree::
 	:maxdepth: 1
