@@ -782,17 +782,21 @@ url = {https://github.com/spacetelescope/stpsf},
 version = {2.0.0}
 }
 
-@article{Liaudat_2023,
-doi = {10.1088/1361-6420/acb664},
-url = {https://dx.doi.org/10.1088/1361-6420/acb664},
-year = {2023},
-month = {feb},
-publisher = {IOP Publishing},
-volume = {39},
-number = {3},
-pages = {035008},
-author = {Liaudat, Tobias and Starck, Jean-Luc and Kilbinger, Martin and Frugier, Pierre-Antoine},
-title = {Rethinking data-driven point spread function modeling with a differentiable optical model},
-journal = {Inverse Problems},
-abstract = {In astronomy, upcoming space telescopes with wide-field optical instruments have a spatially varying point spread function (PSF). Specific scientific goals require a high-fidelity estimation of the PSF at target positions where no direct measurement of the PSF is provided. Even though observations of the PSF are available at some positions of the field of view (FOV), they are undersampled, noisy, and integrated into wavelength in the instrument’s passband. PSF modeling represents a challenging ill-posed problem, as it requires building a model from these observations that can infer a super-resolved PSF at any wavelength and position in the FOV. Current data-driven PSF models can tackle spatial variations and super-resolution. However, they are not capable of capturing PSF chromatic variations. Our model, coined WaveDiff, proposes a paradigm shift in the data-driven modeling of the point spread function field of telescopes. We change the data-driven modeling space from the pixels to the wavefront by adding a differentiable optical forward model into the modeling framework. This change allows the transfer of a great deal of complexity from the instrumental response into the forward model. The proposed model relies on efficient automatic differentiation technology and modern stochastic first-order optimization techniques recently developed by the thriving machine-learning community. Our framework paves the way to building powerful, physically motivated models that do not require special calibration data. This paper demonstrates the WaveDiff model in a simplified setting of a space telescope. The proposed framework represents a performance breakthrough with respect to the existing state-of-the-art data-driven approach. The pixel reconstruction errors decrease six-fold at observation resolution and 44-fold for a 3x super-resolution. The ellipticity errors are reduced at least 20 times, and the size error is reduced more than 250 times. By only using noisy broad-band in-focus observations, we successfully capture the PSF chromatic variations due to diffraction. WaveDiff source code and examples associated with this paper are available at this link .}
+@ARTICLE{Liaudat.etal.2023,
+       author = {{Liaudat}, Tob{\'\i}as I. and {Starck}, Jean-Luc and {Kilbinger}, Martin},
+        title = "{Point spread function modelling for astronomical telescopes: a review focused on weak gravitational lensing studies}",
+      journal = {Frontiers in Astronomy and Space Sciences},
+     keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Cosmology and Nongalactic Astrophysics, Computer Science - Computer Vision and Pattern Recognition},
+         year = 2023,
+        month = oct,
+       volume = {10},
+          eid = {1158213},
+        pages = {1158213},
+          doi = {10.3389/fspas.2023.1158213},
+archivePrefix = {arXiv},
+       eprint = {2306.07996},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023FrASS..1058213L},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+
