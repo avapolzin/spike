@@ -262,7 +262,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -699,7 +699,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -1106,7 +1106,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmode, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
