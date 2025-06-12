@@ -48,7 +48,7 @@ In lieu of passing coordinates to obj, you can also provide an object name (as l
 	psf.hst(img_dir = acs_path, obj = 'M79', img_type = 'flc', inst = 'ACS', camera = 'WFC')
 
 
-	nircam_path = 'path/to/nircam/data/'
+	nircam_path = '/path/to/nircam/data/'
 
 	psf.jwst(img_dir = nircam_path, obj = 'M79', img_type = 'cal', inst = 'NIRCam')
 
