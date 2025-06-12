@@ -19,7 +19,7 @@ Version that incorporates all changes from JOSS review.
 
 * Add tolerance for sub-pixel coordinate differences in tests
 * Update default sampling for ``STPSF``/``WebbPSF``
-* Adopt auto setup of model from img
+* Adopt auto setup of ``STPSF`` model from img
 * Use explicit indexing of HDU in ``spike.psfgen.jwpsf``
 * Fix "savefull" typo in ``spike.psfgen.jwpsf``
 * Add support for PSFs near frame edges to ``spike.tools.rewrite_fits`` and ``spike.tools.cutout``
