@@ -59,14 +59,14 @@ Version that incorporates all changes from JOSS review.
 
 **v1.0.4 (March 28, 2025)**
 
-* Add error message if "Level 3" data product is used
+* Add error message if "Level 3" data products are used as input
 * Remove temporary STDPSF naming convention fix, since addressed on STScI side
 
 
 **v1.0.3 (March 22, 2025)**
 
 * Fix inverted sampling in ``spike.tools.regridarr``
-* Fix "coords" -> "coord" in loops if input is multiple objects
+* Fix "coords" -> "coord" in loops if input is list of multiple objects
 
 
 **v1.0.2 (March 18, 2025)**
@@ -78,7 +78,7 @@ Version that incorporates all changes from JOSS review.
 
 **v1.0 (March 3, 2025)**
 
-Initial release.
+Initial stable release.
 
 
 **v0.5**
