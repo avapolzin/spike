@@ -425,6 +425,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 			url += '_SM3.fits'
 		elif (imcam == 'WFC3/IR') and (pos[3] == 'F139M'):
 			url += '_1x1.fits'
+		elif (imcam == 'WFC3/UVIS') and (pos[3] == 'F475W'):
+			url += 'x.fits'
 		else:
 			url += '.fits'
 
