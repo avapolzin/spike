@@ -13,6 +13,7 @@ Version that incorporates all changes from JOSS review.
 * Move file suffixes in _topsf files to generate drc/drz files based on inputs
 * Update naming scheme in ``spike.tools.rewrite_fits``
 * Bug fix in renaming user-generated PSF models
+* Updated 'F475W' -> 'F475Wx' in STDPSF url for WFC3/UVIS 
 
 
 **v1.0.9 (June 2, 2025)**
