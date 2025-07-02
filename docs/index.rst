@@ -6,6 +6,8 @@ Easily generated and resampled space-based PSFs.
     :target: https://arxiv.org/abs/2503.02288
 .. image:: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c/status.svg
     :target: https://joss.theoj.org/papers/744ad03a43040debb962391d1668ea5c
+.. image:: https://zenodo.org/badge/235378599.svg
+	:target: https://doi.org/10.5281/zenodo.15791924
 .. image:: https://img.shields.io/badge/GitHub-avapolzin/spike-74349c
     :target: https://github.com/avapolzin/spike
 
