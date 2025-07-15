@@ -31,7 +31,7 @@ For analyses to be consistent, mock PSFs may be used, but the proper treatment o
 
 # Workflow
 
-Given a directory containing reduced and calibrated, but not yet co-added, FITS files from HST, JWST, or Roman and the coordinates of an object of interest, detector/chip-specific model PSFs are directly drizzled by `spike`. A model PSF is generated for each unique input image and coordinate combination. Instrument information, including camera, filter, and, if necessary, chip, is automatically read from the header of each FITS file.
+Given a directory containing reduced and calibrated, but not yet co-added, FITS [@Wells.etal.1981] files from HST, JWST, or Roman and the coordinates of an object of interest, detector/chip-specific model PSFs are directly drizzled by `spike`. A model PSF is generated for each unique input image and coordinate combination. Instrument information, including camera, filter, and, if necessary, chip, is automatically read from the header of each FITS file.
 
 ![Comparison of drizzled PSFs generated for HST images using the default parameters for different methods included in `spike`. All panels use the same ACS/WFC imaging of the COSMOS field in F475W. The stretch of each model's colormap is chosen based on their individual handling of the background, wings, and faint features of the PSF. Note that the ePSF panel (second from right) shows some artifacts; the robustness of the effective PSF method is heavily dependent on the number of stars in the chosen field and may be changed by altering the star detection threshold. \label{fig:hstcomparison}](spike_psf_hstcompare.png)
 
@@ -52,9 +52,9 @@ There is a preliminary module included in `spike` for recovering resampled Roman
 Since drizzled `spike` PSFs are intended for use with calibrated and resampled data products from the original pipelines, it is imperative that the processing done on the PSFs is the same as the processing of those data products. Both `jwst` [@Bushouse.etal.2024] and `romancal` [@romancal] are complex packages that house the entire JWST and Roman pipelines. As such, they have complicated functionality that relies on modules with more stringent installation requirements. Using `jwst` and `romancal` out of the box places strict limitations on the allowed operating systems. To address this, there are stripped down versions of the necessary "tweak" and resample scripts included with `spike` as `spike.jwstcal`, `spike.romancal`, `spike.stcal`, and `spike.stpipe`. Each module is only subtly changed from `jwst`, `romancal`, and their underlying `STCAL` [@stcal] and `stpipe` [@stpipe] to avoid unnecessary dependencies that restrict installation.
 
 # Software and Packages Used
- - ASDF [@graham.etal]
+ - ASDF [@Greenfield.etal.2015; @graham.etal]
  - Astropy [@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022]
- - `crds` [@crds]
+ - `crds` [@Greenfield.Miller.2016]
  - `drizzle` [@Simon.etal.2024]
  - `drizzlepac` [@Hoffmann.etal.2021]
  - `gwcs` [@Dencheva.etal]
