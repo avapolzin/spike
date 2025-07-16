@@ -56,7 +56,7 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
  - Astropy [@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022]
  - `crds` [@Greenfield.Miller.2016]
  - `drizzle` [@Simon.etal.2024]
- - `drizzlepac` [@Hoffmann.etal.2021]
+ - `drizzlepac` [@Fruchter.etal.2010; @Hoffmann.etal.2021]
  - `gwcs` [@Dencheva.etal]
  - `jsonschema` [@jsonschema]
  - `jwst` [@Bushouse.etal.2024]
