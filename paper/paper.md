@@ -35,7 +35,7 @@ Given a directory containing reduced and calibrated, but not yet co-added, FITS 
 
 ![Comparison of drizzled PSFs generated for HST images using the default parameters for different methods included in `spike`. All panels use the same ACS/WFC imaging of the COSMOS field in F475W. The stretch of each model's colormap is chosen based on their individual handling of the background, wings, and faint features of the PSF. Note that the ePSF panel (second from right) shows some artifacts; the robustness of the effective PSF method is heavily dependent on the number of stars in the chosen field and may be changed by altering the star detection threshold. \label{fig:hstcomparison}](spike_psf_hstcompare.png)
 
-`spike` works with both model and empirical PSFs. The built-in PSF generation options are `TinyTim` [@Krist.etal.2011] and the @Gillis.etal.2020 modification, `STPSF` -- formerly `WebbPSF` [@Perrin_STPSF; @Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], `photutils` ePSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], `PSFEx` [@Bertin.2011], and Space Telescope Science Institute's library of empirical STDPSFs for [HST](https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/) and [JWST](https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/) [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are included for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for HST and \autoref{fig:jwstcomparison} compares output drizzled PSFs for JWST.
+`spike` works with both model and empirical PSFs. The built-in PSF generation options are Tiny Tim [@Krist.etal.2011] and the @Gillis.etal.2020 modification, STPSF -- formerly WebbPSF [@Perrin_STPSF; @Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF], Photutils ePSFs [@Anderson.King.2000; @Anderson.2016; @Bradley.etal], PSFEx [@Bertin.2011], and Space Telescope Science Institute's library of empirical STDPSFs for [HST](https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/) and [JWST](https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/) [@Anderson.2016; @Libralato.etal.2023; @Libralato.etal.2024], all of which are included for having the ability to generate a model PSF for an arbitrary detector location. \autoref{fig:hstcomparison} compares output drizzled PSFs from the different methods for HST and \autoref{fig:jwstcomparison} compares output drizzled PSFs for JWST.
 
 ![Same as \autoref{fig:hstcomparison} for \textit{JWST}/NIRCam imaging in F115W. Note that the ePSF model shown here was generated using a lower detection threshold and a different star selection algorithm due to a paucity of stars in this field. \label{fig:jwstcomparison}](spike_psf_jwstcompare.png)
 
@@ -52,31 +52,31 @@ There is a preliminary module included in `spike` for recovering resampled Roman
 Since drizzled `spike` PSFs are intended for use with calibrated and resampled data products from the original pipelines, it is imperative that the processing done on the PSFs is the same as the processing of those data products. Both `jwst` [@Bushouse.etal.2024] and `romancal` [@romancal] are complex packages that house the entire JWST and Roman pipelines. As such, they have complicated functionality that relies on modules with more stringent installation requirements. Using `jwst` and `romancal` out of the box places strict limitations on the allowed operating systems. To address this, there are stripped down versions of the necessary "tweak" and resample scripts included with `spike` as `spike.jwstcal`, `spike.romancal`, `spike.stcal`, and `spike.stpipe`. Each module is only subtly changed from `jwst`, `romancal`, and their underlying `STCAL` [@stcal] and `stpipe` [@stpipe] to avoid unnecessary dependencies that restrict installation.
 
 # Software and Packages Used
- - ASDF [@Greenfield.etal.2015; @graham.etal]
- - Astropy [@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022]
- - `crds` [@Greenfield.Miller.2016]
- - `drizzle` [@Simon.etal.2024]
- - `drizzlepac` [@Fruchter.etal.2010; @Hoffmann.etal.2021]
- - `gwcs` [@Dencheva.etal]
- - `jsonschema` [@jsonschema]
- - `jwst` [@Bushouse.etal.2024]
- - Matplotlib [@Hunter.2007]
- - NumPy [@harris2020array]
- - `photutils` [@Bradley.etal]
- - `PSFEx` [@Bertin.2011]
- - `psutil` [@psutil]
- - `PyYAML` [@pyyaml]
- - `roman_datamodels` [@roman_datamodels]
- - `romancal` [@romancal]
- - SciPy [@2020SciPy-NMeth]
- - SExtractor [@Bertin.Arnouts.1996]
- - `spherical_geometry` [@spherical_geometry]
- - `STCAL` [@stcal]
- - `stdatamodels` [@stdatamodels]
- - `stpipe` [@stpipe]
- - `TinyTim` [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters
- - `tweakwcs` [@cara.etal]
- - `STPSF` [@Perrin_STPSF], formerly `WebbPSF` [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
+ - [ASDF](https://github.com/asdf-format/asdf) [@Greenfield.etal.2015; @graham.etal]
+ - [Astropy](https://github.com/astropy/astropy) [@AstropyCollaboration.2013; @AstropyCollaboration.2018; @AstropyCollaboration.2022]
+ - [CRDS](https://github.com/spacetelescope/crds) [@Greenfield.Miller.2016]
+ - [`drizzle`](https://github.com/spacetelescope/drizzle) [@Simon.etal.2024]
+ - [`drizzlepac`](https://github.com/spacetelescope/drizzlepac) [@Fruchter.etal.2010; @Hoffmann.etal.2021]
+ - [GWCS](https://github.com/spacetelescope/gwcs) [@Dencheva.etal]
+ - [`jsonschema`](https://github.com/python-jsonschema/jsonschema) [@jsonschema]
+ - [`jwst`](https://github.com/spacetelescope/jwst) [@Bushouse.etal.2024]
+ - [Matplotlib](https://github.com/matplotlib/matplotlib) [@Hunter.2007]
+ - [NumPy](https://github.com/numpy/numpy) [@harris2020array]
+ - [Photutils](https://github.com/astropy/photutils) [@Bradley.etal]
+ - [PSFEx](https://github.com/astromatic/psfex?tab=readme-ov-file) [@Bertin.2011]
+ - [psutil](https://github.com/giampaolo/psutil) [@psutil]
+ - [PyYAML](https://github.com/yaml/pyyaml) [@pyyaml]
+ - [`roman_datamodels`](https://github.com/spacetelescope/roman_datamodels) [@roman_datamodels]
+ - [`romancal`](https://github.com/spacetelescope/romancal) [@Desjardins.etal.2023; @romancal]
+ - [SciPy](https://github.com/scipy/scipy) [@2020SciPy-NMeth]
+ - [SExtractor](https://github.com/astromatic/sextractor) [@Bertin.Arnouts.1996]
+ - [`spherical_geometry`](https://github.com/spacetelescope/spherical_geometry) [@spherical_geometry]
+ - [`STCAL`](https://github.com/spacetelescope/stcal) [@stcal]
+ - [`stdatamodels`](https://github.com/spacetelescope/stdatamodels) [@stdatamodels]
+ - [`stpipe`](https://github.com/spacetelescope/stpipe) [@stpipe]
+ - [Tiny Tim](https://github.com/spacetelescope/tinytim) [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters
+ - [`tweakwcs`](https://github.com/spacetelescope/tweakwcs) [@cara.etal]
+ - [STPSF](https://github.com/spacetelescope/stpsf) [@Schultz.etal.2025; @Perrin_STPSF], formerly [WebbPSF](https://github.com/spacetelescope/webbpsf) [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
 
 # Acknowledgments
 
