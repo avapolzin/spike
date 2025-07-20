@@ -64,16 +64,16 @@ Since drizzled `spike` PSFs are intended for use with calibrated and resampled d
  - [NumPy](https://github.com/numpy/numpy) [@harris2020array]
  - [Photutils](https://github.com/astropy/photutils) [@Bradley.etal]
  - [PSFEx](https://github.com/astromatic/psfex?tab=readme-ov-file) [@Bertin.2011]
- - [psutil](https://github.com/giampaolo/psutil) [@psutil]
- - [PyYAML](https://github.com/yaml/pyyaml) [@pyyaml]
- - [`roman_datamodels`](https://github.com/spacetelescope/roman_datamodels) [@roman_datamodels]
- - [`romancal`](https://github.com/spacetelescope/romancal) [@Desjardins.etal.2023; @romancal]
+ - [psutil](https://github.com/giampaolo/psutil)
+ - [PyYAML](https://github.com/yaml/pyyaml)
+ - [`roman_datamodels`](https://github.com/spacetelescope/roman_datamodels)
+ - [`romancal`](https://github.com/spacetelescope/romancal) [@Desjardins.etal.2023]
  - [SciPy](https://github.com/scipy/scipy) [@2020SciPy-NMeth]
  - [SExtractor](https://github.com/astromatic/sextractor) [@Bertin.Arnouts.1996]
  - [`spherical_geometry`](https://github.com/spacetelescope/spherical_geometry) [@spherical_geometry]
- - [`STCAL`](https://github.com/spacetelescope/stcal) [@stcal]
- - [`stdatamodels`](https://github.com/spacetelescope/stdatamodels) [@stdatamodels]
- - [`stpipe`](https://github.com/spacetelescope/stpipe) [@stpipe]
+ - [`STCAL`](https://github.com/spacetelescope/stcal)
+ - [`stdatamodels`](https://github.com/spacetelescope/stdatamodels)
+ - [`stpipe`](https://github.com/spacetelescope/stpipe)
  - [Tiny Tim](https://github.com/spacetelescope/tinytim) [@Krist.etal.2011] -- including the option to use the @Gillis.etal.2020 parameters
  - [`tweakwcs`](https://github.com/spacetelescope/tweakwcs) [@cara.etal]
  - [STPSF](https://github.com/spacetelescope/stpsf) [@Schultz.etal.2025; @Perrin_STPSF], formerly [WebbPSF](https://github.com/spacetelescope/webbpsf) [@Perrin.etal.2012; @Perrin.etal.2014; @Perrin_WebbPSF]
