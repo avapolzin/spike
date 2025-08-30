@@ -1,3 +1,4 @@
+import astropy
 from astropy.io import fits
 from astropy.nddata import NDData
 from astropy.stats import sigma_clipped_stats
@@ -58,7 +59,7 @@ plate_scale = {'ACS/WFC':0.05, 'ACS/HRC':0.025 , 'WFC3/IR':0.13, 'WFC3/UVIS':0.0
 
 
 def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	ebmv = None, av = None, wmag = None,
+	clobber = False, ebmv = None, av = None, wmag = None,
 	jitter = None, major = None, minor = None, angle = None,
 	specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., 
 	specalpha = 1., specbeta = 1., fov_arcsec = 6., despace = 0.):
@@ -69,16 +70,20 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	Tiny Tim PSF model, please use spike.psfgen.tinygillispsf() instead.
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 'WFPC2').
 			For 'WFPC' and 'WFPC2', the camera is selected by-chip and should not be specified here.
 		pos (list): Location of object of interest (spatial and spectral). [X, Y, chip, filter]
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF model saved by TinyTim.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		ebmv (float): Interstellar extinction, specified by reddening in mag. 
 			If specified, av should not be.
 		av (float): Interstellar extinction, specified by visual extinction in mag. 
@@ -104,6 +109,19 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	Returns:
 		TinyTim model PSF
 	"""
+
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
+
 	if not TINY_PATH:
 		# this is a warning and not an error on the off chance that the TinyTim executables are 
 		# in the working directory
@@ -228,15 +246,15 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim', clobber = clobber)
 
 
 	return psfmodel
 
 
 
-def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep = False, 
-	writeto = True, specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., specalpha = 1., 
+def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep = False, writeto = True, 
+	clobber = False, specchoice = 'blackbody', listchoice = 'G5V', temp = 6000., specalpha = 1., 
 	specbeta = 1., fov_arcsec = 6., despace = 0., sample = 1., linearfit = False, regrid = True):
 	"""
 	Generate HST PSFs using TinyTim and the parameter changes laid out in Gillis et al. (2020), 
@@ -248,16 +266,20 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 	it will be removed after use.
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): 'ACS/WFC' is the only recommended instrument/camera combination for this PSF generation method.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		keep (bool): If True, retains make_psf.py (Gillis et al. 2020)
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF model saved by TinyTim.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		specchoice (str): 'list', 'blackbody', 'plaw_nu', 'plaw_lam' -- if 'list', must also specify
 			listchoice; if 'blackbody', must also specify temp; if 'plaw_nu', must also specify specalpha;
 			and if 'plaw_lam', must also specify specbeta.
@@ -276,6 +298,18 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 	Returns:
 		TinyTim model PSF using amended Gillis et al. (2020) parameters
 	"""
+
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
 
 	if not TINY_PATH:
 		# this is a warning and not an error on the off chance that the TinyTim executables are 
@@ -369,13 +403,13 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim (Gillis+ mod)')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'TinyTim (Gillis+ mod)', clobber = clobber)
 
 	return psfmodel
 
 
 def stdpsf(coords, img, imcam, pos, plot = False, verbose = False, 
-	writeto = True, fov_arcsec = 6, norm = 1, regrid = True):
+	writeto = True, clobber = False, fov_arcsec = 6, norm = 1, regrid = True):
 	"""
 	Coordinate-specific PSFs from STDPSF model grids for HST, JWST.
 
@@ -383,16 +417,20 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 	https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/.
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
 			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here. If 'NIRISS' specified alone, assumes the imaging mode.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		norm (float): Flux normalization for output PSF model.
 
@@ -400,6 +438,18 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		STDPSF model PSF
 
 	"""
+
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
 
 	# build the url that points to the STDPSF
 	imcamurl = imcam.replace('/', '')
@@ -507,31 +557,35 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'STDPSFs', clobber = clobber)
 
 
 	return psfmodel
 
 
 def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True,
-	fov_arcsec = 6, sample = 4, regrid = True, image_mask = None, pupil_mask = None, 
-	savefull = False, **calckwargs):
+	clobber = False, fov_arcsec = 6, sample = 4, regrid = True, image_mask = None, 
+	pupil_mask = None, savefull = False, **calckwargs):
 	"""
 	Generate JWST and Roman PSFs using WebbPSF/STPSF. Note: reference to the WebbPSF name is 
 	maintained here in lieu of STPSF to avoid confusion with the generation of empirical STDPSFs.
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
 			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here. If 'NIRISS' specified alone, assumes the imaging mode.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
 			This is in addition to the 2D PSF models saved by WebbPSF (which will be saved as img_psf.fits).
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		sample (float): Factor by which to oversample the PSF.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
@@ -546,6 +600,20 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		WebbPSF model PSF
 
 	"""
+
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
+
+
 	x, y, chip, filt = pos
 
 	coordstring = str(coords.ra)
@@ -574,7 +642,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		if verbose:
 			print('Saving full %s output'%code_name)
 		
-		psfmod.writeto(modname.replace('_psf', '_%s'%code_name)+'.fits')
+		psfmod.writeto(modname.replace('_psf', '_%s'%code_name)+'.fits', overwrite = clobber)
 
 
 	if plot:
@@ -591,14 +659,15 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'WebbPSF', clobber = clobber)
 
 
 	return psfmodel
 
 def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, writeto = True, 
-	fov_arcsec = 6, norm = 1., starselect = 'DAO', starselectargs = {'fwhm':10}, thresh = 125,
-	usermask = None, maskval = None, epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':10}, ):
+	clobber = False, fov_arcsec = 6, norm = 1., starselect = 'DAO', starselectargs = {'fwhm':10}, 
+	thresh = 125, usermask = None, maskval = None, 
+	epsfargs = {'oversampling':1, 'progress_bar':True, 'maxiters':10}):
 	"""
 	Generate PSFs using the empirical photutils.epsf routine. 
 
@@ -607,17 +676,21 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 	PSF may be lower.
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
 			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here.
 		pos (list): Location of object of interest (spatial and spectral). [X, Y, chip, filter]
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		mask (bool): If True, uses data quality array to mask some pixels.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		fov_arcsec (float): "Diameter" of model PSF image in arcsec.
 		norm (float): Flux normalization for output PSF model.
 		starselect (str): 'DAO', 'IRAF', or 'peak', which use DAOStarFinder, IRAFStarFinder, and 
@@ -637,6 +710,18 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		ePSF model PSF
 	
 	"""
+
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
 
 	ext = 1 #read data from relevant SCI extension
 	extv = 1
@@ -763,13 +848,13 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs', clobber = clobber)
 
 	return psfmodel
 
 
 def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True, 
-	savepsfex = False, seconf = None, psfconf = None, regrid = True, 
+	clobber = False, savepsfex = False, seconf = None, psfconf = None, regrid = True,
 	mask = True, maskparams = {}):
 	"""
 	Generate PSFs using PSFEx.
@@ -780,18 +865,22 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	default naming scheme for .cat and .psf files and subsequent steps to rename them.)
 
 	Parameters:
-		coords (astropy skycoord object): Coordinates of object of interest or list of skycoord objects.
+		coords (str or astropy skycoord object): Coordinates of object of interest.
 		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
 			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
 			should not be specified here.
 		img (str): Path to image for which PSF is generated.
 		pos (list): [X, Y, chip, filter] as output from spike.tools.checkpixloc.
-		plot (bool): If True, saves .pngs of the model PSFs.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
 			suffix) and will amend relevant image WCS information/remove extraneous extensions. 
 			This is in addition to the .psf file saved by PSFEx. No 2D PSF model is saved by PSFEx 
 			by default, but this can be toggled in the tools.pypsfex arguments.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 		savepsfex (str): If 'fits' or 'arr' save 2D model to that format.
 		seconf (str): Path to SExtractor configuration file if not using default.
 		peconf (str): Path to PSFEx configuration file if not using default.
@@ -802,6 +891,17 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	Returns:
 		2D PSFEx PSF model
 	"""
+	if type(coords) == str:
+		coords = tools.objloc(coords)
+
+	if not pos:
+		im_cam = imcam.split('/')[0]
+		inst = im_cam[0]
+		if len(im_cam) == 1:
+			camera = None
+		if len(im_cam) == 2:
+			camera = im_cam[1]
+		pos = tools.checkpixloc(coords, img, inst, camera)
 
 	ext = 1 #run SExtractor only on relevant SCI extension
 	extv = 1
@@ -816,7 +916,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		extv = pos[2]
 
 	if mask:
-		tools.mask_fits(img, extv, **maskparams)
+		tools.mask_fits(img, extv, clobber = clobber, **maskparams)
 		if verbose:
 			print('Finished masking data, running SExtractor')
 		tools.pysextractor(img.replace('.fits', '_mask.fits')+'[%i]'%ext, config = seconf)	
@@ -851,7 +951,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	if writeto:
 		if verbose:
 			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
-		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'PSFEx')
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'PSFEx', clobber = clobber)
 
 	return psfmodel
 

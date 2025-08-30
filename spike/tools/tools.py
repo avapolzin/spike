@@ -1,4 +1,5 @@
 from asdf import AsdfFile
+import astropy
 from astropy.coordinates import SkyCoord, name_resolve
 import astropy
 import astropy.units as u
@@ -31,22 +32,27 @@ def objloc(obj):
 	Returns:
 		coords (astropy coordinates object)
 	"""
-	isname = False #check if obj is name or coordinates
-	for s in obj:
-		if s.isalpha():
-			isname = True
-			break
 
-	if isname:
-		coords = name_resolve.get_icrs_coordinates(obj)
+	if type(obj) == astropy.coordinates.sky_coordinate.SkyCoord:
+		return obj
 
-	if not isname:
-		if ':' in obj:
-			coords = SkyCoord(obj, unit = (u.hour, u.deg), frame = 'icrs')
-		if not ':' in obj:
-			coords = SkyCoord(obj, unit = u.deg, frame = 'icrs')
+	else:
+		isname = False #check if obj is name or coordinates
+		for s in obj:
+			if s.isalpha():
+				isname = True
+				break
 
-	return coords
+		if isname:
+			coords = name_resolve.get_icrs_coordinates(obj)
+
+		if not isname:
+			if ':' in obj:
+				coords = SkyCoord(obj, unit = (u.hour, u.deg), frame = 'icrs')
+			if not ':' in obj:
+				coords = SkyCoord(obj, unit = u.deg, frame = 'icrs')
+
+		return coords
 
 
 def checkpixloc(coords, img, inst, camera = None):
@@ -230,13 +236,15 @@ def checkpixloc(coords, img, inst, camera = None):
 	#add support for FOC and NIRISS AMI
 
 
-def to_asdf(fitspath, save = True):
+def to_asdf(fitspath, save = True, clobber = False):
 	"""
 	Convert .fits file to .asdf by simply wrapping data and header extensions.
 
 	Parameters:
 		fitspath (str): Path to .fits file to convert.
 		save (bool): If True, saves the .asdf file.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns:
 		ASDF file object
@@ -254,7 +262,13 @@ def to_asdf(fitspath, save = True):
 		asdf_out['dat'+str(i)] = fits_in[i].data
 
 	if save:
-		asdf_out.write_to(fitspath.replace('fits', 'asdf'))
+		if clobber:
+			asdf_out.write_to(fitspath.replace('fits', 'asdf'))
+		if not clobber:
+			if os.path.exists(fitspath.replace('fits', 'asdf')):
+				warnings.warn('File already exists; proceeding without saving. Use clobber = True to allow overwrite.', Warning, stacklevel = 2)
+			if not os.path.exists(fitspath.replace('fits', 'asdf')):
+				asdf_out.write_to(fitspath.replace('fits', 'asdf'))
 
 	return asdf_out
 
@@ -332,7 +346,7 @@ def regridarr (im, sample):
 	return out	
 
 
-def psfexim(psfpath, pixloc, regrid = True, save = False):
+def psfexim(psfpath, pixloc, regrid = True, save = False, clobber = False):
 	"""
 	Generate image from PSFEx .psf file.
 
@@ -342,6 +356,8 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
 		save (str): If 'fits' or 'arr', will save in the specified format with name from psfpath.
 			The option to save as an array results in a .npy file.
+		clobber (bool): If True (and save = True), will overwrite existing files with the same name.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns:
 		2D image of PSFEx model
@@ -383,15 +399,21 @@ def psfexim(psfpath, pixloc, regrid = True, save = False):
 		if save.lower() not in ['arr', 'fits']:
 			warnings.warn('Save input must be "arr" or "fits". Generating PSF model without saving.', Warning, stacklevel = 2)
 		if save.lower() == 'arr':
-			np.save(psfpath.replace('.psf', '_psfex_psf.npy'), psfmodel)
+			if clobber:
+				np.save(psfpath.replace('.psf', '_psfex_psf.npy'), psfmodel)
+			if not clobber:
+				if os.path.exists(psfpath.replace('.psf', '_psfex_psf.npy')):
+					warnings.warn('File already exists; generating PSF model without saving. Use clobber = True to allow overwrite.', Warning, stacklevel = 2)
+				if not os.path.exists(psfpath.replace('.psf', '_psfex_psf.npy')):
+					np.save(psfpath.replace('.psf', '_psfex_psf.npy'), psfmodel)
 		if save.lower() == 'fits':
-			fits.writeto(psfpath.replace('.psf', '_psfex_psf.fits'), psfmodel)
+			fits.writeto(psfpath.replace('.psf', '_psfex_psf.fits'), psfmodel, overwrite = clobber)
 
 	return psfmodel
 
 
 def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True, 
-	savepsf = False, keepconfig = False, regrid = True):
+	savepsf = False, keepconfig = False, regrid = True, clobber = False):
 	"""
 	Wrapper to easily call PSFEx from python. 
 
@@ -407,6 +429,8 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 		savepsf (str): If 'fits', 'arr', or 'txt', will save 2D model PSF in that file format with the same name as the catalog.
 		keepconfig (str): If True, retain parameter files and convolutional kernels moved to working dir.
 		regrid (bool): If True, will (interpolate and) regrid model PSF to image pixel scale.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns:
 		Generates a .psf file that stores linear bases of PSF.
@@ -443,12 +467,13 @@ def pypsfex(cat_path, pos, config = None, userargs = None, makepsf = True,
 			x, y = im.shape/2 #select central pixel if not specified
 
 
-		psfmodel = psfexim(cat_path.replace('cat', 'psf'), pixloc = (x, y), save = savepsf, regrid = regrid)
+		psfmodel = psfexim(cat_path.replace('cat', 'psf'), pixloc = (x, y), 
+			save = savepsf, regrid = regrid, clobber = clobber)
 			
 		return psfmodel
 
 
-def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
+def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False):
 	"""
 	Write relevant image headers to the model PSFs and modify the coordinates and WCS.
 	Creates a full _topsf_*.fits file with only one SCI extension for use with drizzle/resample.
@@ -460,6 +485,8 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 		imcam (str): 'ACS/WFC' is the only recommended instrument/camera combination for this PSF generation method.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 		method (list): Method used to generate PSF.
+		clobber (bool): If True, will overwrite existing FITS files with the same name.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns: 
 		Generates a new FITS file with a _topsf suffix, which stores the 2D PSF model in the 
@@ -609,16 +636,16 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None):
 	hdulist = fits.HDUList(hdlist)
 
 	if img.split('_')[-1] != '_c0m.fits':
-		hdulist.writeto(modname)
+		hdulist.writeto(modname, overwrite = clobber)
 
 	if img.split('_')[-1] == '_c0m.fits':
 		modname = modname.replace('_topsf.fits', '_topsf_c0m.fits')
-		hdulist.writeto(modname)
+		hdulist.writeto(modname, overwrite = clobber)
 		os.system('cp %s %s'%(img.replace('c0m.fits', 'c1m.fits'), modname.replace('c0m.fits', 'c1m.fits')))
 
 
-def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0, 
-	maskerr = False, errthresh = 20, usermask = None, fillval = 0):
+def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0, maskerr = False, 
+	errthresh = 20, usermask = None, fillval = 0, clobber = False):
 	"""
 	Generate a FITS file that fills in masked pixels with a specified value. Useful for
 	feeding to e.g., SExtractor. Preserves truncated FITS extension structure, for the specified
@@ -636,6 +663,8 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 		usermask (arr): If specified, used as mask on data array (good pixels should have value of 0). 
 			Must be the same dimensions as the data array. (Can be used in addition to DQ and ERR masking.)
 		fillval (float): Value with which to fill the masked pixels.
+		clobber (bool): If True , will overwrite existing FITS files with the same name.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns: 
 		Generates a new FITS file with a _mask suffix with masked pixels filled in by fillval.
@@ -688,10 +717,10 @@ def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0,
 	hdlist = [cphdr, cihdr, cehdr, cdqhdr]
 
 	hdulist = fits.HDUList(hdlist)
-	hdulist.writeto(img.replace('.fits', '_mask.fits'))
+	hdulist.writeto(img.replace('.fits', '_mask.fits'), overwrite = clobber)
 
 
-def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
+def cutout(img, coords, ext = 1, fov_pixel = 120, save = True, clobber = False):
 	"""
 	Get cutout of image around some coordinates.
 
@@ -704,6 +733,8 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 		save (bool): If True, will save a FITS file containing cropped region. Note that the 
 			output FITS file will not have any distortion corrections stored as it is already 
 			decontextualized from the original image.
+		clobber (bool): If True (and save = True), will overwrite existing FITS files with the same name.
+			(Default state -- clobber = False -- is recommended.)
 
 	Returns: 
 		cutoutim (arr): Array containing cutout region of the image.
@@ -790,7 +821,7 @@ def cutout(img, coords, ext = 1, fov_pixel = 120, save = True):
 
 	hdulist = fits.HDUList(hdlist)
 	if save:
-		hdulist.writeto(img.replace('.fits', '_crop.fits'))
+		hdulist.writeto(img.replace('.fits', '_crop.fits'), overwrite = clobber)
 
 	return cutoutim
 

@@ -5,6 +5,13 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
+**Development version:**
+Can be installed via GitHub (will be available on PyPI once it's formally released).
+Documentation is up to date for the development version.
+
+* Add tolerance for more "coords" and "obj" types in ``spike.psfgen`` and ``spike.psf``
+* Add "clobber" option (off by default, does not affect behavior of plotting or resampling)
+
 
 **v1.1.0 (June 12, 2025)**
 

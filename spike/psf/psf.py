@@ -1,3 +1,4 @@
+import astropy
 import os
 import glob
 from multiprocessing import Pool, cpu_count
@@ -40,12 +41,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						 'build':True,
 						 'combine_type':'imedian',
 						 'static':False},
-		returnpsf = 'full',
-		cutout_fov = 151,
-		savecutout = True,
-		finalonly = False,
-		removedir = 'toremove',
-		**kwargs):
+		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
+		removedir = 'toremove', clobber = False, **kwargs):
 	"""
 	Generate drizzled HST PSFs.
 
@@ -72,7 +69,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		objonly (bool): If True, only drizzles input images that cover the selected obj.
 		pretweaked (bool): If True, skips TweakReg steps to include fine WCS corrections.
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before TweakReg.
-		plot (bool): If True, saves .pngs of the model PSFs.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
@@ -87,6 +85,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
 		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
 		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
+		clobber (bool): If True, will overwrite existing files with the duplicate names.
+			(Default state -- clobber = False -- is recommended.)
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -170,7 +170,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	imglist = {} #images to drizzle per object per filter (used if objonly = True)
 	if genpsf: #generate model PSFs for each image + object
-		if type(obj) == str: #check number of objects
+		if type(obj) in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #check number of objects
 			drizzlelist[obj] = {}
 			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
@@ -226,7 +226,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
+							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), 
+								kwds = dict(kwargs, clobber = clobber))
 					pool.close()
 					pool.join()
 
@@ -248,7 +249,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -262,7 +263,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -447,7 +448,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		dout = np.concatenate((sorted(glob.glob(savedir+'*_drc.fits')), 
 			sorted(glob.glob(savedir+'*_drz.fits')), sorted(glob.glob(savedir+'*_mos.fits'))))
 		for di in dout:
-			tools.to_asdf(di)
+			tools.to_asdf(di, clobber = clobber)
 
 		if verbose:
 			print('Generated ASDF output')
@@ -481,7 +482,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
+									clobber = clobber)
 					returndict[do][dk] = crop
 
 		return returndict
@@ -492,7 +494,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
-		removedir = 'toremove', tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, **kwargs):
+		removedir = 'toremove', clobber = False, tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, 
+		**kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
 
@@ -519,7 +522,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		pretweaked (bool): If True, skips tweak step to include fine WCS corrections.
 		usecrds (bool): If True, use CRDS config settings as defaults. 
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before tweak.
-		plot (bool): If True, saves .pngs of the model PSFs.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
@@ -530,6 +534,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS. Only used if returnpsf = 'crop'.
 		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
 		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
+		clobber (bool): If True, will overwrite existing files with the duplicate names.
+			(Default state -- clobber = False -- is recommended.)
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -607,7 +613,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	imglist = {} #write file names to drizzle per object per filter
 	if genpsf: #generate model PSFs for each image + object
-		if type(obj) == str: #check number of objects
+		if type(obj) in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #check number of objects
 			drizzlelist[obj] = {}
 			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
@@ -628,7 +634,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					drizzlelist[obj][pos[3]].append(modname)
 					imglist[obj][pos[3]].append(i)
 
-					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
+					psffunc(skycoords, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -661,7 +667,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), kwds = kwargs)
+							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), 
+								kwds = dict(kwargs, clobber = clobber))
 					pool.close()
 					pool.join()
 
@@ -683,7 +690,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -699,7 +706,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -866,7 +873,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 		dout = sorted(glob.glob(savedir+'*_%s.fits'%suff)) 
 		for di in dout:
-			tools.to_asdf(di)
+			tools.to_asdf(di, clobber = clobber)
 		if verbose:
 			print('Generated ASDF output')
 
@@ -892,8 +899,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
+					crop = tools.xcutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
+									clobber = clobber)
 					returndict[do][dk] = crop
 
 		return returndict
@@ -903,7 +911,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, 
 		out = 'fits', returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
-		removedir = 'toremove', tweakparams = {}, drizzleparams = {}, **kwargs):
+		removedir = 'toremove', clobber = False, tweakparams = {}, drizzleparams = {}, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -931,7 +939,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		pretweaked (bool): If True, skips tweak step to include fine WCS corrections.
 		usecrds (bool): If True, use CRDS config settings as defaults. 
 		keeporig (bool): If True (and pretweaked = False), create copy of img_dir before tweak.
-		plot (bool): If True, saves .pngs of the model PSFs.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
 		verbose (bool): If True, prints progress messages.
 		parallel (bool): If True, runs PSF generation in parallel.
 		out (str): 'fits' or 'asdf'. Output for the drizzled PSF. If 'asdf', .asdf AND .fits are saved.
@@ -942,6 +951,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		savecutout (bool): If True, save a .fits file with the cutout region, including WCS.
 		finalonly (bool): If True, only retains final drizzled/resampled data products in savedir and deletes intermediate products.
 		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
+		clobber (bool): If True, will overwrite existing files with the duplicate names.
+			(Default state -- clobber = False -- is recommended.)
 		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
@@ -1015,7 +1026,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	imglist = {}
 	if genpsf: #generate model PSFs for each image + object
-		if type(obj) == str: #check number of objects
+		if type(obj) in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #check number of objects
 			drizzlelist[obj] = {}
 			imglist[obj] = {}
 			skycoords = tools.objloc(obj)
@@ -1035,7 +1046,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					drizzlelist[obj][pos[3]].append(modname)
 					imglist[obj][pos[3]].append(i)
 
-					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
+					psffunc(skycoords, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
 		if type(obj) != str: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
@@ -1068,7 +1079,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 							drizzlelist[obj[j]][p[3]].append(modname)
 							imglist[obj[j]][p[3]].append(i)
 
-							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), kwds = kwargs)
+							pool.apply_async(psffunc, args = (skycoords[j], i, imcam, p, plot, verbose), 
+								kwds = dict(kwargs, clobber = clobber))
 					pool.close()
 					pool.join()
 				if not parallel:
@@ -1089,7 +1101,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-						psffunc(coord, i, imcam, pos, plot, verbose, **kwargs) 
+						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -1106,7 +1118,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 			psfmodel = fits.open(up)[1].data
 
-			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER')
+			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -1266,7 +1278,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 		dout = sorted(glob.glob(savedir+'*_%s.fits'%s)) 
 		for di in dout:
-			tools.to_asdf(di)
+			tools.to_asdf(di, clobber = clobber)
 
 
 	if returnpsf:
@@ -1292,7 +1304,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname, suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout)
+									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
+									clobber = clobber)
 					returndict[do][dk] = crop
 
 		return returndict

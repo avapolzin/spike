@@ -59,5 +59,4 @@ Note that it will often be preferred to provide a savedir argument, as otherwise
 
 The output drizzled/resampled PSF is placed in the full spatial context of the processed frames by default. A convenience function is included to crop the data to the region immediately around the PSF, ``spike.tools.cutout``. Alternatively, setting returnpsf = 'crop' in the ``spike.psf`` functions will result in a cutout around the PSF coordinates with a size set by the cutout_fov argument.
 
-
-``spike.tools`` and ``spike.psfgen`` functions can also be used in isolation. Note that the PSF generation functions in ``spike.psfgen`` assume that the "coords" argument will be the output of ``spike.tools.objloc`` and the "pos" argument will be the output of ``spike.tools.checkpixloc``. An ``astropy`` SkyCoord object and a list following [X, Y, chip, filter] can be input respectively instead.
+``spike.tools`` and ``spike.psfgen`` functions can also be used in isolation.
