@@ -132,6 +132,7 @@ def checkpixloc(coords, img, inst, camera = None):
 			out = [float(x_coord), float(y_coord), chip, filt]
 
 	if imcam in ['WFPC', 'WFPC1', 'WFPC2']:
+		# make chip indexing explicit for consistency with other instruments
 		if imcam in ['WFPC', 'WFPC1']: #accounting for use of both names
 			chip1 = hdu[1]
 			chip2 = hdu[2]

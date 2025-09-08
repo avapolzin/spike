@@ -114,7 +114,7 @@ sphinxcontrib-jquery==4.1
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
-spike-psf @ file:///Users/avapolzin/spike
+spike-psf==1.1.0
 stack-data==0.6.3
 stdatamodels==2.2.0
 stregion==1.1.9

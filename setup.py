@@ -21,7 +21,7 @@ setuptools.setup(
 		"Programming Language :: Python",
 		"Topic :: Scientific/Engineering :: Astronomy",
 		"Topic :: Scientific/Engineering :: Physics"],
-	python_requires = ">=3.10",
+	python_requires = ">=3.11",
 	install_requires = ["asdf", "astropy", "crds", "drizzle", 
 	"drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git", 
 	"gwcs", 

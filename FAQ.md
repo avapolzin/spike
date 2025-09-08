@@ -55,6 +55,10 @@ There are several ways to make sure that your environment variables are accessib
 
 This error pops up when your computer is out of storage. The imaging files that `spike` uses are already quite large, and the various PSF generation and drizzling steps create additional files that can take up quite a bit of space. There is little to do for this while `spike` is running, but you can toggle `finalonly = True` from `spike.psf.hst`, `spike.psf.jwst`, and `spike.psf.roman` to only retain the drizzled/resampled PSFs after the last step. By default, though, `spike` saves all intermediate products.
 
+6. **Can I still use `spike` with Python 3.10?**
+
+In short, yes, though this is not recommended. In response to the deprecation of Python 3.10 support in `drizzlepac >= 3.10`, beginning in v1.1.1, `spike` was updated to require Python >= 3.11 by default. If you would like to use `spike` with Python 3.10, earlier versions of `spike` will work. You may also wish to handle things on an ad hoc basis (at your own risk) and install `drizzlepac<=3.9.1` via [GitHub](https://github.com/spacetelescope/drizzlepac/releases) with a more recent version of `spike`. In that case, dependencies from [spike/docs/requirements_version.txt](https://github.com/avapolzin/spike/blob/master/docs/requirements_version.txt), which includes specified versions for all required packages in a working Python 3.10.16 environment (last tested with `spike` version 1.1.0), may be a useful guide. You may need to update your local `spike` setup.py in this case.
+
 ### TinyTim
 
 *If you plan to use TinyTim PSFs (for HST), TinyTim must be downloaded and installed separately following the instructions [here](https://github.com/spacetelescope/tinytim/releases).* 
