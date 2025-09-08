@@ -114,7 +114,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None
@@ -303,7 +303,7 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None
@@ -443,7 +443,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None
@@ -605,7 +605,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None
@@ -715,7 +715,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None
@@ -895,7 +895,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 		coords = tools.objloc(coords)
 
 	if not pos:
-		im_cam = imcam.split('/')[0]
+		im_cam = imcam.split('/')
 		inst = im_cam[0]
 		if len(im_cam) == 1:
 			camera = None

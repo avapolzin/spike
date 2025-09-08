@@ -9,8 +9,9 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 Can be installed via GitHub (will be available on PyPI once it's formally released).
 Documentation is up to date for the development version.
 
-* Add tolerance for more "coords" and "obj" types in ``spike.psfgen`` and ``spike.psf``
+* Add allowance for more "coords" and "obj" types in ``spike.psfgen`` and ``spike.psf``
 * Add "clobber" option (off by default, does not affect behavior of plotting or resampling)
+* Create input prompt for ACS and WFC3 "camera" if not specified in ``spike.psf`` call
 
 
 **v1.1.0 (June 12, 2025)**

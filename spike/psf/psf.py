@@ -53,7 +53,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		img_type (str): e.g, 'flc', 'flt', 'cal', 'c0m' -- specifies which file-type to include.
 			spike currently only works with MEF files (since astrodrizzle only works with MEF files).
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS'
-		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC3
+		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC3 (if not specified, 
+			will ask for input)
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
@@ -114,6 +115,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	imgs = sorted(glob.glob(img_dir+'*'+img_type+'.fits'))
 
 	if inst.upper() in ['ACS', 'WFC3']:
+		if not camera:
+			camera = input('Enter %s camera:'%inst.upper())
 		imcam = inst.upper()+'/'+camera.upper()
 	if inst.upper() in ['WFPC1', 'WFPC2', 'NICMOS', 'STIS']:
 		imcam = inst.upper()
