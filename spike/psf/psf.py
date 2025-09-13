@@ -37,7 +37,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						 'driz_cr_corr':False,
 						 'clean':False,
 						 'configobj':None,
-						 'final_pixfrac':0.8,
+						 'final_pixfrac':1.0,
 						 'build':True,
 						 'combine_type':'imedian',
 						 'static':False},
