@@ -383,11 +383,17 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		os.system('mv %s*_sci* %s'%(img_dir, savedir))
 		os.system('mv %s*_mask* %s'%(img_dir, savedir))
 		os.system('mv ./*_sci2.fits %s'%(savedir))
+		os.system('mv ./*skymatch_mask* %s'%(savedir))
 		os.system('mv %s*_wht.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_med.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_blt.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_crclean.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_crmask.fits %s'%(img_dir, savedir))
+		os.system('mv ./astrodrizzle.log %s'%(savedir))
+		os.system('mv ./tweakreg.log %s'%(savedir))
+		os.system('mv ./tiny.param %s'%(savedir))
+		# electing not to include more files in case of similar names
+		# or in cases where the files will be input-specific
 
 
 		if verbose:
@@ -433,6 +439,12 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		os.system('mv %s*_blt.fits %s'%(img_dir, removedir))
 		os.system('mv %s*_crclean.fits %s'%(img_dir, removedir))
 		os.system('mv %s*_crmask.fits %s'%(img_dir, removedir))
+		os.system('mv ./*skymatch_mask* %s'%removedir)
+		os.system('mv ./astrodrizzle.log %s'%(removedir))
+		os.system('mv ./tweakreg.log %s'%(removedir))
+		os.system('mv ./tiny.param %s'%(removedir))
+		# electing not to include more files in case of similar names
+		# or in cases where the files will be input-specific
 
 		os.system('rm -r %s'%(removedir))
 
