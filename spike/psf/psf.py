@@ -551,10 +551,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
 		clobber (bool): If True, will overwrite existing files with the duplicate names.
 			(Default state -- clobber = False -- is recommended.)
-		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
+		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the JWST pipeline documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
-		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
-				documentation for a full list.
+		drizzleparams (dict): Dictionary of keyword arguments for the resample step. See the JWST pipeline documentation
+		 		for a full list.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -620,8 +620,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 	if not pretweaked:
 		for fk in filelist.keys():
-			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
-					output_dir = img_dir, save_results = True)
+			filemodels = tweakreg_step.TweakRegStep().call(filelist[fk], 
+					output_dir = img_dir, save_results = True, **tweakparams)
 
 		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
@@ -755,8 +755,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
 
-				resamp = resample_step.ResampleStep(**drizzleparams)
-				resampkwds = {'input_models': drizzlelist[do][dk], 
+				resamp = resample_step.ResampleStep()
+				resampkwds = {**drizzleparams, 
+				  			  'input_models': drizzlelist[do][dk], 
 							  'output_file': resampname,
 							  'output_dir':img_dir, 
 							  'save_results':True}
@@ -774,17 +775,17 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
 
-				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
+				resamp = resample_step.ResampleStep().call(drizzlelist[do][dk],
 					output_file = resampname, 
-					output_dir = img_dir, save_results = True)
+					output_dir = img_dir, save_results = True, **drizzleparams)
 
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		if not objonly:
 			for fk in filelist.keys():
-				resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+				resamp = resample_step.ResampleStep().call(filelist[fk],
+						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
 			if parallel:
 				pool = Pool(processes=(cpu_count() - 1))
@@ -799,8 +800,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					resampname = shortdec+shortra+'_'+dk+'_img'
 					resampname = resampname.replace(':', '').replace(' ', '')
 
-					resamp = resample_step.ResampleStep(**drizzleparams)
-					resampkwds = {'input_models': imglist[do][dk], 
+					resamp = resample_step.ResampleStep()
+					resampkwds = {**drizzleparams,
+								  'input_models': imglist[do][dk], 
 								  'output_file': resampname,
 								  'output_dir':img_dir, 
 								  'save_results':True}
@@ -818,10 +820,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					resampname = shortdec+shortra+'_'+dk+'_img'
 					resampname = resampname.replace(':', '').replace(' ', '')
 
-					resamp = resample_step.ResampleStep(**drizzleparams).call(imglist[do][dk],
+					resamp = resample_step.ResampleStep().call(imglist[do][dk],
 						output_file = resampname, 
-						output_dir = img_dir, save_results = True)
-
+						output_dir = img_dir, save_results = True, **drizzleparams)
 
 	#####################################################################
 	suff = "resamplestep"
@@ -968,9 +969,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		removedir (str): Directory (**to be deleted**) that stores intermediate products for removal. Default is 'toremove'.
 		clobber (bool): If True, will overwrite existing files with the duplicate names.
 			(Default state -- clobber = False -- is recommended.)
-		tweakparams (dict): Dictionary of keyword arguments for drizzlepac.tweakreg. See the drizzlepac documentation
+		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the Roman pipeline documentation
 				for a full list.
-		drizzleparams (dict): Dictionary of keyword arguments for drizzlepac.astrodrizzle. See the drizzlepac 
+		drizzleparams (dict): Dictionary of keyword arguments for resample step. See the Roman pipeline 
 				documentation for a full list.
 		**kwargs: Keyword arguments for PSF generation function.
 
@@ -1033,8 +1034,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	if not pretweaked:
 		for fk in filelist.keys():
-			filemodels = tweakreg_step.TweakRegStep(**tweakparams).call(filelist[fk], 
-					output_dir = img_dir, save_results = True)
+			filemodels = tweakreg_step.TweakRegStep().call(filelist[fk], 
+					output_dir = img_dir, save_results = True, **tweakparams)
 
 		imgs = sorted(glob.glob(img_dir+'*_tweakregstep.fits'))
 
@@ -1166,8 +1167,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
 
-				resamp = resample_step.ResampleStep(**drizzleparams)
-				resampkwds = {'input_models': drizzlelist[do][dk], 
+				resamp = resample_step.ResampleStep()
+				resampkwds = {**drizzleparams, 
+				  			  'input_models': drizzlelist[do][dk], 
 							  'output_file': resampname,
 							  'output_dir':img_dir, 
 							  'save_results':True}
@@ -1185,16 +1187,16 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				resampname = shortdec+shortra+'_'+dk
 				resampname = resampname.replace(':', '').replace(' ', '')
 
-				resamp = resample_step.ResampleStep(**drizzleparams).call(drizzlelist[do][dk],
-					output_file = resampname, output_dir = img_dir, save_results = True)
+				resamp = resample_step.ResampleStep().call(drizzlelist[do][dk],
+					output_file = resampname, output_dir = img_dir, save_results = True, **drizzleparams)
 
 
 	
 	if drizzleimgs: # useful for processing all images + PSFs simultaneously
 		if not objonly:
 			for fk in filelist.keys():
-				resamp = resample_step.ResampleStep(**drizzleparams).call(filelist[fk],
-						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True)
+				resamp = resample_step.ResampleStep().call(filelist[fk],
+						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
 			if parallel:
 				pool = Pool(processes=(cpu_count() - 1))
@@ -1208,8 +1210,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					resampname = shortdec+shortra+'_'+dk+'_img'
 					resampname = resampname.replace(':', '').replace(' ', '')
 
-					resamp = resample_step.ResampleStep(**drizzleparams)
-					resampkwds = {'input_models': imglist[do][dk], 
+					resamp = resample_step.ResampleStep()
+					resampkwds = {**drizzleparams,
+				   				  'input_models': imglist[do][dk], 
 								  'output_file': resampname,
 								  'output_dir':img_dir, 
 								  'save_results':True}
@@ -1227,8 +1230,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					resampname = shortdec+shortra+'_'+dk+'_img'
 					resampname = resampname.replace(':', '').replace(' ', '')
 
-					resamp = resample_step.ResampleStep(**drizzleparams).call(imglist[do][dk],
-						output_file = resampname, output_dir = img_dir, save_results = True)
+					resamp = resample_step.ResampleStep().call(imglist[do][dk],
+						output_file = resampname, output_dir = img_dir, save_results = True, **drizzleparams)
 	#####################################################################
 	suff = "resamplestep"
 
