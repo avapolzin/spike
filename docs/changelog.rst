@@ -17,10 +17,10 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 * Add allowance for more "coords" and "obj" types in ``spike.psfgen`` and ``spike.psf``
 * Add "clobber" option (off by default, does not affect behavior of plotting or resampling)
 * Create input prompt for ACS and WFC3 "camera" if not specified in ``spike.psf`` call
-* Change Python version requirement (to >=3.11) in response to changes in ``drizzlepac>=3.10``
+* Change Python version requirement (>=3.11) in response to changes in ``drizzlepac>=3.10``
 * Update ``spike.psf.hst`` "drizzleparams" defaults to be more agnostic to dither pattern
 * More comprehensive cleanup of intermediate files
-* Fix propagation of user inputs to ``spike.psf.jwst`` and ``roman`` resample steps
+* Fix propagation of user inputs to ``spike.psf.jwst`` and ``roman`` pipeline steps
 
 
 **v1.1.0 (June 12, 2025)**
