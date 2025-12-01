@@ -78,6 +78,12 @@ If you don't already have the [Gillis et al. (2020)](https://bitbucket.org/brgil
 
 The STDPSFs are read into `photutils` as URLs as needed, so there could be an issue connecting to the Space Telescope website for [HST](https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/) or [JWST](https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/) STDPSFs.
 
+If you can connect to the site through the link above, there may have been a change in the filename or path as those directories are not static and are sometimes updated. In that case, please either open an [issue](https://github.com/avapolzin/spike/issues) or send me an [email](mailto:apolzin@uchicago.edu) so that I can amend the code accordingly.
+
+2. **No STDPSF grid exists for my chosen WFC3 filter. Can I still use a pre-computed empirical PSF?**
+
+Yes, you can. You can download pre-computed empirical WFC3 PSFs from [MAST](https://mast.stsci.edu) (under "Select a Collection" > "WFC3 PSF"). Once you download these locally, you can feed `spike.psf.hst` `method = 'USER'` where `usermethod` will be the path to the directory where you downloaded those PSFs. If there are point sources in your image, you always have the option to compute empirical PSFs via `spike` with `PSFEx` or the `photutils` effective PSF.
+
 
 ### PSFEx
 

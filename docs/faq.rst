@@ -61,7 +61,7 @@ There are several ways to make sure that your environment variables are accessib
 
 5. **Why am I getting some version of 'OSError: 8388608 requested and 0 written'?**
 
-This error pops up when your computer is out of storage. The imaging files that ``spike`` uses are already quite large, and the various PSF generation and drizzling steps create additional files that can take up quite a bit of space. There is little to do for this while `spike` is running, but you can toggle ``finalonly = True`` from ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` to only retain the drizzled/resampled PSFs after the last step. By default, though, ``spike`` saves all intermediate products.
+This error pops up when your computer is out of storage. The imaging files that ``spike`` uses are already quite large, and the various PSF generation and drizzling steps create additional files that can take up quite a bit of space. There is little to do for this while ``spike`` is running, but you can toggle ``finalonly = True`` from ``spike.psf.hst``, ``spike.psf.jwst``, and ``spike.psf.roman`` to only retain the drizzled/resampled PSFs after the last step. By default, though, ``spike`` saves all intermediate products.
 
 6. **Can I still use spike with Python 3.10?**
 
@@ -88,6 +88,12 @@ STDPSF
 1. **Why am I getting an HTTPS error when my PSF generation method is 'STDPSF'?**
 
 The STDPSFs are read into ``photutils`` as URLs as needed, so there could be an issue connecting to the Space Telescope website for `HST <https://www.stsci.edu/~jayander/HST1PASS/LIB/PSFs/STDPSFs/>`_ or `JWST <https://www.stsci.edu/~jayander/JWST1PASS/LIB/PSFs/STDPSFs/>`_ STDPSFs.
+
+If you can connect to the site through the link above, there may have been a change in the filename or path as those directories are not static and are sometimes updated. In that case, please either open an `issue <https://github.com/avapolzin/spike/issues>`_ or send me an `email <mailto:apolzin@uchicago.edu>`_ so that I can amend the code accordingly.
+
+2. **No STDPSF grid exists for my chosen WFC3 filter. Can I still use a pre-computed empirical PSF?**
+
+Yes, you can. You can download pre-computed empirical WFC3 PSFs from `MAST <https://mast.stsci.edu>`_ (under "Select a Collection" > "WFC3 PSF"). Once you download these locally, you can feed ``spike.psf.hst`` ``method = 'USER'`` where ``usermethod`` will be the path to the directory where you downloaded those PSFs. If there are point sources in your image, you always have the option to compute empirical PSFs via ``spike`` with ``PSFEx`` or the ``photutils`` effective PSF.
 
 
 PSFEx

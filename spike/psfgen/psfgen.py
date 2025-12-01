@@ -477,6 +477,8 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 			url += '_1x1.fits'
 		elif (imcam == 'WFC3/UVIS') and (pos[3] == 'F475W'):
 			url += 'x.fits'
+		elif (imcam == 'WFC3/UVIS') and (pos[3] == 'F200LP'): #hopefully temporary
+			raise Exception('No STDPSF grid currently available for WFC3/UVIS F200LP. Please select a different PSF generation method.')
 		else:
 			url += '.fits'
 

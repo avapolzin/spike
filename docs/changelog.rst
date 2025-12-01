@@ -5,9 +5,12 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
-.. **Development version:**
-.. Can be installed via GitHub (will be available on PyPI once it's formally released).
-.. Documentation is up to date for the development version.
+**Development version:**
+
+Can be installed via GitHub (will be available on PyPI once it's formally released).
+Documentation is up to date for the development version.
+
+* Raise exception if WFC3/UVIS F200LP used with STDPSF in response to STScI-side changes
 
 .. * Add option to use object name in output files rather than coordinates
 
