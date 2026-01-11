@@ -25,7 +25,7 @@ setuptools.setup(
 	install_requires = ["asdf", "astropy", "crds", "drizzle", 
 	"drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git", 
 	"gwcs", 
-	"jsonschema", "matplotlib", "numpy", "photutils", "psutil", "pyyaml", "roman-datamodels", 
+	"jsonschema", "matplotlib", "numpy", "photutils", "psutil", "pyyaml", "roman-datamodels==0.22.0", 
 	"scipy", "spherical-geometry", "stdatamodels==2.2.0", "tweakwcs", 
 	"stpsf"],
 	package_data={'spike': ['configs/*/*']},

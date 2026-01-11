@@ -12,6 +12,7 @@ Documentation is up to date for the development version.
 
 * Raise exception if 200LP used with WFC3 STDPSF in response to STScI-side changes
 * Prioritize Simbad results in returning coordinates from object name
+* Add version requirement for ``roman_datamodels`` (will update fully post-launch)
 
 .. * Add option to use object name in output files rather than coordinates
 

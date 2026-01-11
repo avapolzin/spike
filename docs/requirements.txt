@@ -15,7 +15,7 @@ numpy
 photutils
 psutil
 pyyaml
-roman-datamodels
+roman-datamodels==0.22.0
 scipy
 spherical-geometry
 stdatamodels==2.2.0 
