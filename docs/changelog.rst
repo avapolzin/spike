@@ -10,7 +10,8 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 Can be installed via GitHub (will be available on PyPI once it's formally released).
 Documentation is up to date for the development version.
 
-* Raise exception if WFC3/UVIS F200LP used with STDPSF in response to STScI-side changes
+* Raise exception if 200LP used with WFC3 STDPSF in response to STScI-side changes
+* Prioritize Simbad results in returning coordinates from object name
 
 .. * Add option to use object name in output files rather than coordinates
 

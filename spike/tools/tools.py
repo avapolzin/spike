@@ -44,7 +44,15 @@ def objloc(obj):
 				break
 
 		if isname:
-			coords = name_resolve.get_icrs_coordinates(obj)
+			try: 
+			#simbad should be most reliable and should be queried first
+			#seems astropy changed recently, though because I've seen funky behavior
+				name_resolve.sesame_database.set('simbad')
+				coords = name_resolve.get_icrs_coordinates(obj)
+			except:
+			#if no simbad results, THEN query other databses for coordinates
+				name_resolve.sesame_database.set('all')
+				coords = name_resolve.get_icrs_coordinates(obj)
 
 		if not isname:
 			if ':' in obj:
