@@ -1,11 +1,11 @@
 import astropy
-import os
-import glob
-from multiprocessing import Pool, cpu_count
-from spike import psfgen, tools
 from astropy.io import fits
 from astropy.wcs import WCS, utils
+import glob
+from multiprocessing import Pool, cpu_count
 import numpy as np
+import os
+from spike import psfgen, tools
 import subprocess
 from subprocess import call
 import warnings

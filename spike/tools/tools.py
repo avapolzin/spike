@@ -1,9 +1,8 @@
 from asdf import AsdfFile
 import astropy
 from astropy.coordinates import SkyCoord, name_resolve
-import astropy
-import astropy.units as u
 from astropy.io import fits
+import astropy.units as u
 from astropy.wcs import WCS, utils
 import numpy as np
 import os
