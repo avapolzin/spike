@@ -18,3 +18,6 @@ If you use this package or the scripts in `the repository <https://github.com/av
 * if you use STDPSFs: ``photutils`` (`Bradley et al. 2024 <https://zenodo.org/records/13989456>`_) and `Anderson (2016) <https://ui.adsabs.harvard.edu/abs/2016wfc..rept...12A/abstract>`_ + the relevant instrument paper -- MIRI (`Libralato et al. 2024 <https://ui.adsabs.harvard.edu/abs/2024PASP..136c4502L/abstract>`_); NIRISS (`Libralato et al. 2023 <https://ui.adsabs.harvard.edu/abs/2023ApJ...950..101L/abstract>`_) 
 
 Note that the BibTex for all of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.
+
+
+See a (mostly) complete list of papers that cite ``spike`` `here <https://ui.adsabs.harvard.edu/search/q=citations(bibcode%3A2025JOSS...10.8200P)&sort=date%20desc%2C%20bibcode%20desc&p_=0>`_.
