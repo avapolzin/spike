@@ -20,4 +20,4 @@ If you use this package or the scripts in `the repository <https://github.com/av
 Note that the BibTex for all of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.
 
 
-See a (mostly) complete list of papers that cite ``spike`` `here <https://ui.adsabs.harvard.edu/search/q=citations(bibcode%3A2025JOSS...10.8200P)&sort=date%20desc%2C%20bibcode%20desc&p_=0>`_.
+See a (mostly) complete list of papers that cite ``spike`` `here <https://ui.adsabs.harvard.edu/search/q=citations(bibcode%3A2025JOSS...10.8200P)>`_.
