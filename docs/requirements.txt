@@ -2,6 +2,7 @@ sphinx
 sphinx-rtd-theme
 nbsphinx
 nbsphinx-link
+docutils==0.21.2
 ipython
 asdf
 astropy
