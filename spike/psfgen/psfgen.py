@@ -174,6 +174,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	if coords.dec.deg < 0:
 		coordstring += str(coords.dec)
 
+	# modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
 
 	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
@@ -226,11 +227,11 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	# NICMOS has time complication since the cryo-cooler etc. matter
 	# set date of change over at April 3, 2002: https://ui.adsabs.harvard.edu/abs/2008AIPC..985..799S/abstract
 
-	if imcam not in  ['ACS/WFC', 'ACS/HRC']:
-		psfmodel = fits.open(modname+'00_psf.fits')[0].data
+	# if imcam not in  ['ACS/WFC', 'ACS/HRC']:
+	# 	psfmodel = fits.open(modname+'00_psf.fits')[0].data
 
-	if imcam in ['ACS/WFC', 'ACS/HRC']:
-		psfmodel = fits.open(modname+'00.fits')[0].data
+	# if imcam in ['ACS/WFC', 'ACS/HRC']:
+	psfmodel = fits.open(modname+'00.fits')[0].data
 
 
 	if plot:

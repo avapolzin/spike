@@ -5,16 +5,20 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
-**Development version:**
+.. **Development version:**
 
-Can be installed via GitHub (will be available on PyPI once it's formally released).
-Documentation is up to date for the development version.
+.. Can be installed via GitHub (will be available on PyPI once it's formally released).
+.. Documentation is up to date for the development version.
+
+
+.. * Add option to use object name in output files rather than coordinates
+
+**v1.2.1 (January 26, 2026)**
 
 * Raise exception if 200LP used with WFC3 STDPSF in response to STScI-side changes
 * Prioritize Simbad results in returning coordinates from object name
 * Add version requirement for ``roman_datamodels`` (will update fully post-launch)
-
-.. * Add option to use object name in output files rather than coordinates
+* Major improvements to WFPC2 processing
 
 
 **v1.2.0 (October 6, 2025)**

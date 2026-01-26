@@ -122,7 +122,27 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		imcam = inst.upper()
 
 	if inst.upper() == 'WFPC2':
-		updatewcs = True
+		## following https://spacetelescope.github.io/notebooks/notebooks/DrizzlePac/drizzle_wfpc2/drizzle_wfpc2.html
+		## as feeding updatewcs to tweakparams and drizzleparams does not work as it is supposed to
+		from stwcs.updatewcs import updatewcs
+		import subprocess
+
+		if verbose:
+			print('Updating WFPC2 CRDS path.')
+
+		os.environ['CRDS_SERVER_URL']="https://hst-crds.stsci.edu"
+		os.environ['CRDS_PATH'] = os.path.abspath(os.path.join('.', 'reference_files'))
+
+		subprocess.check_output('crds bestrefs --files %s --sync-references=1 --update-bestrefs'%(img_dir+'*'+img_type+'.fits'), 
+				shell=True, stderr=subprocess.DEVNULL)
+
+		os.environ['uref'] = os.path.abspath(os.path.join('.', 'reference_files', 'references', 'hst', 'wfpc2')) + os.path.sep
+
+		# updatewcs(img_dir+'*'+img_type+'.fits')
+
+		# ## should be sufficient on their own, but do not work as suggested
+		# tweakparams['updatewcs'] = True ## secondary check, but also handled explicitly above
+		# drizzleparams['updatewcs'] = True
 
 	genpsf = True
 	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'STDPSF', 'EPSF', 'PSFEX', 'USER']:
@@ -156,10 +176,17 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		try: #get filter
 			filt = hdu[0].header['FILTER']
 		except:
-			if hdu[0].header['FILTER1'].startswith('F'):
-				filt = hdu[0].header['FILTER1']
-			else:
-				filt = hdu[0].header['FILTER2']
+			if inst.upper() == 'WFPC2':
+				if str(hdu[0].header['FILTNAM1']).startswith('F'):
+					filt = hdu[0].header['FILTNAM1'].rstrip()
+				else:
+					filt = hdu[0].header['FILTNAM2'].rstrip()
+
+			if inst.upper() != 'WFPC2':
+				if str(hdu[0].header['FILTER1']).startswith('F'):
+					filt = hdu[0].header['FILTER1']
+				else:
+					filt = hdu[0].header['FILTER2']
 		if filt not in filelist.keys():
 			filelist[filt] = []
 		filelist[filt].append(fi)
@@ -312,7 +339,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
 	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
-		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir))))
+		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drw.fits'%img_dir))))
 
 	if len(drzs) == 0:
 		raise Exception('No co-added/resampled output files created. Check your input path, coordinates and the output of the PSF generation steps.')
@@ -366,6 +394,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 		os.system('mv %s*_drc* %s'%(img_dir, savedir)) # drizzled files
 		os.system('mv %s*_drz* %s'%(img_dir, savedir)) # drizzled files
+		os.system('mv %s*_drw* %s'%(img_dir, savedir)) # drizzled files
 		os.system('mv %s*_mos* %s'%(img_dir, savedir)) # drizzled files
 
 		os.system('mv %s*_psf* %s'%(img_dir, savedir)) # generated PSF models
@@ -384,12 +413,16 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		os.system('mv %s*_mask* %s'%(img_dir, savedir))
 		os.system('mv ./*_sci2.fits %s'%(savedir))
 		os.system('mv ./*skymatch_mask* %s'%(savedir))
+		os.system('mv ./*hlet_mask* %s'%(savedir))
 		os.system('mv %s*_wht.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_med.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_blt.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_hlet.fits %s'%(img_dir, savedir))
+		os.system('mv %s*_d2im.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_crclean.fits %s'%(img_dir, savedir))
 		os.system('mv %s*_crmask.fits %s'%(img_dir, savedir))
 		os.system('mv ./astrodrizzle.log %s'%(savedir))
+		os.system('mv ./headerlet.log %s'%(savedir))
 		os.system('mv ./tweakreg.log %s'%(savedir))
 		os.system('mv ./tiny.param %s'%(savedir))
 		# electing not to include more files in case of similar names
@@ -407,6 +440,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 		os.system('mv %s*_drz* %s'%(img_dir, savedir)) #move files to preserve
 		os.system('mv %s*_drc* %s'%(img_dir, savedir))
+		os.system('mv %s*_drw* %s'%(img_dir, savedir))
 		os.system('mv %s*_mos* %s'%(img_dir, savedir))
 
 		if verbose:
@@ -610,7 +644,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		try: #get filter
 			filt = hdu[0].header['FILTER']
 		except:
-			if hdu[0].header['FILTER1'].startswith('F'):
+			if str(hdu[0].header['FILTER1']).startswith('F'):
 				filt = hdu[0].header['FILTER1']
 			else:
 				filt = hdu[0].header['FILTER2']
@@ -1024,7 +1058,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		try: #get filter
 			filt = hdu[0].header['FILTER']
 		except:
-			if hdu[0].header['FILTER1'].startswith('F'):
+			if str(hdu[0].header['FILTER1']).startswith('F'):
 				filt = hdu[0].header['FILTER1']
 			else:
 				filt = hdu[0].header['FILTER2']

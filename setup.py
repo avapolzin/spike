@@ -5,7 +5,7 @@ pypi_descrip = (spike_home / "README.md").read_text()
 
 setuptools.setup(
 	name = "spike-psf",
-	version = "1.2.0",
+	version = "1.2.1",
 	author = "Ava Polzin",
 	author_email = "apolzin@uchicago.edu",
 	description = "Drizzle/resample HST, JWST, and Roman PSFs for improved analyses.",

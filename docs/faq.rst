@@ -33,6 +33,12 @@ Tweaking an image is a "destructive" process insofar as it irrevocably changes t
 
 ``spike`` works by generating PSFs for individual exposures and then running them through the same processing and combination steps employed by the *HST*, *JWST*, and Roman pipelines to process images. This creates a location-specific drizzled PSF that is a resampled and combined in the same way as the images are in the final drizzled/mosaiced product. Because ``spike`` relies on doing this image combination step, the input files should be calibrated, but not yet combined -- e.g., cal, flt, or flc files and not i2d, drz, or drc files. Similarly, because ``astrodrizzle`` does not work with waivered FITS files, ``spike`` only takes as input multi-extension FITS files. 
 
+6. **I'm seeing an error that says "ValueError: Undefined variable 'uref' in string..." Why can't I tweak or drizzle WFPC2 imaging?**
+
+The WFPC2 data use a prior convention/format for astrometry and WCS. You must update the WCS to be compatible with ``drizzlepac``. There are `instructions on preprocessing WFPC2 data <https://spacetelescope.github.io/notebooks/notebooks/DrizzlePac/drizzle_wfpc2/drizzle_wfpc2.html>_` from STScI; however, in my experience, data recently downloaded from MAST should not have ``stwcs.updatewcs.updatewcs`` run, and instead the CRDS keywords just need to be added to your path. ``spike`` also handles this automatically when WFPC2 data are used.
+
+Some other notes on this: The c0m files seem to behave more reliably than flt files as inputs. Additionally, if you are getting an error about celestial coordinates, ``spike`` may be reading the WCS from the header of one of the PSF models. Even with ``clobber=True``, make sure that your input file directory is clear of artifacts from previous (especially aborted) runs for best performance. Tweaking WFPC2 imaging may impact how ``drizzlepac`` reads the data, so I recommend only tweaking if necessary.
+
 
 spike
 -----

@@ -92,10 +92,17 @@ def checkpixloc(coords, img, inst, camera = None):
 	try: #get filter
 		filt = hdu[0].header['FILTER']
 	except:
-		if hdu[0].header['FILTER1'].startswith('F'):
-			filt = hdu[0].header['FILTER1']
-		else:
-			filt = hdu[0].header['FILTER2']
+		if inst.upper() == 'WFPC2':
+			if str(hdu[0].header['FILTNAM1']).startswith('F'):
+				filt = hdu[0].header['FILTNAM1'].rstrip()
+			else:
+				filt = hdu[0].header['FILTNAM2'].rstrip()
+
+		if inst.upper() != 'WFPC2':
+			if str(hdu[0].header['FILTER1']).startswith('F'):
+				filt = hdu[0].header['FILTER1']
+			else:
+				filt = hdu[0].header['FILTER2']
 
 	### instrument checks ###
 	if imcam in ['ACS/WFC', 'WFC3/UVIS']:
@@ -570,7 +577,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 		hdr['COMMENT'] = "PSF generated via spike."
 	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI', ver = 1)
 
-	if img.split('_')[-1] != '_c0m.fits':
+	if img.split('_')[-1] != 'c0m.fits':
 		ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
 		dqhdrdat = np.zeros_like(imgdat[('DQ', extv)].data)
 		cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR', ver = 1)
@@ -585,10 +592,10 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 	img_type = img.split('_')[-1].replace('.fits', '')
 	modname = img.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 
-	if img.split('_')[-1] != '_c0m.fits':
+	if img.split('_')[-1] != 'c0m.fits':
 		hdlist = [cphdr, cihdr, cehdr, cdqhdr]
 
-	if img.split('_')[-1] == '_c0m.fits':
+	if img.split('_')[-1] == 'c0m.fits':
 		hdlist = [cphdr, cihdr]
 
 	try: #get WCSDVARR
@@ -643,10 +650,10 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 
 	hdulist = fits.HDUList(hdlist)
 
-	if img.split('_')[-1] != '_c0m.fits':
+	if img.split('_')[-1] != 'c0m.fits':
 		hdulist.writeto(modname, overwrite = clobber)
 
-	if img.split('_')[-1] == '_c0m.fits':
+	if img.split('_')[-1] == 'c0m.fits':
 		modname = modname.replace('_topsf.fits', '_topsf_c0m.fits')
 		hdulist.writeto(modname, overwrite = clobber)
 		os.system('cp %s %s'%(img.replace('c0m.fits', 'c1m.fits'), modname.replace('c0m.fits', 'c1m.fits')))
