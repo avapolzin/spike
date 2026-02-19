@@ -5,7 +5,7 @@ FAQs
 
 This file is also available on `GitHub <https://github.com/avapolzin/spike/blob/master/FAQ.md>`_, where it will be updated along with the development version of the code (and may be more responsive to common issues).
 
-Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I've tried to project for more common questions here.
+Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, and I've tried to project for more common questions here.
 
 For more detailed questions/concerns about any of ``spike``'s dependencies, please refer to the original documentation for that code specifically.
 
@@ -35,7 +35,7 @@ Tweaking an image is a "destructive" process insofar as it irrevocably changes t
 
 6. **I'm seeing an error that says "ValueError: Undefined variable 'uref' in string..." Why can't I tweak or drizzle WFPC2 imaging?**
 
-The WFPC2 data use a prior convention/format for astrometry and WCS. You must update the WCS to be compatible with ``drizzlepac``. There are `instructions on preprocessing WFPC2 data <https://spacetelescope.github.io/notebooks/notebooks/DrizzlePac/drizzle_wfpc2/drizzle_wfpc2.html>_` from STScI; however, in my experience, data recently downloaded from MAST should not have ``stwcs.updatewcs.updatewcs`` run, and instead the CRDS keywords just need to be added to your path. ``spike`` also handles this automatically when WFPC2 data are used.
+The WFPC2 data use a prior convention/format for astrometry and WCS. You must update the WCS to be compatible with ``drizzlepac``. There are `instructions on preprocessing WFPC2 data <https://spacetelescope.github.io/notebooks/notebooks/DrizzlePac/drizzle_wfpc2/drizzle_wfpc2.html>`_ from STScI; however, in my experience, data recently downloaded from MAST should not have ``stwcs.updatewcs.updatewcs`` run, and instead the CRDS keywords just need to be added to your path. ``spike`` also handles this automatically when WFPC2 data are used.
 
 Some other notes on this: The c0m files seem to behave more reliably than flt files as inputs. Additionally, if you are getting an error about celestial coordinates, ``spike`` may be reading the WCS from the header of one of the PSF models. Even with ``clobber=True``, make sure that your input file directory is clear of artifacts from previous (especially aborted) runs for best performance. Tweaking WFPC2 imaging may impact how ``drizzlepac`` reads the data, so I recommend only tweaking if necessary.
 

@@ -1,6 +1,6 @@
 # FAQs
 
-Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, though I've tried to project for more common questions here.
+Since there are so many different codes in play, it make sense to have a centralized place to address common questions/concerns without necessitating digging through the documentation/issues. I will amend this as new considerations come up, and I've tried to project for more common questions here.
 
 For more detailed questions/concerns about any of `spike`'s dependencies, please refer to the original documentation for that code specifically.
 
