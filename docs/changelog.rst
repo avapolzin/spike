@@ -10,7 +10,7 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 Can be installed via GitHub (will be available on PyPI once it's formally released).
 Documentation is up to date for the development version.
 
-* Patch ``pkg_resources`` deprecation and remain backwards compatible
+* Patch ``pkg_resources`` deprecation while remaining backwards compatible
 * Restore typical detector x, y alignment in drizzling step with default kwargs
 * Fix bug with WFC3 resampling when TinyTim model PSFs used
 
