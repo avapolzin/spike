@@ -12,6 +12,7 @@ Documentation is up to date for the development version.
 
 * Patch ``pkg_resources`` deprecation and remain backwards compatible
 * Restore typical detector x, y alignment in drizzling step with default kwargs
+* Fix bug with WFC3 resampling when TinyTim model PSFs used
 
 
 .. * Add option to use object name in output files rather than coordinates

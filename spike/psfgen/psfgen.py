@@ -222,7 +222,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	if verbose:
 		print("Completed PSF modeling.")
 
-	if imcam in ['ACS/WFC', 'ACS/HRC']: 
+	if imcam in ['ACS/WFC', 'ACS/HRC', 'WFC3/UVIS', 'WFC3/IR']: 
 		os.system(TINY_PATH+'/tiny3 tiny.param')
 		if verbose:
 			print("Completed geometric distortion correction.")
@@ -235,7 +235,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 	# if imcam not in  ['ACS/WFC', 'ACS/HRC']:
 	# 	psfmodel = fits.open(modname+'00_psf.fits')[0].data
 
-	# if imcam in ['ACS/WFC', 'ACS/HRC']:
+	# if imcam in ['ACS/WFC', 'ACS/HRC', 'WFC3/UVIS', 'WFC3/IR']:
 	psfmodel = fits.open(modname+'00.fits')[0].data
 
 
