@@ -39,6 +39,10 @@ The WFPC2 data use a prior convention/format for astrometry and WCS. You must up
 
 Some other notes on this: The c0m files seem to behave more reliably than flt files as inputs. Additionally, if you are getting an error about celestial coordinates, ``spike`` may be reading the WCS from the header of one of the PSF models. Even with ``clobber=True``, make sure that your input file directory is clear of artifacts from previous (especially aborted) runs for best performance. Tweaking WFPC2 imaging may impact how ``drizzlepac`` reads the data, so I recommend only tweaking if necessary.
 
+7. **My WFC3 data is in a filter not included in STDPSF and there are no suitable stars in frame for an empirical PSF. What should I do?**
+
+As STScI recommends against using ``TinyTim`` PSF models with WFC3 imaging, you can follow their suggested approach and use the library of empirical PSFs distributed via MAST. To access, simply go to `mast.stsci.edu <https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html>`_, then under "Select a Data Category" choose "WFC3 PSF", specifying "UVIS" or "IR" under the "Waveband" dropdown before running the query. From there, you can filter the returned PSFs to best match your data. To use those single-frame PSFs with ``spike``, download the empirical PSFs from MAST into a local directory, making sure the files are renamed according to the convention in the ``spike`` documentation. You can then run ``spike.psf.hst`` as normal with ``method = 'USER'`` and the "usermethod" argument set to a string representing the path from your working directory to the directory where the STScI WFC3 PSFs are downloaded.
+
 
 spike
 -----
@@ -75,7 +79,7 @@ In short, yes, though this is not recommended. In response to the deprecation of
 
 7. **I'm seeing errors related to pkg_resources or importlib. How do I fix these?**
 
-In version 82.0.0, ``setuptools`` fully deprecated ``pkg_resources`` without offering an immediate alternative or any backwards compatible solutions. Instead, ``importlib`` is supposed to be a replacement to most common workflows, but the relevant modules are not available for Python < 3.13. Many libraries are now scrambling to update accordingly -- some by installing another tool, ``importlib_resources``; some by moving directly to `importlib`, though the primary functions are not available in all Python versions; and some by requesting that individual users downgrade their ``setuptools`` installations. ``spike`` does not require you to install additional dependencies to workaround a newer version of ``setuptools`` and remains compatible with ``pkg_resources``, so the easiest user-side solution is to downgrade to ``setuptools==81.0.0``. It also comes with an ``importlib`` solution, but for users who want to use the newest version of ``setuptools`` and are not yet using Python > 3.13, this will require updating Python versions.
+In version 82.0.0, ``setuptools`` fully deprecated ``pkg_resources`` without offering an immediate one-to-one alternative or any backward compatibility. Instead, ``importlib`` is supposed to be a replacement to most common workflows, but the relevant modules are not available for Python < 3.13. Many libraries are now scrambling to update accordingly -- some by installing another tool, ``importlib_resources``; some by moving directly to `importlib`, though the primary functions are not available in all Python versions; and some by requesting that individual users downgrade their ``setuptools`` installations. ``spike`` does not require you to install additional dependencies to workaround a newer version of ``setuptools`` and remains compatible with ``pkg_resources``, so the easiest user-side solution is to downgrade to ``setuptools==81.0.0``. It also comes with an ``importlib`` solution, but for users who want to use the newest version of ``setuptools`` and are not yet using Python > 3.13, this will require updating Python versions.
 
 
 TinyTim

@@ -32,7 +32,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					   'expand_refcat':True,
 					   'outshifts':'shift_searchrad.txt', 
 					   'updatehdr':True,
-					   'wcsname': 'TWEAK'}, 
+					   'wcsname':'TWEAK'}, 
 		drizzleparams = {'preserve':False,
 						 'driz_cr_corr':False,
 						 'clean':False,
@@ -41,8 +41,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						 'build':True,
 						 'combine_type':'imedian',
 						 'static':False,
-						 'driz_sep_rot': None,
-						 'final_rot': None},
+						 'driz_sep_rot':None,
+						 'final_rot':None},
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
 		removedir = 'toremove', clobber = False, **kwargs):
 	"""
