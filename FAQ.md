@@ -38,7 +38,7 @@ Some other notes on this: The c0m files seem to behave more reliably than flt fi
 
 1. **Why am I getting `NameResolveError: Unable to find coordinates for name ...` when I feed `spike.psf` an object name?**
 
-First, check your internet connection. Name queries require access to the internet. The next most likely reason you'd get this sort of error is that the object name is not resolvable by NED. Providing coordinates will allow `spike` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run `spike` immediately.
+First, check your internet connection. Name queries require access to the internet. The next most likely reason you'd get this sort of error is that the object name is not resolvable by Simbad or NED. Providing coordinates will allow `spike` to proceed. If searching for that name generally works, I have found that sometimes (perhaps due to updates on the CDS side of things?) searches that have worked in the past will temporarily return an error. In that case, you can either wait a bit and try again with a name search or you can provide the coordinates yourself to run `spike` immediately.
 
 2. **I am encountering a problem with one of the pipeline modules (`spike.jwstcal`, `spike.romancal`, or `spike.stcal`). How much has changed from the official Space Telescope releases?**
 
@@ -65,6 +65,10 @@ This error pops up when your computer is out of storage. The imaging files that 
 6. **Can I still use `spike` with Python 3.10?**
 
 In short, yes, though this is not recommended. In response to the deprecation of Python 3.10 support in `drizzlepac >= 3.10`, beginning in v1.1.1, `spike` was updated to require Python >= 3.11 by default. If you would like to use Python 3.10, earlier versions of `spike` will work. You may also wish to handle things on an ad hoc basis (at your own risk) and install `drizzlepac<=3.9.1` via [GitHub](https://github.com/spacetelescope/drizzlepac/releases) with a more recent version of `spike`. In that case, dependencies from [spike/docs/requirements_version.txt](https://github.com/avapolzin/spike/blob/master/docs/requirements_version.txt), which includes specified versions for all required packages in a working Python 3.10.16 environment (last tested with `spike` version 1.1.0), may be a useful guide. You may need to update your local `spike` setup.py in this case.
+
+7. **I'm seeing errors related to `pkg_resources` or `importlib`. How do I fix these?**
+
+In version 82.0.0, `setuptools` fully deprecated `pkg_resources` without offering an immediate alternative or any backwards compatible solutions. Instead, `importlib` is supposed to be a replacement to most common workflows, but not those that require recovering the path to files installed alongside a package. Many libraries are now scrambling to update accordingly -- some by installing another tool, `importlib_resources`; some by moving directly to `importlib`, though the primary functions are not available in all Python versions; and some by requesting that individual users downgrade their `setuptools` installations. `spike` does not require you to install additional dependencies to workaround a newer version of `setuptools` and remains compatible with `pkg_resources`, so the easiest user-side solution is to downgrade to `setuptools==81.0.0`. It also comes with an `importlib` solution, but for users who want to use the newest version of `setuptools` and are not yet using Python > 3.13, this will require updating Python versions.
 
 ### TinyTim
 

@@ -40,7 +40,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 						 'final_pixfrac':1.0,
 						 'build':True,
 						 'combine_type':'imedian',
-						 'static':False},
+						 'static':False,
+						 'driz_sep_rot': None,
+						 'final_rot': None},
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False,
 		removedir = 'toremove', clobber = False, **kwargs):
 	"""

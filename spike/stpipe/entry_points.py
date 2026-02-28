@@ -41,7 +41,7 @@ Original: https://github.com/spacetelescope/stpipe/blob/main/src/stpipe/entry_po
 import warnings
 from collections import namedtuple
 
-import importlib_metadata
+import importlib.metadata as importlib_metadata
 
 STEPS_GROUP = "stpipe.steps"
 

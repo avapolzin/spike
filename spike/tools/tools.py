@@ -6,7 +6,6 @@ import astropy.units as u
 from astropy.wcs import WCS, utils
 import numpy as np
 import os
-import pkg_resources
 from scipy.interpolate import RectBivariateSpline
 import warnings
 
@@ -15,7 +14,13 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
 
 warnings.formatwarning = warning_on_one_line
 
-CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
+# deal with deprecation of pkg_resources, but remain compatible with early versions
+try:
+	import pkg_resources
+	CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
+except:
+	from importlib.resources import files as importlibfiles
+	CONFIG_PATH = str(importlibfiles('spike').joinpath('configs/'))
 
 # #########
 #  * * * * 

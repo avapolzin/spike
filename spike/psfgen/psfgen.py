@@ -8,7 +8,6 @@ import numpy as np
 import os
 from photutils.detection import DAOStarFinder, IRAFStarFinder
 from photutils.psf import extract_stars, EPSFBuilder, GriddedPSFModel
-import pkg_resources
 from spike import tools
 import subprocess
 import urllib
@@ -26,7 +25,13 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
 
 warnings.formatwarning = warning_on_one_line
 
-CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
+# deal with deprecation of pkg_resources, but remain compatible with early versions
+try:
+	import pkg_resources
+	CONFIG_PATH = pkg_resources.resource_filename('spike', 'configs/')
+except:
+	from importlib.resources import files as importlibfiles
+	CONFIG_PATH = str(importlibfiles('spike').joinpath('configs/'))
 
 tinyparams = {}
 tinyparams['imcam'] = {'WFPC1/WFC':1, 'WFPC1/PC':2, 'FOC/f48':3, 'FOC/f96':4, 

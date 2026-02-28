@@ -5,10 +5,13 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
-.. **Development version:**
+**Development version:**
 
-.. Can be installed via GitHub (will be available on PyPI once it's formally released).
-.. Documentation is up to date for the development version.
+Can be installed via GitHub (will be available on PyPI once it's formally released).
+Documentation is up to date for the development version.
+
+* Patch ``pkg_resources`` deprecation and remain backwards compatible
+* Restore typical detector x, y alignment in drizzling step with default kwargs
 
 
 .. * Add option to use object name in output files rather than coordinates
