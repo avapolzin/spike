@@ -15,6 +15,8 @@ To install ``spike``, either ``pip install spike-psf`` or install the developmen
 	cd spike
 	pip install .
 
+If you prefer to use the JWST and Roman pipeline steps directly from STScI (which do not explicitly support Windows computers), you should add the extras flag ``-e .[stdep]`` to your pip install command (e.g., ``pip install spike-psf -e .[stdep]``). This is currently an *experimental* option.
+
 If you install ``spike`` via PyPI, you will need to separately install ``DrizzlePac`` from the distribution on `GitHub <https://github.com/spacetelescope/drizzlepac>`_, as PyPI does not handle direct dependencies.
 
 To receive updates about ``spike``, including notice of improvements and bug fixes, please fill out `this form <https://forms.gle/q7oCeD7gdVeVTPuTA>`_ with your email.

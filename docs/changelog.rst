@@ -13,9 +13,8 @@ Documentation is up to date for the development version.
 * Patch ``pkg_resources`` deprecation while remaining backwards compatible
 * Restore typical detector x, y alignment in drizzling step with default kwargs
 * Fix bug with WFC3 resampling when TinyTim model PSFs used
-
-
-.. * Add option to use object name in output files rather than coordinates
+* Add option to use object name in output files rather than coordinates (experimental)
+* Add option to directly use STScI dependencies, currently no Windows support (experimental)
 
 **v1.2.1 (January 26, 2026)**
 
