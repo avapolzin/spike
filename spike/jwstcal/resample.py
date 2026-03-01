@@ -50,7 +50,10 @@ from drizzle.resample import Drizzle
 from spherical_geometry.polygon import SphericalPolygon
 
 from stdatamodels.jwst import datamodels
-from stdatamodels.jwst.library.basic_utils import bytes2human
+# from stdatamodels.jwst.library.basic_utils import bytes2human
+## deprecated in newest versions of stdatamodels
+## solution is to force stdatamodels==2.2.0 on install
+## removing that stringent requirement for now though
 
 import spike.jwstcal.resample_utils as resample_utils
 
@@ -221,7 +224,7 @@ class ResampleData:
         if not can_allocate:
             raise OutputTooLargeError(
                 f'Combined ImageModel size {self.output_array_shape} '
-                f'requires {bytes2human(required_memory)}. '
+                # f'requires {bytes2human(required_memory)}. '
                 f'Model cannot be instantiated.'
             )
 
