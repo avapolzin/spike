@@ -15,7 +15,7 @@ Documentation is up to date for the development version.
 * Fix bug with WFC3 resampling when TinyTim model PSFs used
 * Add option to use object name in output files rather than coordinates (experimental)
 * Add option to directly use STScI dependencies, currently no Windows support (experimental)
-* Remove stringent version requirements for ``stdatamodels`` and ``roman_datamodels``
+* Remove stringent version requirement for ``stdatamodels``
 
 **v1.2.1 (January 26, 2026)**
 
