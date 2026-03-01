@@ -60,10 +60,10 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
 				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
-				named [imgprefix]_[coords]_[band]_topsf.fits, e.g., imgprefix_23.31+30.12_F814W_topsf.fits or 
+				named [imgprefix]_[obj]_[band]_topsf.fits, e.g., imgprefix_23.31+30.12_F814W_topsf.fits or 
 				imgprefix_195.78-46.52_F555W_topsf.fits
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
-				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
+				directory of user-generated, PSFs named [imgprefix]_[obj]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
 				imgprefix corresponds to the name of the relevant flt/flc/c0f/c1f/... files in the directory and the 
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
@@ -358,12 +358,23 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			im, imtype, obj, filt, _ = up.split('_')
 
 			img = imgdir+'%s_%s.fits'%(im, imtype)
-			coord = tools.objloc(obj)
+			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handles string coordinates
 			pos = tools.checkpixloc(coords)
 
 			psfmodel = fits.open(up)[1].data
 
 			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
+
+			if usename:
+				isname = False
+				namestring = None
+				if type(obj) == str:
+					for s in obj:
+						if s.isalpha():
+							isname = True
+							break
+				if isname:
+					namestring = obj.replace(':', '').replace(' ', '')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -371,7 +382,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			if coord.dec.deg < 0:
 				coordstring += str(coord.dec)
 
-			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+			if usename and isname:
+				modout = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				modname  = i.replace('%s.fits'%img_type, namestring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				os.system('mv %s %s'%(modout, modname)) 
+
+			if not usename or not isname:
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}
@@ -627,11 +644,11 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		camera (str): 'Imaging', 'AMI' -- MUST BE SPECIFIED FOR NIRISS
 		method (str): 'WebbPSF', 'STDPSF' (empirical), 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
-				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
+				named [imgprefix]_[obj]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
 				imgprefix_195.78-46.52_F555W_psf.fits. Note: the WebbPSF name is maintained here in lieu of STPSF to avoid
 				confusion with the generation of empirical STDPSFs.
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
-				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
+				directory of user-generated, PSFs named [imgprefix]_[obj]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
 				imgprefix corresponds to the name of the relevant flt/flc/c0f/c1f/... files in the directory and the 
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
@@ -857,12 +874,23 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			im, im2, im3, imtype, obj, filt, _ = up.split('_')
 
 			img = imgdir+'%s_%s_%s_%s.fits'%(im, im2, im3, imtype)
-			coord = tools.objloc(obj)
+			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handle string coordinates
 			pos = tools.checkpixloc(coords)
 
 			psfmodel = fits.open(up)[1].data
 
 			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
+
+			if usename:
+				isname = False
+				namestring = None
+				if type(obj) == str:
+					for s in obj:
+						if s.isalpha():
+							isname = True
+							break
+				if isname:
+					namestring = obj.replace(':', '').replace(' ', '')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -870,7 +898,13 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			if coord.dec.deg < 0:
 				coordstring += str(coord.dec)
 
-			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+			if usename and isname:
+				modout = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				modname  = i.replace('%s.fits'%img_type, namestring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				os.system('mv %s %s'%(modout, modname)) 
+
+			if not usename or not isname:
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}
@@ -1082,11 +1116,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		camera (str): None
 		method (str): 'WebbPSF', 'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
-				named [imgprefix]_[coords]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
+				named [imgprefix]_[obj]_[band]_psf.fits, e.g., imgprefix_23.31+30.12_F814W_psf.fits or 
 				imgprefix_195.78-46.52_F555W_psf.fits. Note: the WebbPSF name is maintained here in lieu of STPSF to avoid
 				confusion with the generation of empirical STDPSFs.
 		usermethod (func or str): If method = 'USER', usermethod should be a function that generates, or path to a 
-				directory of user-generated, PSFs named [imgprefix]_[coords]_[band]_psf.fits, e.g., 
+				directory of user-generated, PSFs named [imgprefix]_[obj]_[band]_psf.fits, e.g., 
 				imgprefix_23.31+30.12_F814W_psf.fits or imgprefix_195.78-46.52_F555W_psf.fits, where the 
 				imgprefix corresponds to the name of the relevant cal/calints... files in the directory and the 
 				headers are from the original images (see spike.tools.rewrite_fits, which can be used to this end).
@@ -1341,12 +1375,23 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			im, imf, imn, imd, imtype, obj, filt, _ = up.split('_')
 
 			img = imgdir+'%s_%s_%s_%s_%s.fits'%(im, imf, imn, imd, imtype)
-			coord = tools.objloc(obj)
+			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handles string coordinates
 			pos = tools.checkpixloc(coords)
 
 			psfmodel = fits.open(up)[1].data
 
 			tools.rewrite_fits(psfmodel, img, coord, imcam, pos, method = 'USER', clobber = clobber)
+
+			if usename:
+				isname = False
+				namestring = None
+				if type(obj) == str:
+					for s in obj:
+						if s.isalpha():
+							isname = True
+							break
+				if isname:
+					namestring = obj.replace(':', '').replace(' ', '')
 
 			coordstring = str(coord.ra)
 			if coord.dec.deg >= 0:
@@ -1354,7 +1399,13 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			if coord.dec.deg < 0:
 				coordstring += str(coord.dec)
 
-			modname = img.replace('%s.fits'%imtype, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%imtype)
+			if usename and isname:
+				modout = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				modname  = i.replace('%s.fits'%img_type, namestring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+				os.system('mv %s %s'%(modout, modname)) 
+
+			if not usename or not isname:
+				modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
 
 			if obj not in drizzlelist.keys():
 				drizzlelist[obj] = {}

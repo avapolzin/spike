@@ -22,7 +22,7 @@ or
 pip install spike-psf
 ```
 
-If you prefer to use the JWST and Roman pipeline steps directly from STScI (which do not explicitly support Windows computers), you should add the extras flag `-e .[stdep]` to your pip install command (e.g., `pip install spike-psf -e .[stdep]`). This is currently an _experimental_ option.
+If you prefer to use the JWST and Roman pipeline steps directly from STScI (which do not explicitly support Windows computers), add the extras flag `-e .[stdep]` to your pip install command (e.g., `pip install spike-psf -e .[stdep]`). `spike` will use `jwst` and `romancal` if they are available in the environment. This is currently an _experimental_ option.
 
 If you install from PyPI, you will also need to install `DrizzlePac` from the [GitHub distribution](https://github.com/spacetelescope/drizzlepac.git).
 
