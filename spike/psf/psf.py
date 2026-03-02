@@ -425,9 +425,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
-	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
-		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir)), 
-		sorted(glob.glob('%s*_drw.fits'%img_dir))))
+	drzs = np.concatenate((sorted(glob.glob('%s*_drc*.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drz*.fits'%img_dir)), sorted(glob.glob('%s*_mos*.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drw*.fits'%img_dir))))
 
 	if len(drzs) == 0:
 		raise Exception('No co-added/resampled output files created. Check your input path, coordinates and the output of the PSF generation steps.')
@@ -631,7 +631,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
 		removedir = 'toremove', clobber = False, usename = False, tweakparams = {}, 
-		drizzleparams = {'allowed_memory':0.5}, **kwargs):
+		drizzleparams = {'allowed_memory':0.5}, usest = True, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
 
@@ -678,6 +678,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for the resample step. See the JWST pipeline documentation
 		 		for a full list.
+		usest (bool): If True, will import jwst pipeline if available rather than using spike.jwst.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -692,11 +693,15 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 	if not usecrds:
 		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
 
-	## add support for STScI dependencies used directly
-	try:
-		from jwst import resample as resample_step
-		from jwst import tweakreg as tweakreg_tweakreg_step
-	except:
+	if usest:
+		## add support for STScI dependencies used directly
+		try:
+			from jwst import resample as resample_step
+			from jwst import tweakreg as tweakreg_tweakreg_step
+		except:
+			from spike.jwstcal import resample_step
+			from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
+	if not usest:
 		from spike.jwstcal import resample_step
 		from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
 
@@ -1102,7 +1107,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, removedir = 'toremove', 
-		clobber = False, usename = False, tweakparams = {}, drizzleparams = {}, **kwargs):
+		clobber = False, usename = False, tweakparams = {}, drizzleparams = {}, usest = True, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -1150,6 +1155,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for resample step. See the Roman pipeline 
 				documentation for a full list.
+		usest (bool): If True, will import romancal pipeline if available rather than using spike.romancal.
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -1163,11 +1169,15 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 	if not usecrds:
 		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
 
-	## add support for STScI dependencies used directly
-	try:
-		from romancal import tweakreg as tweakreg_step
-		from romancal import resample as resample_step
-	except:
+
+	if usest:
+		## add support for STScI dependencies used directly
+		try:
+			from romancal import tweakreg as tweakreg_step
+			from romancal import resample as resample_step
+		except:
+			from spike.romancal import tweakreg_step, resample_step
+	if not usest:
 		from spike.romancal import tweakreg_step, resample_step
 
 	if img_dir[-1] != '/':
