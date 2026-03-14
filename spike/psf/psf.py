@@ -403,6 +403,13 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if keeporig:
 		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
 
+	if 'build' in drizzleparams.keys():
+		if drizzleparams['build'] in [False, 'false']:
+			warnings.warn('drizzleparams keyword build being changed to True; if this poses a problem for your use case, please open an issue.', Warning, stacklevel = 2)
+	drizzleparams['build'] = True #necessary for WCS, may not be optimal if working with large mosaics
+	## if build = True poses a problem, contact directly or open an issue -- simple matter of modifying
+	## file types tracked by drzs (below) to e.g. '*_drc*.fits' etc., but note that cropping will not work
+
 	for do in drizzlelist.keys():
 		cstring = tools.objloc(do)
 		coordstring = str(cstring.ra)
@@ -425,9 +432,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
-	drzs = np.concatenate((sorted(glob.glob('%s*_drc*.fits'%img_dir)), 
-		sorted(glob.glob('%s*_drz*.fits'%img_dir)), sorted(glob.glob('%s*_mos*.fits'%img_dir)), 
-		sorted(glob.glob('%s*_drw*.fits'%img_dir))))
+	drzs = np.concatenate((sorted(glob.glob('%s*_drc.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drz.fits'%img_dir)), sorted(glob.glob('%s*_mos.fits'%img_dir)), 
+		sorted(glob.glob('%s*_drw.fits'%img_dir))))
 
 	if len(drzs) == 0:
 		raise Exception('No co-added/resampled output files created. Check your input path, coordinates and the output of the PSF generation steps.')
