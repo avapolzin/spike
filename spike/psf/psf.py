@@ -100,7 +100,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		If returnpsf = 'full', will return each of the full drizzled PSF images in an object, filter indexed dict.
 		If returnpsf = 'crop', will return a cutout region of the drizzled PSF images (around the PSF) in an obj, filt indexed dict.
 	"""
-	from drizzlepac import tweakreg, tweakback, astrodrizzle
+	from drizzlepac import tweakreg, astrodrizzle
 
 	if img_type.lower() in ['drc', 'drz', 'drw', 'mos']:
 		raise Exception('%s files are already drizzled. spike works with calibrated, but not-yet-combined images -- e.g., flc, crf, cal.'%img_type)
@@ -404,7 +404,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		drizzleparams['preserve'] = True #reset parameter to ensure that original files maintained
 
 	if 'build' in drizzleparams.keys():
-		if drizzleparams['build'] in [False, 'false']:
+		if drizzleparams['build'] in [False, 'false', 'False']:
 			warnings.warn('drizzleparams keyword build being changed to True; if this poses a problem for your use case, please open an issue.', Warning, stacklevel = 2)
 	drizzleparams['build'] = True #necessary for WCS, may not be optimal if working with large mosaics
 	## if build = True poses a problem, contact directly or open an issue -- simple matter of modifying
@@ -418,17 +418,33 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if cstring.dec.deg < 0:
 			coordstring += str(cstring.dec)
 
+		if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+			isname = False
+			namestring = None
+			for s in do:
+				if s.isalpha():
+					isname = True
+					break
+			if isname:
+				namestring = do.replace(':', '').replace(' ', '')
+
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
-				outname = coordstring+'_'+dk+'_psf'
+				if usename and isname:
+					outname = namestring+'_'+dk+'_psf'
+				if not usename or not isname:
+					outname = coordstring+'_'+dk+'_psf'
 				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				pool.apply_async(astrodrizzle.AstroDrizzle, args = (drizzlelist[do][dk]), kwds = drizzleparams)
 			pool.close()
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				outname = coordstring+'_'+dk+'_psf'
+				if usename and isname:
+					outname = namestring+'_'+dk+'_psf'
+				if not usename or not isname:
+					outname = coordstring+'_'+dk+'_psf'
 				drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 				astrodrizzle.AstroDrizzle(drizzlelist[do][dk], **drizzleparams)
 
@@ -457,6 +473,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for fk in filelist.keys():
 				drizzleparams['output'] = img_dir + '%s_img'%fk #set output name with filter
 				astrodrizzle.AstroDrizzle(filelist[fk], **drizzleparams)
+		
 		if objonly:
 			for do in imglist.keys():
 				cstring = tools.objloc(do)
@@ -466,17 +483,33 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				if cstring.dec.deg < 0:
 					coordstring += str(cstring.dec)
 
+				if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+					isname = False
+					namestring = None
+					for s in do:
+						if s.isalpha():
+							isname = True
+							break
+					if isname:
+						namestring = do.replace(':', '').replace(' ', '')
+
 				if parallel:
 					pool = Pool(processes=(cpu_count() - 1))
 					for dk in imglist[do].keys():
-						outname = coordstring+'_'+dk+'_img'
+						if usename and isname:
+							outname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							outname = coordstring+'_'+dk+'_img'
 						drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 						pool.apply_async(astrodrizzle.AstroDrizzle, args = (imglist[do][dk]), kwds = drizzleparams)
 					pool.close()
 					pool.join()
 				if not parallel:
 					for dk in drizzlelist[do].keys():
-						outname = coordstring+'_'+dk+'_img'
+						if usename and isname:
+							outname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							outname = coordstring+'_'+dk+'_img'
 						drizzleparams['output'] = img_dir + outname #set output based on coord, filter
 						astrodrizzle.AstroDrizzle(imglist[do][dk], **drizzleparams)
 
@@ -613,6 +646,16 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				if skycoords[o].dec.deg < 0:
 					coordstring += str(skycoords[o].dec)
 
+			if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+				isname = False
+				namestring = None
+				for s in do:
+					if s.isalpha():
+						isname = True
+						break
+				if isname:
+					namestring = do.replace(':', '').replace(' ', '')
+
 			returndict[do] = {}
 			for dk in drizzlelist[do].keys():
 
@@ -620,13 +663,19 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					savedir += '/'
 
 				if returnpsf == 'full':	
-					dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff))
+					if usename and isname:
+						dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(namestring, dk, suff))
+					if not usename or not isname:
+						dr_psf = fits.open(savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff))
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.cutout(img = savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
-									clobber = clobber)
+					if usename and isname:
+						savename = savedir+'%s_%s_psf_%s.fits'%(namestring, dk, suff)
+					if not usename or not isname:
+						savename = savedir+'%s_%s_psf_%s.fits'%(coordstring, dk, suff)
+					crop = tools.cutout(img = savename, coords = tools.objloc(do), fov_pixel = cutout_fov, 
+						 			save = savecutout, clobber = clobber)
 					returndict[do][dk] = crop
 
 		return returndict
