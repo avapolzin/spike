@@ -834,6 +834,38 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					namestring = obj.replace(':', '').replace(' ', '')
 
 			for i in imgs:
+				pos = tools.checkpixloc(skycoords, i, inst, camera)
+				coordstring = str(skycoords.ra)
+				if skycoords.dec.deg >= 0:
+					coordstring += '+'+str(skycoords.dec)
+				if skycoords.dec.deg < 0:
+					coordstring += str(skycoords.dec)
+
+				if usename and isname:
+					modout = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+					modname  = i.replace('%s.fits'%img_type, namestring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+
+				if not usename or not isname:
+					modname = i.replace('%s.fits'%img_type, coordstring+'_%s'%pos[3]+'_topsf_%s.fits'%img_type)
+
+				if np.isfinite(pos[0]): #confirm object falls onto image
+					if pos[3] not in drizzlelist[obj].keys():
+						drizzlelist[obj][pos[3]] = []
+						imglist[obj][pos[3]] = []
+					drizzlelist[obj][pos[3]].append(modname)
+					imglist[obj][pos[3]].append(i)
+
+					psffunc(skycoords, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
+
+		if type(obj) not in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #if multiple objects, option to parallelize 
+			skycoords = [] #only open each FITS file once
+
+			for o in obj:
+				drizzlelist[o] = {}
+				imglist[o] = {}
+				skycoords.append(tools.objloc(o))
+			
+			for i in imgs:
 
 				if parallel:
 					if method.upper() == 'PSFEX':
@@ -925,7 +957,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 						if usename and isname:
 							# rename output from psffunc
 							os.system('mv %s %s'%(modout, modname)) 
-					
+						
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
 

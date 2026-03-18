@@ -11,6 +11,7 @@ Can be installed via GitHub (will be available on PyPI once it's formally releas
 Documentation is up to date for the development version.
 
 * Complete new usename feature for output files
+* Restore option to run ``spike.psf.jwst`` for multiple objects simultaneously
 
 **v1.2.2 (March 16, 2026)**
 
