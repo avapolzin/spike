@@ -6,7 +6,6 @@ from multiprocessing import Pool, cpu_count
 import numpy as np
 import os
 from spike import psfgen, tools
-import subprocess
 from subprocess import call
 import warnings
 
@@ -686,8 +685,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
-		removedir = 'toremove', clobber = False, usename = False, tweakparams = {}, 
-		drizzleparams = {'allowed_memory':0.5}, usest = True, **kwargs):
+		removedir = 'toremove', clobber = False, usename = False, shortcoord_style = 'hmsdms',
+		tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, usest = True, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
 
@@ -730,6 +729,8 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
 			(Experimental and not yet fully tested.)
+		shortcoord_style (str): If usename False and object positions are input as resolvable names, shortcoord_style sets
+			the coordinate style in output files. One of 'decimal' (deg), 'dms' (degree, minute, second), or 'hmsdms' (sexagecimal).
 		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the JWST pipeline documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for the resample step. See the JWST pipeline documentation
@@ -1010,21 +1011,24 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 	#####################################################################
 	for do in drizzlelist.keys():
-		shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+		isname = False
+		namestring = None
+		for s in do:
+			if s.isalpha():
+				isname = True
+				break
+		if isname:
+			namestring = do.replace(':', '').replace(' ', '')
+
+		if not isname:
+			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+		if isname:
+			do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 		if ':' not in shortra:
 			if int(shortra) > 0:
 				shortra = "+"+shortra
-
-		if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-			isname = False
-			namestring = None
-			for s in do:
-				if s.isalpha():
-					isname = True
-					break
-			if isname:
-				namestring = do.replace(':', '').replace(' ', '')
 
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
@@ -1067,21 +1071,25 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
 			for do in imglist.keys():
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+				isname = False
+				namestring = None
+				for s in do:
+					if s.isalpha():
+						isname = True
+						break
+				if isname:
+					namestring = do.replace(':', '').replace(' ', '')
+
+				if not isname:
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				if isname:
+					do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 				if ':' not in shortra:
 					if int(shortra) > 0:
 						shortra = "+"+shortra
-
-				if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-					isname = False
-					namestring = None
-					for s in do:
-						if s.isalpha():
-							isname = True
-							break
-					if isname:
-						namestring = do.replace(':', '').replace(' ', '')
 
 				if parallel:
 					pool = Pool(processes=(cpu_count() - 1))
@@ -1188,21 +1196,24 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		for do in drizzlelist.keys():
 			returndict[do] = {}
 
-			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+			isname = False
+			namestring = None
+			for s in do:
+				if s.isalpha():
+					isname = True
+					break
+			if isname:
+				namestring = do.replace(':', '').replace(' ', '')
+
+			if not isname:
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+			if isname:
+				do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 			if ':' not in shortra:
 				if int(shortra) > 0:
 					shortra = "+"+shortra
-
-			if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-				isname = False
-				namestring = None
-				for s in do:
-					if s.isalpha():
-						isname = True
-						break
-				if isname:
-					namestring = do.replace(':', '').replace(' ', '')
 					
 			for dk in drizzlelist[do].keys():
 
@@ -1231,7 +1242,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, removedir = 'toremove', 
-		clobber = False, usename = False, tweakparams = {}, drizzleparams = {}, usest = True, **kwargs):
+		clobber = False, usename = False, shortcoord_style = 'hmsdms', tweakparams = {}, drizzleparams = {}, 
+		usest = True, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -1275,6 +1287,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
 			(Experimental and not yet fully tested.)
+		shortcoord_style (str): If usename False and object positions are input as resolvable names, shortcoord_style sets
+			the coordinate style in output files. One of 'decimal' (deg), 'dms' (degree, minute, second), or 'hmsdms' (sexagecimal).
 		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the Roman pipeline documentation
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for resample step. See the Roman pipeline 
@@ -1551,21 +1565,24 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	#####################################################################
 	for do in drizzlelist.keys():
-		shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+		isname = False
+		namestring = None
+		for s in do:
+			if s.isalpha():
+				isname = True
+				break
+		if isname:
+			namestring = do.replace(':', '').replace(' ', '')
+
+		if not isname:
+			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+		if isname:
+			do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 		if ':' not in shortra:
 			if int(shortra) > 0:
 				shortra = "+"+shortra
-
-		if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-			isname = False
-			namestring = None
-			for s in do:
-				if s.isalpha():
-					isname = True
-					break
-			if isname:
-				namestring = do.replace(':', '').replace(' ', '')
 
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
@@ -1607,21 +1624,24 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
 			for do in imglist.keys():
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				isname = False
+				namestring = None
+				for s in do:
+					if s.isalpha():
+						isname = True
+						break
+				if isname:
+					namestring = do.replace(':', '').replace(' ', '')
+
+				if not isname:
+					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				if isname:
+					do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 				if ':' not in shortra:
 					if int(shortra) > 0:
 						shortra = "+"+shortra
-
-				if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-					isname = False
-					namestring = None
-					for s in do:
-						if s.isalpha():
-							isname = True
-							break
-					if isname:
-						namestring = do.replace(':', '').replace(' ', '')
 				
 				if parallel:
 					pool = Pool(processes=(cpu_count() - 1))
@@ -1726,21 +1746,24 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		for do in drizzlelist.keys():
 			returndict[do] = {}
 
-			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+			isname = False
+			namestring = None
+			for s in do:
+				if s.isalpha():
+					isname = True
+					break
+			if isname:
+				namestring = do.replace(':', '').replace(' ', '')
+
+			if not isname:
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+			if isname:
+				do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 			if ':' not in shortra:
 				if int(shortra) > 0:
 					shortra = "+"+shortra
-
-			if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
-				isname = False
-				namestring = None
-				for s in do:
-					if s.isalpha():
-						isname = True
-						break
-				if isname:
-					namestring = do.replace(':', '').replace(' ', '')
 					
 			for dk in drizzlelist[do].keys():
 
