@@ -277,7 +277,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -323,7 +323,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -357,9 +357,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		for up in userpsfs:
 			im, imtype, obj, filt, _ = up.split('_')
 
-			img = imgdir+'%s_%s.fits'%(im, imtype)
+			img = img_dir+'%s_%s.fits'%(im, imtype)
 			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handles string coordinates
-			pos = tools.checkpixloc(coords)
+			pos = tools.checkpixloc(coord)
 
 			psfmodel = fits.open(up)[1].data
 
@@ -753,7 +753,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		## add support for STScI dependencies used directly
 		try:
 			from jwst import resample as resample_step
-			from jwst import tweakreg as tweakreg_tweakreg_step
+			from jwst import tweakreg as tweakreg_step
 		except:
 			from spike.jwstcal import resample_step
 			from spike.jwstcal import tweakreg_tweakreg_step as tweakreg_step
@@ -884,7 +884,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -930,7 +930,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -966,9 +966,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 			im, im2, im3, imtype, obj, filt, _ = up.split('_')
 
-			img = imgdir+'%s_%s_%s_%s.fits'%(im, im2, im3, imtype)
+			img = img_dir+'%s_%s_%s_%s.fits'%(im, im2, im3, imtype)
 			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handle string coordinates
-			pos = tools.checkpixloc(coords)
+			pos = tools.checkpixloc(coord)
 
 			psfmodel = fits.open(up)[1].data
 
@@ -1010,18 +1010,31 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 	#####################################################################
 	for do in drizzlelist.keys():
+		shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+		if ':' not in shortra:
+			if int(shortra) > 0:
+				shortra = "+"+shortra
+
+		if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+			isname = False
+			namestring = None
+			for s in do:
+				if s.isalpha():
+					isname = True
+					break
+			if isname:
+				namestring = do.replace(':', '').replace(' ', '')
+
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
 
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				resamp = resample_step.ResampleStep()
 				resampkwds = {**drizzleparams, 
@@ -1034,14 +1047,12 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				resamp = resample_step.ResampleStep().call(drizzlelist[do][dk],
 					output_file = resampname, 
@@ -1055,42 +1066,53 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				resamp = resample_step.ResampleStep().call(filelist[fk],
 						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
-			if parallel:
-				pool = Pool(processes=(cpu_count() - 1))
-				for dk in imglist[do].keys():
+			for do in imglist.keys():
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 
-					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
 
-					if ':' not in shortra:
-						if int(shortra) > 0:
-							shortra = "+"+shortra
+				if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+					isname = False
+					namestring = None
+					for s in do:
+						if s.isalpha():
+							isname = True
+							break
+					if isname:
+						namestring = do.replace(':', '').replace(' ', '')
 
-					resampname = shortdec+shortra+'_'+dk+'_img'
-					resampname = resampname.replace(':', '').replace(' ', '')
+				if parallel:
+					pool = Pool(processes=(cpu_count() - 1))
+					for dk in imglist[do].keys():
 
-					resamp = resample_step.ResampleStep()
-					resampkwds = {**drizzleparams,
-								  'input_models': imglist[do][dk], 
-								  'output_file': resampname,
-								  'output_dir':img_dir, 
-								  'save_results':True}
-					pool.apply_async(resamp.call, kwds = resampkwds)
-				pool.close()
-				pool.join()
-			if not parallel:
-				for dk in imglist[do].keys():
-					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+						if usename and isname:
+							resampname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							resampname = shortdec+shortra+'_'+dk
+							resampname = resampname.replace(':', '').replace(' ', '')
 
-					if ':' not in shortra:
-						if int(shortra) > 0:
-							shortra = "+"+shortra
+						resamp = resample_step.ResampleStep()
+						resampkwds = {**drizzleparams,
+									'input_models': imglist[do][dk], 
+									'output_file': resampname,
+									'output_dir':img_dir, 
+									'save_results':True}
+						pool.apply_async(resamp.call, kwds = resampkwds)
+					pool.close()
+					pool.join()
+				if not parallel:
+					for dk in imglist[do].keys():
+						if usename and isname:
+							resampname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							resampname = shortdec+shortra+'_'+dk
+							resampname = resampname.replace(':', '').replace(' ', '')
 
-					resampname = shortdec+shortra+'_'+dk+'_img'
-					resampname = resampname.replace(':', '').replace(' ', '')
-
-					resamp = resample_step.ResampleStep().call(imglist[do][dk],
-						output_file = resampname, 
-						output_dir = img_dir, save_results = True, **drizzleparams)
+						resamp = resample_step.ResampleStep().call(imglist[do][dk],
+							output_file = resampname, 
+							output_dir = img_dir, save_results = True, **drizzleparams)
 
 	#####################################################################
 	suff = "resamplestep"
@@ -1165,31 +1187,45 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		returndict = {}
 		for do in drizzlelist.keys():
 			returndict[do] = {}
+
+			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+			if ':' not in shortra:
+				if int(shortra) > 0:
+					shortra = "+"+shortra
+
+			if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+				isname = False
+				namestring = None
+				for s in do:
+					if s.isalpha():
+						isname = True
+						break
+				if isname:
+					namestring = do.replace(':', '').replace(' ', '')
+					
 			for dk in drizzlelist[do].keys():
 
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				if savedir.split('/')[-1] != '':
 					savedir += '/'
 
 				if returnpsf == 'full':	
-					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname ,suff))
+					dr_psf = fits.open(savedir+'%s_%s.fits'%(resampname, suff))
 					returndict[do][dk] = dr_psf[1].data
 
 				if returnpsf == 'crop':
-					crop = tools.xcutout(img = savedir+'%s_%s.fits'%(resampname ,suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
+					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname, suff), 
+						 			coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout, 
 									clobber = clobber)
 					returndict[do][dk] = crop
 
 		return returndict
-
 
 def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None, method = 'WebbPSF', 
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
@@ -1256,7 +1292,6 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	if not usecrds:
 		os.environ["STPIPE_DISABLE_CRDS_STEPPARS"] = 'True'
-
 
 	if usest:
 		## add support for STScI dependencies used directly
@@ -1389,7 +1424,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -1435,7 +1470,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 										isname = True
 										break
 							if isname:
-								namestring = obj.replace(':', '').replace(' ', '')
+								namestring = obj[j].replace(':', '').replace(' ', '')
 
 						coordstring = str(coord.ra)
 						if coord.dec.deg >= 0:
@@ -1472,9 +1507,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 			im, imf, imn, imd, imtype, obj, filt, _ = up.split('_')
 
-			img = imgdir+'%s_%s_%s_%s_%s.fits'%(im, imf, imn, imd, imtype)
+			img = img_dir+'%s_%s_%s_%s_%s.fits'%(im, imf, imn, imd, imtype)
 			coord = tools.objloc(obj.replace('-', ' -').replace('+', ' +')) #handles string coordinates
-			pos = tools.checkpixloc(coords)
+			pos = tools.checkpixloc(coord)
 
 			psfmodel = fits.open(up)[1].data
 
@@ -1516,17 +1551,31 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 	#####################################################################
 	for do in drizzlelist.keys():
+		shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+		if ':' not in shortra:
+			if int(shortra) > 0:
+				shortra = "+"+shortra
+
+		if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+			isname = False
+			namestring = None
+			for s in do:
+				if s.isalpha():
+					isname = True
+					break
+			if isname:
+				namestring = do.replace(':', '').replace(' ', '')
+
 		if parallel:
 			pool = Pool(processes=(cpu_count() - 1))
 			for dk in drizzlelist[do].keys():
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				resamp = resample_step.ResampleStep()
 				resampkwds = {**drizzleparams, 
@@ -1539,14 +1588,12 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			pool.join()
 		if not parallel:
 			for dk in drizzlelist[do].keys():
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				resamp = resample_step.ResampleStep().call(drizzlelist[do][dk],
 					output_file = resampname, output_dir = img_dir, save_results = True, **drizzleparams)
@@ -1559,40 +1606,54 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				resamp = resample_step.ResampleStep().call(filelist[fk],
 						output_file = '%s_img'%fk, output_dir = img_dir, save_results = True, **drizzleparams)
 		if objonly:
-			if parallel:
-				pool = Pool(processes=(cpu_count() - 1))
-				for dk in imglist[do].keys():
-					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+			for do in imglist.keys():
+				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 
-					if ':' not in shortra:
-						if int(shortra) > 0:
-							shortra = "+"+shortra
+				if ':' not in shortra:
+					if int(shortra) > 0:
+						shortra = "+"+shortra
 
-					resampname = shortdec+shortra+'_'+dk+'_img'
-					resampname = resampname.replace(':', '').replace(' ', '')
+				if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+					isname = False
+					namestring = None
+					for s in do:
+						if s.isalpha():
+							isname = True
+							break
+					if isname:
+						namestring = do.replace(':', '').replace(' ', '')
+				
+				if parallel:
+					pool = Pool(processes=(cpu_count() - 1))
+					for dk in imglist[do].keys():
 
-					resamp = resample_step.ResampleStep()
-					resampkwds = {**drizzleparams,
-				   				  'input_models': imglist[do][dk], 
-								  'output_file': resampname,
-								  'output_dir':img_dir, 
-								  'save_results':True}
-					pool.apply_async(resamp.call, kwds = resampkwds)
-				pool.close()
-				pool.join()
-			if not parallel:
-				for dk in imglist[do].keys():
-					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+						if usename and isname:
+							resampname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							resampname = shortdec+shortra+'_'+dk
+							resampname = resampname.replace(':', '').replace(' ', '')
 
-					if ':' not in shortra:
-						if int(shortra) > 0:
-							shortra = "+"+shortra
+						resamp = resample_step.ResampleStep()
+						resampkwds = {**drizzleparams,
+									'input_models': imglist[do][dk], 
+									'output_file': resampname,
+									'output_dir':img_dir, 
+									'save_results':True}
+						pool.apply_async(resamp.call, kwds = resampkwds)
+					pool.close()
+					pool.join()
 
-					resampname = shortdec+shortra+'_'+dk+'_img'
-					resampname = resampname.replace(':', '').replace(' ', '')
+				if not parallel:
+					for dk in imglist[do].keys():
 
-					resamp = resample_step.ResampleStep().call(imglist[do][dk],
-						output_file = resampname, output_dir = img_dir, save_results = True, **drizzleparams)
+						if usename and isname:
+							resampname = namestring+'_'+dk+'_img'
+						if not usename or not isname:
+							resampname = shortdec+shortra+'_'+dk
+							resampname = resampname.replace(':', '').replace(' ', '')
+
+						resamp = resample_step.ResampleStep().call(imglist[do][dk],
+							output_file = resampname, output_dir = img_dir, save_results = True, **drizzleparams)
 	#####################################################################
 	suff = "resamplestep"
 
@@ -1664,15 +1725,30 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		returndict = {}
 		for do in drizzlelist.keys():
 			returndict[do] = {}
+
+			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
+
+			if ':' not in shortra:
+				if int(shortra) > 0:
+					shortra = "+"+shortra
+
+			if usename: #all do should be strings now as keys, so this is a final (probably unnecesary) check
+				isname = False
+				namestring = None
+				for s in do:
+					if s.isalpha():
+						isname = True
+						break
+				if isname:
+					namestring = do.replace(':', '').replace(' ', '')
+					
 			for dk in drizzlelist[do].keys():
 
-				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
-				if ':' not in shortra:
-					if int(shortra) > 0:
-						shortra = "+"+shortra
-
-				resampname = shortdec+shortra+'_'+dk
-				resampname = resampname.replace(':', '').replace(' ', '')
+				if usename and isname:
+					resampname = namestring+'_'+dk+'_img'
+				if not usename or not isname:
+					resampname = shortdec+shortra+'_'+dk
+					resampname = resampname.replace(':', '').replace(' ', '')
 
 				if savedir.split('/')[-1] != '':
 					savedir += '/'
@@ -1683,7 +1759,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 				if returnpsf == 'crop':
 					crop = tools.cutout(img = savedir+'%s_%s.fits'%(resampname, suff), 
-									coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout,
+						 			coords = tools.objloc(do), fov_pixel = cutout_fov, save = savecutout, 
 									clobber = clobber)
 					returndict[do][dk] = crop
 

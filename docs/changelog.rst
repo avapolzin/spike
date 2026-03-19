@@ -5,13 +5,16 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
-**Development version:**
+.. **Development version:**
 
-Can be installed via GitHub (will be available on PyPI once it's formally released).
-Documentation is up to date for the development version.
+.. Can be installed via GitHub (will be available on PyPI once it's formally released).
+.. Documentation is up to date for the development version.
+
+**v1.2.3 (March 18, 2026)**
 
 * Complete new usename feature for output files
-* Restore option to run ``spike.psf.jwst`` for multiple objects simultaneously
+* Restore multi-object support in ``spike.psf.jwst``, accidentally removed in v1.2.2
+* Fix bug in file path for user generated PSFs
 
 **v1.2.2 (March 16, 2026)**
 
