@@ -26,13 +26,14 @@ except:
 #  * * * * 
 # #########
 
-def objloc(obj):
+def objloc(obj, prompt = True):
 	"""
 	Get object location.
 
 	Parameters:
 		obj (str): Name or coordinates for object of interest. If coordinates, should be in
 			HH:MM:SS DD:MM:SS or degree formats. Names must be resolvable in SIMBAD.
+		prompt (bool): If prompt, will ask for coordinates in the case that obj name is not resolvable.
 	Returns:
 		coords (astropy coordinates object)
 	"""
@@ -48,15 +49,34 @@ def objloc(obj):
 				break
 
 		if isname:
-			try: 
-			#simbad should be most reliable and should be queried first
-			#seems astropy changed recently, though because I've seen funky behavior
-				name_resolve.sesame_database.set('simbad')
-				coords = name_resolve.get_icrs_coordinates(obj)
-			except:
-			#if no simbad results, THEN query other databses for coordinates
-				name_resolve.sesame_database.set('all')
-				coords = name_resolve.get_icrs_coordinates(obj)
+			if not prompt:
+				try: 
+				#simbad should be most reliable and should be queried first
+				#seems astropy changed recently, though because I've seen funky behavior
+					name_resolve.sesame_database.set('simbad')
+					coords = name_resolve.get_icrs_coordinates(obj)
+				except:
+				#if no simbad results, THEN query other databses for coordinates
+					name_resolve.sesame_database.set('all')
+					coords = name_resolve.get_icrs_coordinates(obj)
+
+			if prompt:
+				try:
+					try: 
+					#simbad should be most reliable and should be queried first
+					#seems astropy changed recently, though because I've seen funky behavior
+						name_resolve.sesame_database.set('simbad')
+						coords = name_resolve.get_icrs_coordinates(obj)
+					except:
+					#if no simbad results, THEN query other databses for coordinates
+						name_resolve.sesame_database.set('all')
+						coords = name_resolve.get_icrs_coordinates(obj)
+				except:
+					coordobj = input('Object name (%s) not resolvable, please enter coordinates:  '%obj)
+					if ':' in coordobj:
+						coords = SkyCoord(coordobj, unit = (u.hour, u.deg), frame = 'icrs')
+					if not ':' in coordobj:
+						coords = SkyCoord(coordobj, unit = u.deg, frame = 'icrs')
 
 		if not isname:
 			if ':' in obj:

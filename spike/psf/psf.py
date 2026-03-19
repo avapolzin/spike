@@ -119,7 +119,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	if inst.upper() in ['ACS', 'WFC3']:
 		if not camera:
-			camera = input('Enter %s camera:'%inst.upper())
+			camera = input('Enter %s camera:  '%inst.upper())
 		imcam = inst.upper()+'/'+camera.upper()
 	if inst.upper() in ['WFPC1', 'WFPC2', 'NICMOS', 'STIS']:
 		imcam = inst.upper()

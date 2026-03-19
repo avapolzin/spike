@@ -10,7 +10,8 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 Can be installed via GitHub (will be available on PyPI once it's formally released).
 Documentation is up to date for the development version.
 
-* Add sub-degree coordinate differentiation in output file names given decimal coordinates
+* Differentiate at arcsecond-level in output file names given obj as decimal coordinates
+* Add option to prompt for coordinates if object name not resolvable by Simbad, NED
 
 **v1.2.3 (March 18, 2026)**
 
