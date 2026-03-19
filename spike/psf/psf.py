@@ -685,7 +685,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, usecrds = False, 
 		keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits',
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, 
-		removedir = 'toremove', clobber = False, usename = False, shortcoord_style = 'hmsdms',
+		removedir = 'toremove', clobber = False, usename = False, shortcoord_style = {'style':'hmsdms', 'sep':':'},
 		tweakparams = {}, drizzleparams = {'allowed_memory':0.5}, usest = True, **kwargs):
 	"""
 	Generate drizzled James Webb Space Telescope PSFs.
@@ -729,8 +729,9 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
 			(Experimental and not yet fully tested.)
-		shortcoord_style (str): If usename False and object positions are input as resolvable names, shortcoord_style sets
-			the coordinate style in output files. One of 'decimal' (deg), 'dms' (degree, minute, second), or 'hmsdms' (sexagecimal).
+		shortcoord_style (dict): If usename False and object positions are input as resolvable names, shortcoord_style sets
+			the coordinate style in output files. Style is one of 'decimal' (deg), 'dms' (degree, minute, second), 
+			or 'hmsdms' (sexagecimal) + kwargs.
 		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the JWST pipeline documentation
 				for a full list. See here: https://jwst-pipeline.readthedocs.io/en/latest/jwst/tweakreg/README.html#step-arguments
 		drizzleparams (dict): Dictionary of keyword arguments for the resample step. See the JWST pipeline documentation
@@ -858,6 +859,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 					psffunc(skycoords, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
+					if usename and isname:
+						# rename output from psffunc
+						os.system('mv %s %s'%(modout, modname)) 
+
 		if type(obj) not in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
 
@@ -953,11 +958,11 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
+							psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
-						if usename and isname:
-							# rename output from psffunc
-							os.system('mv %s %s'%(modout, modname)) 
+							if usename and isname:
+								# rename output from psffunc
+								os.system('mv %s %s'%(modout, modname)) 
 						
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -1023,10 +1028,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		if not isname:
 			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 		if isname:
-			do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+			do_coord = tools.objloc(do).to_string(**shortcoord_style)
 			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-		if ':' not in shortra:
+		if (':' not in shortra) and ('m' not in shortra):
 			if int(shortra) > 0:
 				shortra = "+"+shortra
 
@@ -1084,10 +1089,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				if not isname:
 					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 				if isname:
-					do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+					do_coord = tools.objloc(do).to_string(**shortcoord_style)
 					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-				if ':' not in shortra:
+				if (':' not in shortra) and ('m' not in shortra):
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 
@@ -1208,10 +1213,10 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			if not isname:
 				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 			if isname:
-				do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+				do_coord = tools.objloc(do).to_string(**shortcoord_style)
 				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-			if ':' not in shortra:
+			if (':' not in shortra) and ('m' not in shortra):
 				if int(shortra) > 0:
 					shortra = "+"+shortra
 					
@@ -1242,8 +1247,8 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		usermethod = None, savedir = 'psfs', drizzleimgs = False, objonly = True, pretweaked = False, 
 		usecrds = False, keeporig = True, plot = False, verbose = False, parallel = False, out = 'fits', 
 		returnpsf = 'full', cutout_fov = 151, savecutout = True, finalonly = False, removedir = 'toremove', 
-		clobber = False, usename = False, shortcoord_style = 'hmsdms', tweakparams = {}, drizzleparams = {}, 
-		usest = True, **kwargs):
+		clobber = False, usename = False, shortcoord_style = {'style':'hmsdms', 'sep':':'}, tweakparams = {},
+		drizzleparams = {}, usest = True, **kwargs):
 	"""
 	Generate drizzled Roman Space Telescope PSFs.
 
@@ -1287,8 +1292,9 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
 			(Experimental and not yet fully tested.)
-		shortcoord_style (str): If usename False and object positions are input as resolvable names, shortcoord_style sets
-			the coordinate style in output files. One of 'decimal' (deg), 'dms' (degree, minute, second), or 'hmsdms' (sexagecimal).
+		shortcoord_style (dict): If usename False and object positions are input as resolvable names, shortcoord_style sets
+			the coordinate style in output files. Style is one of 'decimal' (deg), 'dms' (degree, minute, second), 
+			or 'hmsdms' (sexagecimal) + kwargs.
 		tweakparams (dict): Dictionary of keyword arguments for the tweakreg step. See the Roman pipeline documentation
 				for a full list.
 		drizzleparams (dict): Dictionary of keyword arguments for resample step. See the Roman pipeline 
@@ -1411,6 +1417,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 					psffunc(skycoords, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
+					if usename and isname:
+						# rename output from psffunc
+						os.system('mv %s %s'%(modout, modname)) 
+
 		if type(obj) not in [str, astropy.coordinates.sky_coordinate.SkyCoord]: #if multiple objects, option to parallelize 
 			skycoords = [] #only open each FITS file once
 
@@ -1506,11 +1516,11 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
-						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
+							psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 
-						if usename and isname:
-							# rename output from psffunc
-							os.system('mv %s %s'%(modout, modname)) 
+							if usename and isname:
+								# rename output from psffunc
+								os.system('mv %s %s'%(modout, modname)) 
 					
 	if not genpsf:
 		userpsfs = sorted(glob.glob(usermethod))
@@ -1577,10 +1587,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		if not isname:
 			shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 		if isname:
-			do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+			do_coord = tools.objloc(do).to_string(**shortcoord_style)
 			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-		if ':' not in shortra:
+		if (':' not in shortra) and ('m' not in shortra):
 			if int(shortra) > 0:
 				shortra = "+"+shortra
 
@@ -1636,10 +1646,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				if not isname:
 					shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 				if isname:
-					do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+					do_coord = tools.objloc(do).to_string(**shortcoord_style)
 					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-				if ':' not in shortra:
+				if (':' not in shortra) and ('m' not in shortra):
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 				
@@ -1758,10 +1768,10 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			if not isname:
 				shortdec, shortra = [cc.split('.')[0] for cc in do.split(' ')]
 			if isname:
-				do_coord = tools.objloc(do).to_string(style = shortcoord_style)
+				do_coord = tools.objloc(do).to_string(**shortcoord_style)
 				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
-			if ':' not in shortra:
+			if (':' not in shortra) and ('m' not in shortra):
 				if int(shortra) > 0:
 					shortra = "+"+shortra
 					
