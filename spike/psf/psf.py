@@ -1032,6 +1032,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 		if (':' not in shortra) and ('m' not in shortra):
+			shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 			if int(shortra) > 0:
 				shortra = "+"+shortra
 
@@ -1093,6 +1094,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 				if (':' not in shortra) and ('m' not in shortra):
+					shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 
@@ -1217,6 +1219,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 			if (':' not in shortra) and ('m' not in shortra):
+				shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 				if int(shortra) > 0:
 					shortra = "+"+shortra
 					
@@ -1591,6 +1594,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 			shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 		if (':' not in shortra) and ('m' not in shortra):
+			shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 			if int(shortra) > 0:
 				shortra = "+"+shortra
 
@@ -1650,6 +1654,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 					shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 				if (':' not in shortra) and ('m' not in shortra):
+					shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 					if int(shortra) > 0:
 						shortra = "+"+shortra
 				
@@ -1772,6 +1777,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				shortdec, shortra = [cc.split('.')[0] for cc in do_coord.split(' ')]
 
 			if (':' not in shortra) and ('m' not in shortra):
+				shortdec, shortra = ['%.4f'%cc for cc in do_coord.split(' ')] #arcsec differentiation
 				if int(shortra) > 0:
 					shortra = "+"+shortra
 					

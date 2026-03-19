@@ -10,7 +10,7 @@ copyright = '2026, Ava Polzin'
 author = 'Ava Polzin'
 root_doc = 'index'
 
-release = '1.2.3'
+release = '1.2.4.-dev'
 
 extensions = [
 	'sphinx_rtd_theme',
