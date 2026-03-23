@@ -90,7 +90,6 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		clobber (bool): If True, will overwrite existing files with the duplicate names.
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
-			(Experimental and not yet fully tested.)
 		**kwargs: Keyword arguments for PSF generation function.
 
 	Returns:
@@ -728,7 +727,6 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 		clobber (bool): If True, will overwrite existing files with the duplicate names.
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
-			(Experimental and not yet fully tested.)
 		shortcoord_style (dict): If usename False and object positions are input as resolvable names, shortcoord_style sets
 			the coordinate style in output files. Style is one of 'decimal' (deg), 'dms' (degree, minute, second), 
 			or 'hmsdms' (sexagecimal) + kwargs.
@@ -1294,7 +1292,6 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 		clobber (bool): If True, will overwrite existing files with the duplicate names.
 			(Default state -- clobber = False -- is recommended.)
 		usename (bool): If True, use resolvable object name (from obj) if provided in generating output files. 
-			(Experimental and not yet fully tested.)
 		shortcoord_style (dict): If usename False and object positions are input as resolvable names, shortcoord_style sets
 			the coordinate style in output files. Style is one of 'decimal' (deg), 'dms' (degree, minute, second), 
 			or 'hmsdms' (sexagecimal) + kwargs.
