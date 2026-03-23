@@ -21,4 +21,5 @@ Please include a brief note, including what version of `python` and `spike` you 
 (Please check all that apply.) **Before opening this issue, I have:**
 - [ ] checked the [documentation](https://spike-psf.readthedocs.io)
 - [ ] checked the [FAQs](https://github.com/avapolzin/spike/blob/master/FAQ.md)
+- [ ] checked [discussions](https://github.com/avapolzin/spike/discussions?discussions_q=)
 - [ ] checked [closed issues](https://github.com/avapolzin/spike/issues?q=is%3Aissue%20state%3Aclosed)
