@@ -54,6 +54,8 @@ If you encounter a bug that ultimately traces back to `spike.jwstcal`, `spike.ro
 
 Note that `spike.jwstcal` and `spike.romancal` are dependent on `crds`, which means that the two environment variables CRDS_PATH and CRDS_SERVER_URL must be set according to the instructions [here](https://jwst-pipeline.readthedocs.io/en/latest/jwst/user_documentation/reference_files_crds.html).
 
+As of v1.2.2, `spike` allows users to toggle whether the STScI codes are used (if they are available in the environment) or the `spike` version of the pipeline modules via the "usest" keyword in each of the `spike.psf` functions. There is also the option to install `jwst` and `romancal` from source as extras when installing `spike` (e.g., `pip install spike-psf[stdep]`). The "usest" option has not been tested for all OSes or versions of Python/dependencies and bug reports/version-dependent behavior reports are very welcome.
+
 3. **I'm encountering an AttributeError when I enable parallelization and define my own function to generate PSFs. How do I fix this?**
 
 As it turns out, `multiprocessing` specifically requires that functions be *imported*. It is possible that you will have to create a dummy script that houses your custom PSF generation function. There's a good example of this on [StackOverflow](https://stackoverflow.com/a/42383397) and in the [`spike` tests](https://github.com/avapolzin/spike/blob/master/tests/tests.py).
