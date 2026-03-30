@@ -583,9 +583,8 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	Parameters:
 		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
-		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
-			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
-			should not be specified here. If 'NIRISS' specified alone, assumes the imaging mode.
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). 
+			If 'NIRISS' specified alone, assumes the imaging mode.
 		pos (list): Location of object of interest (spatial and spectral).[X, Y, chip, filter]
 			If None, will find location based on coordinates and instrument/camera.
 		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
@@ -976,9 +975,7 @@ def acsepsf(coords, img, imcam, pos, plot = False, verbose = False,
 	Parameters:
 		coords (str or astropy skycoord object): Coordinates of object of interest.
 		img (str): Path to image for which PSF is generated.
-		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
-			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
-			should not be specified here.
+		imcam (str): Only available for 'ACS/WFC'.
 		pos (list): [X, Y, chip, filter] as output from spike.tools.checkpixloc.
 			If None, will find location based on coordinates and instrument/camera.
 		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
@@ -992,10 +989,17 @@ def acsepsf(coords, img, imcam, pos, plot = False, verbose = False,
 			(Default state -- clobber = False -- is recommended.)
 	"""
 
+	if imcam.upper() != 'ACS/WFC':
+		raise ValueError("ACS ePSFs will not work with %s. Please select a different PSF generation method."%imcam)
+
 	x, y, chip, filt = pos
 	xin, yin = int(x), int(y) #pixel position for interpolation
 	xad, yad = x - xin, y - yin #fine adjustment for interpolation
 	chip = 'WFC'+str(chip)
+
+	acs_epsf_allowed = ['F435W', 'F475W', 'F502N', 'F555W', 'F606W', 'F625W', 'F658N', 'F660N', 'F775W', 'F814W', 'F850LP']
+	if filt not in acs_epsf_allowed:
+		raise ValueError("ACS ePSFs not available for %s. Please select a different PSF generation method."%filt)	
 
 	prefix = img.split('/')[-1].split('_')[0]
 	psfgrid = glob.glob(img[:img.index(prefix)] + prefix + '-STDPBF_ACSWFC_' + filt + '_*')
