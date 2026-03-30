@@ -16,8 +16,9 @@ If you use this package or the scripts in `the repository <https://github.com/av
 * if you use ``PSFEx`` to generate empirical PSFs: ``PSFEx`` (`Bertin 2011 <https://ui.adsabs.harvard.edu/abs/2011ASPC..442..435B/abstract>`_) and ``SExtractor`` (`Bertin & Arnauts 1996 <https://ui.adsabs.harvard.edu/abs/1996A%26AS..117..393B/abstract>`_)
 * if you use ePSFs: ``photutils`` (`Bradley et al. 2024 <https://zenodo.org/records/13989456>`_) and `Anderson & King (2000) <https://ui.adsabs.harvard.edu/abs/2000PASP..112.1360A/abstract>`_/`Anderson (2016) <https://ui.adsabs.harvard.edu/abs/2016wfc..rept...12A/abstract>`_
 * if you use STDPSFs: ``photutils`` (`Bradley et al. 2024 <https://zenodo.org/records/13989456>`_) and `Anderson (2016) <https://ui.adsabs.harvard.edu/abs/2016wfc..rept...12A/abstract>`_ + the relevant instrument paper -- MIRI (`Libralato et al. 2024 <https://ui.adsabs.harvard.edu/abs/2024PASP..136c4502L/abstract>`_); NIRISS (`Libralato et al. 2023 <https://ui.adsabs.harvard.edu/abs/2023ApJ...950..101L/abstract>`_) 
+* if you use ACS/WFC Focus-Diverse ePSFs: ``acstools`` (`Lim et al. 2022 <https://zenodo.org/records/7406933>`_), `Bellini et al. (2018) <https://ui.adsabs.harvard.edu/abs/2018acs..rept....8B/abstract>`_, and `Anand et al. (2023) <https://ui.adsabs.harvard.edu/abs/2023acs..rept....6A/abstract>`_
 
-Note that the BibTex for all of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.
+Note that the BibTeX for most of these references is included in the ``spike`` `paper.bib <https://github.com/avapolzin/spike/blob/master/paper/paper.bib>`_.
 
 
 See a (mostly) complete and up-to-date list of papers that cite ``spike`` `here <https://ui.adsabs.harvard.edu/search/q=citations(bibcode%3A2025JOSS...10.8200P)>`_.

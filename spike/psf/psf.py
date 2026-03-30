@@ -56,8 +56,8 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		inst (str): 'ACS', 'WFC3', 'WFPC', 'WFPC2', NICMOS'
 		camera (str): 'WFC', 'HRC' (ACS), 'UVIS', 'IR' (WFC3) -- MUST BE SPECIFIED FOR ACS, WFC3 (if not specified, 
 			will ask for input)
-		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical),
-				'epsf' (empirical), 'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
+		method (str): 'TinyTim', 'TinyTim_Gillis', 'STDPSF' (empirical), 'epsf' (empirical), 'ACS_ePSF' (empirical),
+				'PSFEx' (empirical) -- see spike.psfgen for details -- or 'USER';
 				if 'USER', usermethod should be a function that generates, or path to a directory of user-generated, PSFs 
 				named [imgprefix]_[obj]_[band]_topsf.fits, e.g., imgprefix_23.31+30.12_F814W_topsf.fits or 
 				imgprefix_195.78-46.52_F555W_topsf.fits
@@ -147,7 +147,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		# drizzleparams['updatewcs'] = True
 
 	genpsf = True
-	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'STDPSF', 'EPSF', 'PSFEX', 'USER']:
+	if method.upper() not in ['TINYTIM', 'TINYTIM_GILLIS', 'STDPSF', 'EPSF', 'PSFEX', 'ACS_EPSF', 'USER']:
 		raise Exception('method must be one of TINYTIM, TINYTIM_GILLIS, STDPSF, EPSF, PSFEX, USER')
 	if method.upper() == 'TINYTIM':
 		if inst.upper() == 'WFC3':
@@ -166,6 +166,11 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		psffunc = psfgen.effpsf
 	if method.upper() == 'PSFEX':
 		psffunc = psfgen.psfex
+	if method.upper() == 'ACS_EPSF':
+		acs_epsf_allowed = ['F435W', 'F475W', 'F502N', 'F555W', 'F606W', 'F625W', 'F658N', 'F660N', 'F775W', 'F814W', 'F850LP']
+		if (inst.upper() != 'ACS') and (camera.upper() != 'WFC'):
+			raise ValueError("ACS ePSFs will not work with %s. Please select a different PSF generation method."%imcam)
+		psffunc = psfgen.acsepsf
 	if method.upper() == 'USER':
 		if type(usermethod) == str: #check if user input is path to directory
 			genpsf = False
@@ -241,6 +246,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 					drizzlelist[obj][pos[3]].append(modname)
 					imglist[obj][pos[3]].append(i)
 
+					if (method.upper() == 'ACS_EPSF') and (pos[3] not in acs_epsf_allowed):
+						raise ValueError("ACS ePSFs not available for %s. Please select a different PSF generation method."%pos[3])
+					
 					psffunc(skycoords, i, imcam, pos, plot, verbose, **kwargs)
 
 					if usename and isname:
@@ -297,6 +305,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
 
+							if (method.upper() == 'ACS_EPSF') and (pos[3] not in acs_epsf_allowed):
+								raise ValueError("ACS ePSFs not available for %s. Please select a different PSF generation method."%pos[3])
+
 							pool.apply_async(psffunc, args = (coord, i, imcam, pos, plot, verbose), 
 								kwds = dict(kwargs, clobber = clobber))
 
@@ -342,6 +353,9 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 								imglist[obj[j]][pos[3]] = []
 							drizzlelist[obj[j]][pos[3]].append(modname)
 							imglist[obj[j]][pos[3]].append(i)
+
+						if (method.upper() == 'ACS_EPSF') and (pos[3] not in acs_epsf_allowed):
+							raise ValueError("ACS ePSFs not available for %s. Please select a different PSF generation method."%pos[3])
 
 						psffunc(coord, i, imcam, pos, plot, verbose, clobber = clobber, **kwargs)
 

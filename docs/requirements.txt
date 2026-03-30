@@ -4,6 +4,7 @@ nbsphinx
 nbsphinx-link
 docutils==0.21.2
 ipython
+acstools
 asdf
 astropy
 crds

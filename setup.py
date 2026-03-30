@@ -22,7 +22,7 @@ setuptools.setup(
 		"Topic :: Scientific/Engineering :: Astronomy",
 		"Topic :: Scientific/Engineering :: Physics"],
 	python_requires = ">=3.11",
-	install_requires = ["asdf", "astropy", "crds", "drizzle", 
+	install_requires = ["acstools", "asdf", "astropy", "crds", "drizzle", 
 	"drizzlepac @ git+https://github.com/spacetelescope/drizzlepac.git", 
 	"gwcs", "jsonschema", "matplotlib", "numpy", "photutils", "psutil", "pyyaml", 
 	"roman-datamodels==0.22.0", "scipy", "spherical-geometry", "stdatamodels", 

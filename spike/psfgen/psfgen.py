@@ -1,8 +1,10 @@
+from acstools.focus_diverse_epsfs import psf_retriever, interp_epsf
 import astropy
 from astropy.io import fits
 from astropy.nddata import NDData
 from astropy.stats import sigma_clipped_stats
 from astropy.table import Table
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -964,5 +966,87 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	return psfmodel
 
 
-	
+def acsepsf(coords, img, imcam, pos, plot = False, verbose = False, 
+	writeto = True, clobber = False):
+	"""
+	Generate ACS/WFC Focus-Diverse ePSFs from STScI web tool.
 
+	Works for only most popular filters: F435W, F475W, F502N, F555W, F606W, F625W, F658N, F660N, F775W, F814W, F850LP
+
+	Parameters:
+		coords (str or astropy skycoord object): Coordinates of object of interest.
+		img (str): Path to image for which PSF is generated.
+		imcam (str): Specification of instrument/camera used to capture the images (e.g., 'ACS/WFC', 'WFC3/IR', 'WFPC', 
+			'WFPC2', 'MIRI', 'NIRCAM', 'NIRISS/Imaging'). For 'WFPC' and 'WFPC2', the camera is selected by-chip and 
+			should not be specified here.
+		pos (list): [X, Y, chip, filter] as output from spike.tools.checkpixloc.
+			If None, will find location based on coordinates and instrument/camera.
+		plot (bool): If True, saves .pngs of the model PSFs. (Not affected by clobber; 
+			images with the same name are overwritten by default.)
+		verbose (bool): If True, prints progress messages.
+		writeto (bool): If True, will write 2D model PSF (differentiated with '_topsf' 
+			suffix) and will amend relevant image WCS information/remove extraneous extensions. 
+			This is in addition to the .psf file saved by PSFEx. No 2D PSF model is saved by PSFEx 
+			by default, but this can be toggled in the tools.pypsfex arguments.
+		clobber (bool): If True, will overwrite existing files with the same name on save.
+			(Default state -- clobber = False -- is recommended.)
+	"""
+
+	x, y, chip, filt = pos
+	xin, yin = int(x), int(y) #pixel position for interpolation
+	xad, yad = x - xin, y - yin #fine adjustment for interpolation
+	chip = 'WFC'+str(chip)
+
+	prefix = img.split('/')[-1].split('_')[0]
+	psfgrid = glob.glob(img[:img.index(prefix)] + prefix + '-STDPBF_ACSWFC_' + filt + '_*')
+	if len(psfgrid) >= 1:
+		if verbose:
+			print('Existing model grid found for %s. Attempting to open.'%prefix)
+		try:
+			if verbose:
+				print('Reading ePSF model grid.')
+			psfs = fits.open(psfgrid)
+		except:
+			if verbose:
+				print('Existing grid did not open. Retrieving new ePSF models.')
+			psfgrid = psf_retriever(prefix, location = img[:img.index(prefix)])
+			if verbose:
+				print('Reading ePSF model grid.')
+			psfs = fits.open(psfgrid)
+
+	if len(psfgrid) == 0:
+		if verbose:
+			print('Retrieving ePSF models.')
+		psfgrid = psf_retriever(prefix, location = img[:img.index(prefix)])
+		if verbose:
+			print('Reading ePSF model grid.')
+		psfs = fits.open(psfgrid)
+
+	if verbose:
+		print('Interpolating ePSF model grid.')
+	psfmodel = interp_epsf(psfs, xin, yin, chip, pixel_space=True, subpixel_x=xad, subpixel_y=yad)
+
+	coordstring = str(coords.ra)
+	if coords.dec.deg >= 0:
+		coordstring += '+'+str(coords.dec)
+	if coords.dec.deg < 0:
+		coordstring += str(coords.dec)
+
+	modname = img.replace('.fits', '_'+coordstring+'_%s'%pos[3]+'_psf')
+
+	if plot:
+		fig= plt.figure(figsize = (5, 5))
+		plt.imshow(psfmodel, origin = 'lower', cmap = 'Greys', 
+			vmin = np.nanpercentile(psfmodel, 20), vmax = np.nanpercentile(psfmodel, 97))
+		plt.colorbar()
+		fig.savefig(modname+'.png', bbox_inches = 'tight', dpi = 100)
+
+		if verbose:
+			print('PSF model image written to %s.png'%(modname))
+
+	if writeto:
+		if verbose:
+			print('Writing to %s.fits.'%modname.replace('_psf', '_topsf'))
+		tools.rewrite_fits(psfmodel, coords, img, imcam, pos, method = 'ePSFs', clobber = clobber)
+
+	return psfmodel
