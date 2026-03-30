@@ -13,7 +13,7 @@ Documentation is up to date for the development version.
 * Differentiate at arcsecond-level in output file names given obj as decimal coordinates
 * Add option to prompt for coordinates if object name not resolvable by Simbad, NED
 * Fix bug for objects that fall on chips 5-8 of *HST*/WFPC in ``spike.tools.checkpixloc``
-* Add new PSF generation option for ACS/WFC: focus-diverse ePSFs called via method = 'ACS_ePSF' 
+* Add focus-diverse ePSFs for ACS/WFC called via method = 'ACS_ePSF' 
 
 **v1.2.3 (March 18, 2026)**
 
