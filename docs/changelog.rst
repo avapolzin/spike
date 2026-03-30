@@ -14,7 +14,6 @@ Documentation is up to date for the development version.
 * Add option to prompt for coordinates if object name not resolvable by Simbad, NED
 * Fix bug for objects that fall on chips 5-8 of *HST*/WFPC in ``spike.tools.checkpixloc``
 * Add new PSF generation option for ACS/WFC: focus-diverse ePSFs called via method = 'ACS_ePSF' 
-https://spacetelescope.github.io/hst_notebooks/notebooks/ACS/acs_focus_diverse_epsfs/acs_focus_diverse_epsfs.html
 
 **v1.2.3 (March 18, 2026)**
 
