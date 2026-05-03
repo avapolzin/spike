@@ -11,6 +11,7 @@ Can be installed via GitHub (will be available on PyPI once it's formally releas
 Documentation is up to date for the development version.
 
 * Differentiate at arcsecond-level in output file names given obj as decimal coordinates
+* Ensure PSFs with "long" coordinate names are written with RA in hours for readability
 * Add option to prompt for coordinates if object name not resolvable by Simbad, NED
 * Fix bug for objects that fall on chips 5-8 of *HST*/WFPC in ``spike.tools.checkpixloc``
 * Add focus-diverse ePSFs for ACS/WFC called via method = 'ACS_ePSF' 
@@ -25,7 +26,7 @@ Documentation is up to date for the development version.
 
 * Patch ``pkg_resources`` deprecation while remaining backwards compatible
 * Make explicit default detector x, y alignment in drizzling step in drizzleparams kwargs
-* Enforce "build = True" for ``drizzlepac`` to consistent output file structure
+* Enforce "build = True" for ``drizzlepac`` for consistent output file structure
 * Fix bug with WFC3 resampling when TinyTim model PSFs used
 * Add option to use object name in output files rather than coordinates (experimental)
 * Add option to directly use STScI dependencies, currently no Windows support (experimental)

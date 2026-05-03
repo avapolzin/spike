@@ -285,7 +285,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -334,7 +334,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -388,7 +388,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 				if isname:
 					namestring = obj.replace(':', '').replace(' ', '')
 
-			coordstring = str(coord.ra)
+			coordstring = coord.ra.to_string(u.hour)
 			if coord.dec.deg >= 0:
 				coordstring += '+'+str(coord.dec)
 			if coord.dec.deg < 0:
@@ -904,7 +904,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -950,7 +950,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -1003,7 +1003,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 				if isname:
 					namestring = obj.replace(':', '').replace(' ', '')
 
-			coordstring = str(coord.ra)
+			coordstring = coord.ra.to_string(u.hour)
 			if coord.dec.deg >= 0:
 				coordstring += '+'+str(coord.dec)
 			if coord.dec.deg < 0:
@@ -1464,7 +1464,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -1510,7 +1510,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 							if isname:
 								namestring = obj[j].replace(':', '').replace(' ', '')
 
-						coordstring = str(coord.ra)
+						coordstring = coord.ra.to_string(u.hour)
 						if coord.dec.deg >= 0:
 							coordstring += '+'+str(coord.dec)
 						if coord.dec.deg < 0:
@@ -1564,7 +1564,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 				if isname:
 					namestring = obj.replace(':', '').replace(' ', '')
 
-			coordstring = str(coord.ra)
+			coordstring = coord.ra.to_string(u.hour)
 			if coord.dec.deg >= 0:
 				coordstring += '+'+str(coord.dec)
 			if coord.dec.deg < 0:
