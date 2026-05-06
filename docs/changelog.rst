@@ -5,10 +5,12 @@ Changelog
 
 See below for a record of salient changes to the code itself. Updates to e.g. documentation are not addressed here. The full record of detailed changes is available on `Github <https://github.com/avapolzin/spike/commits/>`_.
 
-**Development version:**
+.. **Development version:**
 
-Can be installed via GitHub (will be available on PyPI once it's formally released).
-Documentation is up to date for the development version.
+.. Can be installed via GitHub (will be available on PyPI once it's formally released).
+.. Documentation is up to date for the development version.
+
+**v1.2.4 (March 18, 2026)**
 
 * Differentiate at arcsecond-level in output file names given obj as decimal coordinates
 * Ensure PSFs with "long" coordinate names are written with RA in hours for readability
