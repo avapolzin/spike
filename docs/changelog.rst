@@ -10,7 +10,7 @@ See below for a record of salient changes to the code itself. Updates to e.g. do
 .. Can be installed via GitHub (will be available on PyPI once it's formally released).
 .. Documentation is up to date for the development version.
 
-**v1.2.4 (March 18, 2026)**
+**v1.2.4 (May 6, 2026)**
 
 * Differentiate at arcsecond-level in output file names given obj as decimal coordinates
 * Ensure PSFs with "long" coordinate names are written with RA in hours for readability
