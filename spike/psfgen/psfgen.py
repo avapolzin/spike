@@ -4,6 +4,7 @@ from astropy.io import fits
 from astropy.nddata import NDData
 from astropy.stats import sigma_clipped_stats
 from astropy.table import Table
+import astropy.units as u
 import glob
 import matplotlib.pyplot as plt
 import numpy as np
@@ -175,7 +176,7 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		spec = 4
 		specparam = specbeta
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -353,7 +354,7 @@ def tinygillispsf(coords, img, imcam, pos, plot = False, verbose = False, keep =
 	
 	from make_psf import make_subsampled_model_psf
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -513,7 +514,7 @@ def stdpsf(coords, img, imcam, pos, plot = False, verbose = False,
 	if (imcam == 'NIRCAM') and (pos[2] not in ['NGCA5', 'NRCB5']):
 		det = stdpsf_jwdet[pos[2]]
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -626,7 +627,7 @@ def jwpsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 
 	x, y, chip, filt = pos
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -746,7 +747,7 @@ def effpsf(coords, img, imcam, pos, plot = False, verbose = False, mask = True, 
 		extv = pos[2]
 
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -940,7 +941,7 @@ def psfex(coords, img, imcam, pos, plot = False, verbose = False, writeto = True
 	if verbose:
 		print('Finished PSFEx, generating image')
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -1031,7 +1032,7 @@ def acsepsf(coords, img, imcam, pos, plot = False, verbose = False,
 		print('Interpolating ePSF model grid.')
 	psfmodel = interp_epsf(psfs, xin, yin, chip, pixel_space=True, subpixel_x=xad, subpixel_y=yad)
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:

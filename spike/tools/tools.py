@@ -613,7 +613,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 		cehdr = fits.ImageHDU(data = ehdrdat, header = imgdat[('ERR', extv)].header, name = 'ERR', ver = 1)
 		cdqhdr = fits.ImageHDU(data = dqhdrdat, header = imgdat[('DQ', extv)].header, name = 'DQ', ver = 1)
 
-	coordstring = str(coords.ra)
+	coordstring = coords.ra.to_string(u.hour)
 	if coords.dec.deg >= 0:
 		coordstring += '+'+str(coords.dec)
 	if coords.dec.deg < 0:
@@ -627,7 +627,7 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 
 	if img.split('_')[-1] == 'c0m.fits':
 		hdlist = [cphdr, cihdr]
-		
+
 	## start of idea to recover whole drizzled image for multi-chip images as an option for the PSF output 
 	## (will call 'context' in addition to 'full' and 'crop')
 	# if img.split('_')[-1] == 'c0m.fits':

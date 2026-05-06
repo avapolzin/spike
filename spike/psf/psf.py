@@ -1,5 +1,6 @@
 import astropy
 from astropy.io import fits
+import astropy.units as u
 from astropy.wcs import WCS, utils
 import glob
 from multiprocessing import Pool, cpu_count
@@ -228,7 +229,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
 
-				coordstring = str(skycoords.ra)
+				coordstring = skycoords.ra.to_string(u.hour)
 				if skycoords.dec.deg >= 0:
 					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg < 0:
@@ -426,7 +427,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 
 	for do in drizzlelist.keys():
 		cstring = tools.objloc(do)
-		coordstring = str(cstring.ra)
+		coordstring = cstring.ra.to_string(u.hour)
 		if cstring.dec.deg >= 0:
 			coordstring += '+'+str(cstring.dec)
 		if cstring.dec.deg < 0:
@@ -491,7 +492,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		if objonly:
 			for do in imglist.keys():
 				cstring = tools.objloc(do)
-				coordstring = str(cstring.ra)
+				coordstring = cstring.ra.to_string(u.hour)
 				if cstring.dec.deg >= 0:
 					coordstring += '+'+str(cstring.dec)
 				if cstring.dec.deg < 0:
@@ -647,14 +648,14 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		returndict = {}
 		for o, do in enumerate(drizzlelist.keys()):
 			if type(obj) == str:
-				coordstring = str(skycoords.ra)
+				coordstring = skycoords.ra.to_string(u.hour)
 				if skycoords.dec.deg >= 0:
 					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg < 0:
 					coordstring += str(skycoords.dec)
 
 			if type(obj) != str:
-				coordstring = str(skycoords[o].ra)
+				coordstring = skycoords[o].ra.to_string(u.hour)
 				if skycoords[o].dec.deg >= 0:
 					coordstring += '+'+str(skycoords[o].dec)
 				if skycoords[o].dec.deg < 0:
@@ -851,7 +852,7 @@ def jwst(img_dir, obj, inst, img_type = 'cal', camera = None, method = 'WebbPSF'
 
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
-				coordstring = str(skycoords.ra)
+				coordstring = skycoords.ra.to_string(u.hour)
 				if skycoords.dec.deg >= 0:
 					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg < 0:
@@ -1411,7 +1412,7 @@ def roman(img_dir, obj, inst, img_type= 'cal', file_type = 'fits', camera = None
 
 			for i in imgs:
 				pos = tools.checkpixloc(skycoords, i, inst, camera)
-				coordstring = str(skycoords.ra)
+				coordstring = skycoords.ra.to_string(u.hour)
 				if skycoords.dec.deg >= 0:
 					coordstring += '+'+str(skycoords.dec)
 				if skycoords.dec.deg < 0:
