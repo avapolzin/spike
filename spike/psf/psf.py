@@ -123,6 +123,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 	if inst.upper() in ['WFPC1', 'WFPC2', 'NICMOS', 'STIS']:
 		imcam = inst.upper()
 
+
 	if inst.upper() == 'WFPC2':
 		## following https://spacetelescope.github.io/notebooks/notebooks/DrizzlePac/drizzle_wfpc2/drizzle_wfpc2.html
 		## as feeding updatewcs to tweakparams and drizzleparams does not work as it is supposed to
@@ -203,6 +204,7 @@ def hst(img_dir, obj, img_type, inst, camera = None, method='TinyTim', usermetho
 		# to overuse of RAM	
 		for fk in filelist.keys():
 			tweakreg.TweakReg(filelist[fk], **tweakparams)
+
 
 	drizzlelist = {} #write file prefixes to drizzle per object per filter
 	imglist = {} #images to drizzle per object per filter (used if objonly = True)

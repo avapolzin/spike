@@ -192,21 +192,22 @@ def tinypsf(coords, img, imcam, pos, plot = False, verbose = False, writeto = Tr
 		spec, specparam, fov_arcsec, despace, modname]
 	if imcam in ['WFPC1', 'WFPC']:
 		if pos[2] <= 4:
-			imcam = 'WFPC/WFC'
+			imcam_ = 'WFPC/WFC'
 		if pos[2] >= 5:
-			imcam = 'WFPC/PC'
+			imcam_ = 'WFPC/PC'
 		imfits = fits.open(img)
 		yyyy, mm, dd = imfits[0].header['DATE'].split('T')[0].split('-')
-		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 
+		command_list = [tinyparams['imcam'][imcam_], pos[2], '%i %i'%(pos[0], pos[1]), 
 		'%i %i %i'%(dd, mm, yyyy), pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
 	if (imcam == 'WFPC2') and (pos[2] == 1):
-		imcam = 'WFPC2/PC'
-		command_list = [tinyparams['imcam'][imcam], '%i %i'%(pos[0], pos[1]), 
+		imcam_ = 'WFPC2/PC'
+		command_list = [tinyparams['imcam'][imcam_], '%i %i'%(pos[0], pos[1]), 
 		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
 	if (imcam == 'WFPC2') and (pos[2] >= 2):
-		imcam = 'WFPC2/WFC'
-		command_list = [tinyparams['imcam'][imcam], pos[2], '%i %i'%(pos[0], pos[1]), 
+		imcam_ = 'WFPC2/WFC'
+		command_list = [tinyparams['imcam'][imcam_], pos[2], '%i %i'%(pos[0], pos[1]), 
 		pos[3], spec, specparam, fov_arcsec, 'N', despace, modname]
+
 
 
 	if verbose:

@@ -190,7 +190,7 @@ def checkpixloc(coords, img, inst, camera = None):
 			chips = [chip1, chip2, chip3, chip4]
 
 		chip = np.nan
-		for a in chips:
+		for aa, a in enumerate(chips):
 			wcs1 = WCS(a.header, fobj = hdu)
 			datshape = a.data.shape[::-1] #transposed based on numpy vs. fits preference
 			if type(coords) != astropy.coordinates.sky_coordinate.SkyCoord:
@@ -202,10 +202,11 @@ def checkpixloc(coords, img, inst, camera = None):
 					if np.logical_and(0 <= check[0] <= datshape[0], 0 <= check[1] <= datshape[1]):
 						xcoord_out.append(check[0])
 						ycoord_out.append(check[1])
-						if a == chip1:
-							chip_out.append('1')
-						if a == chip2:
-							chip_out.append('2')
+						# if a == chip1: ## will remove once I confirm that the simpler line works
+						# 	chip_out.append('1')
+						# if a == chip2:
+						# 	chip_out.append('2')
+						chip_out.append(str(1 + aa))
 				if len(xcoord_out) >= 1:
 					out = [[float(xcoord_out[i]), float(ycoord_out[i]), chip_out[i], filt] for i in range(len(coords))]
 				if len(xcoord_out) == 0:
@@ -600,7 +601,11 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 		hdr['COMMENT'] = "PSF generated using %s via spike."%method
 	if not method:
 		hdr['COMMENT'] = "PSF generated via spike."
+
 	cihdr = fits.ImageHDU(data = psfim, header = hdr, name = 'SCI', ver = 1)
+
+	if img.split('_')[-1] == 'c0m.fits':
+		c1mhdr = fits.ImageHDU(data = np.zeros_like(psfim, dtype = np.int16), header = hdr, name = 'SCI', ver = 1)
 
 	if img.split('_')[-1] != 'c0m.fits':
 		ehdrdat = np.zeros_like(imgdat[('ERR', extv)].data) #shouldn't matter, but doing this explicitly anyway
@@ -622,6 +627,20 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 
 	if img.split('_')[-1] == 'c0m.fits':
 		hdlist = [cphdr, cihdr]
+		
+	## start of idea to recover whole drizzled image for multi-chip images as an option for the PSF output 
+	## (will call 'context' in addition to 'full' and 'crop')
+	# if img.split('_')[-1] == 'c0m.fits':
+	# 	## recreate the structure of the original file if WFPC2
+	# 	# hdlist = [cphdr, cihdr]
+	# 	hdlist = [cphdr]
+	# 	hdlist_c1m = [cphdr] ## create matching DQ arrays
+	# 	for ext_ in [1, 2, 3, 4]:
+	# 		hdlist_c1m.append(fits.ImageHDU(data = np.zeros_like(psfim, dtype = np.int16), header = imgdat[ext_].header, name = 'SCI', ver = ext_))
+	# 		if ext_ != ext:
+	# 			hdlist.append(fits.ImageHDU(data = np.zeros_like(psfim), header = imgdat[ext_].header, name = 'SCI', ver = ext_))
+	# 		if ext_ == ext:
+	# 			hdlist.append(fits.ImageHDU(data = psfim, header = imgdat[ext].header, name = 'SCI', ver = ext))
 
 	try: #get WCSDVARR
 		dp1 = hdr['DP1']
@@ -681,7 +700,9 @@ def rewrite_fits(psfarr, coords, img, imcam, pos, method = None, clobber = False
 	if img.split('_')[-1] == 'c0m.fits':
 		modname = modname.replace('_topsf.fits', '_topsf_c0m.fits')
 		hdulist.writeto(modname, overwrite = clobber)
-		os.system('cp %s %s'%(img.replace('c0m.fits', 'c1m.fits'), modname.replace('c0m.fits', 'c1m.fits')))
+		
+		#write DQ arrays, all with no flags
+		fits.HDUList([cphdr, c1mhdr]).writeto(modname.replace('c0m.fits', 'c1m.fits'))
 
 
 def mask_fits(img, ext = 1, maskdq = True, dqthresh = 0, maskerr = False, 

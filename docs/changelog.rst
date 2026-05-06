@@ -14,7 +14,8 @@ Documentation is up to date for the development version.
 * Ensure PSFs with "long" coordinate names are written with RA in hours for readability
 * Add option to prompt for coordinates if object name not resolvable by Simbad, NED
 * Fix bug for objects that fall on chips 5-8 of *HST*/WFPC in ``spike.tools.checkpixloc``
-* Add focus-diverse ePSFs for ACS/WFC called via method = 'ACS_ePSF' 
+* Add focus-diverse ePSFs for ACS/WFC called via method = 'ACS_ePSF'
+* Fix bug impacting WFPC and WFPC2 WF chips when using ``TinyTim`` PSF modeling 
 
 **v1.2.3 (March 18, 2026)**
 
